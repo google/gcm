@@ -24,7 +24,7 @@
   <property name="dist" location="dist" />
   <property name="jar" value="${dist}/gcm.jar" />
   <property name="src-jar" value="${dist}/gcm-src.jar" />
-  <property name="demo-dir" value="${basedir}/../samples/gcm-demo-app" />
+  <property name="demo-dir" value="${basedir}/../samples/gcm-demo-client" />
 
   <path id="compile.classpath">
     <fileset dir="${lib}">
