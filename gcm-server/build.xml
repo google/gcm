@@ -27,7 +27,8 @@
   <property name="dist"  location="dist"/>
   <property name="jar" value="${dist}/gcm-server.jar"/>
   <property name="src-jar" value="${dist}/gcm-server-src.jar"/>
-  <property name="demo-dir" value="${basedir}/../gcm-demo-server"/>
+  <property name="demo-dir" value="${basedir}/../samples/gcm-demo-server"/>
+  <property name="demo-appengine-dir" value="${basedir}/../samples/gcm-demo-appengine"/>
 
   <path id="compile.classpath">
     <fileset dir="${lib}">
@@ -117,6 +118,7 @@
 
   <target name="update-demo" depends="jar" description="Generates a new GCM server library JAR and copy it to the demo project.">
     <copy file="${jar}" todir="${demo-dir}/WebContent/WEB-INF/lib"/>
+    <copy file="${jar}" todir="${demo-appengine-dir}/WebContent/WEB-INF/lib"/>
   </target>
 
 </project>

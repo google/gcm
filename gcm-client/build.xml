@@ -24,7 +24,7 @@
   <property name="dist" location="dist" />
   <property name="jar" value="${dist}/gcm.jar" />
   <property name="src-jar" value="${dist}/gcm-src.jar" />
-  <property name="demo-dir" value="${basedir}/../gcm-demo-app" />
+  <property name="demo-dir" value="${basedir}/../samples/gcm-demo-app" />
 
   <path id="compile.classpath">
     <fileset dir="${lib}">
@@ -46,6 +46,7 @@
   </target>
 
   <target name="compile" depends="init" description="Generate the GCM client library.">
+
     <javac destdir="${classes}" debug="true" srcdir="${src}"
       includeantruntime="false">
       <classpath refid="compile.classpath" />
