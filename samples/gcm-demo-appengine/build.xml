@@ -47,6 +47,10 @@
 
   <target name="clean" description="Clean all artifacts except the dist files.">
     <delete dir="${build}"/>
+    <delete dir="${classes}"/>
+    <delete>
+      <fileset dir="${web-lib}" excludes="gcm-server.jar,json_simple*.jar"/>
+    </delete>
   </target>
 
   <target name="full-clean" depends="clean" description="Clean all artifacts including the dist files.">
