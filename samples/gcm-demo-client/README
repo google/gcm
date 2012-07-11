@@ -3,7 +3,7 @@ GCM demo app
 
 1.To create the project settings, type:
 
-  android update project --name GCMDemo -p . --target android-8
+  android update project --name GCMDemo -p . --target android-16
 
 2.To build the app, type:
 

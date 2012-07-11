@@ -19,11 +19,13 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Transaction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,11 +40,15 @@ import java.util.logging.Logger;
  */
 public final class Datastore {
 
+  static final int MULTICAST_SIZE = 1000;
   private static final String DEVICE_TYPE = "Device";
   private static final String DEVICE_REG_ID_PROPERTY = "regId";
 
   private static final String MULTICAST_TYPE = "Multicast";
   private static final String MULTICAST_REG_IDS_PROPERTY = "regIds";
+
+  private static final FetchOptions DEFAULT_FETCH_OPTIONS = FetchOptions.Builder
+      .withPrefetchSize(MULTICAST_SIZE).chunkSize(MULTICAST_SIZE);
 
   private static final Logger logger =
       Logger.getLogger(Datastore.class.getName());
@@ -60,9 +66,22 @@ public final class Datastore {
    */
   public static void register(String regId) {
     logger.info("Registering " + regId);
-    Entity entity = new Entity(DEVICE_TYPE);
-    entity.setProperty(DEVICE_REG_ID_PROPERTY, regId);
-    datastore.put(entity);
+    Transaction txn = datastore.beginTransaction();
+    try {
+      Entity entity = findDeviceByRegId(regId);
+      if (entity != null) {
+        logger.fine(regId + " is already registered; ignoring.");
+        return;
+      }
+      entity = new Entity(DEVICE_TYPE);
+      entity.setProperty(DEVICE_REG_ID_PROPERTY, regId);
+      datastore.put(entity);
+      txn.commit();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
+    }
   }
 
   /**
@@ -72,9 +91,21 @@ public final class Datastore {
    */
   public static void unregister(String regId) {
     logger.info("Unregistering " + regId);
-    Entity entity = findDeviceByRegId(regId);
-    Key key = entity.getKey();
-    datastore.delete(key);
+    Transaction txn = datastore.beginTransaction();
+    try {
+      Entity entity = findDeviceByRegId(regId);
+      if (entity == null) {
+        logger.warning("Device " + regId + " already unregistered");
+      } else {
+        Key key = entity.getKey();
+        datastore.delete(key);
+      }
+      txn.commit();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
+    }
   }
 
   /**
@@ -82,34 +113,81 @@ public final class Datastore {
    */
   public static void updateRegistration(String oldId, String newId) {
     logger.info("Updating " + oldId + " to " + newId);
-    Entity entity = findDeviceByRegId(oldId);
-    if (entity == null) {
-      logger.warning("No device for registration id " + oldId);
-      return;
+    Transaction txn = datastore.beginTransaction();
+    try {
+      Entity entity = findDeviceByRegId(oldId);
+      if (entity == null) {
+        logger.warning("No device for registration id " + oldId);
+        return;
+      }
+      entity.setProperty(DEVICE_REG_ID_PROPERTY, newId);
+      datastore.put(entity);
+      txn.commit();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
     }
-    entity.setProperty(DEVICE_REG_ID_PROPERTY, newId);
-    datastore.put(entity);
   }
 
   /**
    * Gets all registered devices.
    */
   public static List<String> getDevices() {
-    Query query = new Query(DEVICE_TYPE);
-    Iterable<Entity> entities = datastore.prepare(query).asIterable();
-    List<String> devices = new ArrayList<String>();
-    for (Entity entity : entities) {
-      String device = (String) entity.getProperty(DEVICE_REG_ID_PROPERTY);
-      devices.add(device);
+    List<String> devices;
+    Transaction txn = datastore.beginTransaction();
+    try {
+      Query query = new Query(DEVICE_TYPE);
+      Iterable<Entity> entities =
+          datastore.prepare(query).asIterable(DEFAULT_FETCH_OPTIONS);
+      devices = new ArrayList<String>();
+      for (Entity entity : entities) {
+        String device = (String) entity.getProperty(DEVICE_REG_ID_PROPERTY);
+        devices.add(device);
+      }
+      txn.commit();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
     }
     return devices;
+  }
+
+  /**
+   * Gets the number of total devices.
+   */
+  public static int getTotalDevices() {
+    Transaction txn = datastore.beginTransaction();
+    try {
+      Query query = new Query(DEVICE_TYPE).setKeysOnly();
+      List<Entity> allKeys =
+          datastore.prepare(query).asList(DEFAULT_FETCH_OPTIONS);
+      int total = allKeys.size();
+      logger.fine("Total number of devices: " + total);
+      txn.commit();
+      return total;
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
+    }
   }
 
   private static Entity findDeviceByRegId(String regId) {
     Query query = new Query(DEVICE_TYPE)
         .addFilter(DEVICE_REG_ID_PROPERTY, FilterOperator.EQUAL, regId);
     PreparedQuery preparedQuery = datastore.prepare(query);
-    Entity entity = preparedQuery.asSingleEntity();
+    List<Entity> entities = preparedQuery.asList(DEFAULT_FETCH_OPTIONS);
+    Entity entity = null;
+    if (!entities.isEmpty()) {
+      entity = entities.get(0);
+    }
+    int size = entities.size();
+    if (size > 0) {
+      logger.severe(
+          "Found " + size + " entities for regId " + regId + ": " + entities);
+    }
     return entity;
   }
 
@@ -122,12 +200,21 @@ public final class Datastore {
    */
   public static String createMulticast(List<String> devices) {
     logger.info("Storing multicast for " + devices.size() + " devices");
-    Entity entity = new Entity(MULTICAST_TYPE);
-    entity.setProperty(MULTICAST_REG_IDS_PROPERTY, devices);
-    datastore.put(entity);
-    Key key = entity.getKey();
-    String encodedKey = KeyFactory.keyToString(key);
-    logger.fine("multicast key: " + encodedKey);
+    String encodedKey;
+    Transaction txn = datastore.beginTransaction();
+    try {
+      Entity entity = new Entity(MULTICAST_TYPE);
+      entity.setProperty(MULTICAST_REG_IDS_PROPERTY, devices);
+      datastore.put(entity);
+      Key key = entity.getKey();
+      encodedKey = KeyFactory.keyToString(key);
+      logger.fine("multicast key: " + encodedKey);
+      txn.commit();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
+    }
     return encodedKey;
   }
 
@@ -140,15 +227,21 @@ public final class Datastore {
   public static List<String> getMulticast(String encodedKey) {
     Key key = KeyFactory.stringToKey(encodedKey);
     Entity entity;
+    Transaction txn = datastore.beginTransaction();
     try {
       entity = datastore.get(key);
       @SuppressWarnings("unchecked")
       List<String> devices =
           (List<String>) entity.getProperty(MULTICAST_REG_IDS_PROPERTY);
+      txn.commit();
       return devices;
     } catch (EntityNotFoundException e) {
       logger.severe("No entity for key " + key);
       return Collections.emptyList();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
     }
   }
 
@@ -162,14 +255,22 @@ public final class Datastore {
   public static void updateMulticast(String encodedKey, List<String> devices) {
     Key key = KeyFactory.stringToKey(encodedKey);
     Entity entity;
+    Transaction txn = datastore.beginTransaction();
     try {
-      entity = datastore.get(key);
-    } catch (EntityNotFoundException e) {
-      logger.severe("No entity for key " + key);
-      return;
+      try {
+        entity = datastore.get(key);
+      } catch (EntityNotFoundException e) {
+        logger.severe("No entity for key " + key);
+        return;
+      }
+      entity.setProperty(MULTICAST_REG_IDS_PROPERTY, devices);
+      datastore.put(entity);
+      txn.commit();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
     }
-    entity.setProperty(MULTICAST_REG_IDS_PROPERTY, devices);
-    datastore.put(entity);
   }
 
   /**
@@ -179,8 +280,16 @@ public final class Datastore {
    * @param encodedKey encoded key for the persistent record.
    */
   public static void deleteMulticast(String encodedKey) {
-    Key key = KeyFactory.stringToKey(encodedKey);
-    datastore.delete(key);
+    Transaction txn = datastore.beginTransaction();
+    try {
+      Key key = KeyFactory.stringToKey(encodedKey);
+      datastore.delete(key);
+      txn.commit();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
+    }
   }
 
 }

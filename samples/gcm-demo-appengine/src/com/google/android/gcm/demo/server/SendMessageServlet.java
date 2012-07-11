@@ -146,17 +146,17 @@ public class SendMessageServlet extends BaseServlet {
     }
   }
 
-  private void sendMulticastMessage(String encodedKey,
+  private void sendMulticastMessage(String multicastKey,
       HttpServletResponse resp) {
     // Recover registration ids from datastore
-    List<String> regIds = Datastore.getMulticast(encodedKey);
+    List<String> regIds = Datastore.getMulticast(multicastKey);
     Message message = new Message.Builder().build();
     MulticastResult multicastResult;
     try {
       multicastResult = sender.sendNoRetry(message, regIds);
     } catch (IOException e) {
       logger.log(Level.SEVERE, "Exception posting " + message, e);
-      multicastDone(resp, encodedKey);
+      multicastDone(resp, multicastKey);
       return;
     }
     boolean allDone = true;
@@ -191,13 +191,13 @@ public class SendMessageServlet extends BaseServlet {
       }
       if (!retriableRegIds.isEmpty()) {
         // update task
-        Datastore.updateMulticast(encodedKey, retriableRegIds);
+        Datastore.updateMulticast(multicastKey, retriableRegIds);
         allDone = false;
         retryTask(resp);
       }
     }
     if (allDone) {
-      multicastDone(resp, encodedKey);
+      multicastDone(resp, multicastKey);
     } else {
       retryTask(resp);
     }

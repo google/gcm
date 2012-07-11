@@ -19,8 +19,11 @@ import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
 
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.api.taskqueue.TaskOptions.Method;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -52,15 +55,35 @@ public class SendAllMessagesServlet extends BaseServlet {
       if (devices.size() == 1) {
         // send a single message using plain post
         String device = devices.get(0);
-        queue.add(withUrl("/sendMessage").param(
+        queue.add(withUrl("/send").param(
             SendMessageServlet.PARAMETER_DEVICE, device));
         status = "Single message queued for registration id " + device;
       } else {
         // send a multicast message using JSON
-        String key = Datastore.createMulticast(devices);
-        queue.add(withUrl("/sendMessage").param(
-            SendMessageServlet.PARAMETER_MULTICAST, key));
-        status = "Multicast message queued for " + devices.size() + " devices";
+        // must split in chunks of 1000 devices (GCM limit)
+        int total = devices.size();
+        List<String> partialDevices = new ArrayList<String>(total);
+        int counter = 0;
+        int tasks = 0;
+        for (String device : devices) {
+          counter++;
+          partialDevices.add(device);
+          int partialSize = partialDevices.size();
+          if (partialSize == Datastore.MULTICAST_SIZE || counter == total) {
+            String multicastKey = Datastore.createMulticast(partialDevices);
+            logger.fine("Queuing " + partialSize + " devices on multicast " +
+                multicastKey);
+            TaskOptions taskOptions = TaskOptions.Builder
+                .withUrl("/send")
+                .param(SendMessageServlet.PARAMETER_MULTICAST, multicastKey)
+                .method(Method.POST);
+            queue.add(taskOptions);
+            partialDevices.clear();
+            tasks++;
+          }
+        }
+        status = "Queued tasks to send " + tasks + " multicast messages to " +
+            total + " devices";
       }
     }
     req.setAttribute(HomeServlet.ATTRIBUTE_STATUS, status.toString());
