@@ -150,8 +150,8 @@ public class SenderTest {
     verify(sender, times(retries)).sleep(capturedSleep.capture());
     long backoffRange = Sender.BACKOFF_INITIAL_DELAY;
     for (long value : capturedSleep.getAllValues()) {
-      assertTrue(value > backoffRange / 2);
-      assertTrue(value < backoffRange * 3 / 2);
+      assertTrue(value >= backoffRange / 2);
+      assertTrue(value <= backoffRange * 3 / 2);
       if (2 * backoffRange < Sender.MAX_BACKOFF_DELAY) {
         backoffRange *= 2;
       }
