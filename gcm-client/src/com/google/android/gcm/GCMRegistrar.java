@@ -31,6 +31,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.util.Log;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +44,14 @@ import java.util.Set;
  */
 public final class GCMRegistrar {
 
+    /**
+     * Default lifespan (7 days) of the {@link #isRegisteredOnServer(Context)}
+     * flag until it is considered expired.
+     */
+    // NOTE: cannot use TimeUnit.DAYS because it's not available on API Level 8
+    public static final long DEFAULT_ON_SERVER_LIFESPAN_MS =
+            1000 * 3600 * 24 * 7;
+
     private static final String TAG = "GCMRegistrar";
     private static final String BACKOFF_MS = "backoff_ms";
     private static final String GSF_PACKAGE = "com.google.android.gsf";
@@ -51,6 +60,10 @@ public final class GCMRegistrar {
     private static final String PROPERTY_REG_ID = "regId";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final String PROPERTY_ON_SERVER = "onServer";
+    private static final String PROPERTY_ON_SERVER_EXPIRATION_TIME =
+            "onServerExpirationTime";
+    private static final String PROPERTY_ON_SERVER_LIFESPAN =
+            "onServerLifeSpan";
 
     /**
      * {@link GCMBroadcastReceiver} instance used to handle the retry intent.
@@ -176,7 +189,7 @@ public final class GCMRegistrar {
         // make sure receivers match
         for (ResolveInfo receiver : receivers) {
             String name = receiver.activityInfo.name;
-            if (! allowedReceivers.contains(name)) {
+            if (!allowedReceivers.contains(name)) {
                 throw new IllegalStateException("Receiver " + name +
                         " is not set with permission " +
                         GCMConstants.PERMISSION_GCM_INTENTS);
@@ -205,7 +218,7 @@ public final class GCMRegistrar {
     }
 
     static void internalRegister(Context context, String... senderIds) {
-        if (senderIds == null || senderIds.length == 0 ) {
+        if (senderIds == null || senderIds.length == 0) {
             throw new IllegalArgumentException("No senderIds");
         }
         StringBuilder builder = new StringBuilder(senderIds[0]);
@@ -252,7 +265,7 @@ public final class GCMRegistrar {
     }
 
     static void internalUnregister(Context context) {
-        Log.v(TAG, "Unregistering app "  + context.getPackageName() );
+        Log.v(TAG, "Unregistering app "  + context.getPackageName());
         Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_UNREGISTRATION);
         intent.setPackage(GSF_PACKAGE);
         intent.putExtra(GCMConstants.EXTRA_APPLICATION_PENDING_INTENT,
@@ -342,20 +355,66 @@ public final class GCMRegistrar {
      */
     public static void setRegisteredOnServer(Context context, boolean flag) {
         final SharedPreferences prefs = getGCMPreferences(context);
-        Log.v(TAG, "Setting registered on server status as: " + flag);
         Editor editor = prefs.edit();
         editor.putBoolean(PROPERTY_ON_SERVER, flag);
+        // set the flag's expiration date
+        long lifespan = getRegisterOnServerLifespan(context);
+        long expirationTime = System.currentTimeMillis() + lifespan;
+        Log.v(TAG, "Setting registeredOnServer status as " + flag + " until " +
+                new Timestamp(expirationTime));
+        editor.putLong(PROPERTY_ON_SERVER_EXPIRATION_TIME, expirationTime);
         editor.commit();
     }
 
     /**
-     * Checks whether the device was successfully registered in the server side.
+     * Checks whether the device was successfully registered in the server side,
+     * as set by {@link #setRegisteredOnServer(Context, boolean)}.
+     *
+     * <p>To avoid the scenario where the device sends the registration to the
+     * server but the server loses it, this flag has an expiration date, which
+     * is {@link #DEFAULT_ON_SERVER_LIFESPAN_MS} by default (but can be changed
+     * by {@link #setRegisterOnServerLifespan(Context, long)}).
      */
     public static boolean isRegisteredOnServer(Context context) {
         final SharedPreferences prefs = getGCMPreferences(context);
         boolean isRegistered = prefs.getBoolean(PROPERTY_ON_SERVER, false);
         Log.v(TAG, "Is registered on server: " + isRegistered);
+        if (isRegistered) {
+            // checks if the information is not stale
+            long expirationTime =
+                    prefs.getLong(PROPERTY_ON_SERVER_EXPIRATION_TIME, -1);
+            if (System.currentTimeMillis() > expirationTime) {
+                Log.v(TAG, "flag expired on: " + new Timestamp(expirationTime));
+                return false;
+            }
+        }
         return isRegistered;
+    }
+
+    /**
+     * Gets how long (in milliseconds) the {@link #isRegistered(Context)}
+     * property is valid.
+     *
+     * @return value set by {@link #setRegisteredOnServer(Context, boolean)} or
+     *      {@link #DEFAULT_ON_SERVER_LIFESPAN_MS} if not set.
+     */
+    public static long getRegisterOnServerLifespan(Context context) {
+        final SharedPreferences prefs = getGCMPreferences(context);
+        long lifespan = prefs.getLong(PROPERTY_ON_SERVER_LIFESPAN,
+                DEFAULT_ON_SERVER_LIFESPAN_MS);
+        return lifespan;
+    }
+
+    /**
+     * Sets how long (in milliseconds) the {@link #isRegistered(Context)}
+     * flag is valid.
+     */
+    public static void setRegisterOnServerLifespan(Context context, 
+            long lifespan) {
+        final SharedPreferences prefs = getGCMPreferences(context);
+        Editor editor = prefs.edit();
+        editor.putLong(PROPERTY_ON_SERVER_LIFESPAN, lifespan);
+        editor.commit();
     }
 
     /**
@@ -364,7 +423,7 @@ public final class GCMRegistrar {
     private static int getAppVersion(Context context) {
         try {
             PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(),0);
+                    .getPackageInfo(context.getPackageName(), 0);
             return packageInfo.versionCode;
         } catch (NameNotFoundException e) {
             // should never happen

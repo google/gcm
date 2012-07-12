@@ -13,4 +13,4 @@ GCM demo app
 
 3.To install the app, type
 
-  adb install -r ./bin/GCMDemo-debug.apk
+  ant installd
