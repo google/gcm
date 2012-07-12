@@ -218,6 +218,18 @@ public final class GCMRegistrar {
     }
 
     static void internalRegister(Context context, String... senderIds) {
+        String flatSenderIds = getFlatSenderId(senderIds);
+        Log.v(TAG, "Registering app "  + context.getPackageName() +
+                " of senders " + flatSenderIds);
+        Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_REGISTRATION);
+        intent.setPackage(GSF_PACKAGE);
+        intent.putExtra(GCMConstants.EXTRA_APPLICATION_PENDING_INTENT,
+                PendingIntent.getBroadcast(context, 0, new Intent(), 0));
+        intent.putExtra(GCMConstants.EXTRA_SENDER, flatSenderIds);
+        context.startService(intent);
+    }
+
+    static String getFlatSenderId(String... senderIds) {
         if (senderIds == null || senderIds.length == 0) {
             throw new IllegalArgumentException("No senderIds");
         }
@@ -225,15 +237,7 @@ public final class GCMRegistrar {
         for (int i = 1; i < senderIds.length; i++) {
             builder.append(',').append(senderIds[i]);
         }
-        String senders = builder.toString();
-        Log.v(TAG, "Registering app "  + context.getPackageName() +
-                " of senders " + senders);
-        Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_REGISTRATION);
-        intent.setPackage(GSF_PACKAGE);
-        intent.putExtra(GCMConstants.EXTRA_APPLICATION_PENDING_INTENT,
-                PendingIntent.getBroadcast(context, 0, new Intent(), 0));
-        intent.putExtra(GCMConstants.EXTRA_SENDER, senders);
-        context.startService(intent);
+        return builder.toString();
     }
 
     /**

@@ -47,6 +47,8 @@ import java.util.concurrent.TimeUnit;
  * hence should run in a limited amount of time. If they execute long
  * operations, they should spawn new threads, otherwise the worker thread will
  * be blocked.
+ * <p>
+ * Subclasses must provide a public no-arg constructor.
  */
 public abstract class GCMBaseIntentService extends IntentService {
 
@@ -59,7 +61,7 @@ public abstract class GCMBaseIntentService extends IntentService {
     // Java lock used to synchronize access to sWakelock
     private static final Object LOCK = GCMBaseIntentService.class;
 
-    private final String mSenderId;
+    private final String[] mSenderIds;
 
     // instance counter
     private static int sCounter = 0;
@@ -75,13 +77,54 @@ public abstract class GCMBaseIntentService extends IntentService {
     private static final String EXTRA_TOKEN = "token";
 
     /**
-     * Subclasses must create a public no-arg constructor and pass the
-     * sender id to be used for registration.
+     * Constructor that does not set a sender id, useful when the sender id
+     * is context-specific.
+     * <p>
+     * When using this constructor, the subclass <strong>must</strong>
+     * override {@link #getSenderIds(Context)}, otherwise methods such as
+     * {@link #onHandleIntent(Intent)} will throw an
+     * {@link IllegalStateException} on runtime.
      */
-    protected GCMBaseIntentService(String senderId) {
-        // name is used as base name for threads, etc.
-        super("GCMIntentService-" + senderId + "-" + (++sCounter));
-        mSenderId = senderId;
+    protected GCMBaseIntentService() {
+        this(getName("DynamicSenderIds"), null);
+    }
+
+    /**
+     * Constructor used when the sender id(s) is fixed.
+     */
+    protected GCMBaseIntentService(String... senderIds) {
+        this(getName(senderIds), senderIds);
+    }
+
+    private GCMBaseIntentService(String name, String[] senderIds) {
+        super(name);  // name is used as base name for threads, etc.
+        mSenderIds = senderIds;
+    }
+
+    private static String getName(String senderId) {
+        String name = "GCMIntentService-" + senderId + "-" + (++sCounter);
+        Log.v(TAG, "Intent service name: " + name);
+        return name;
+    }
+
+    private static String getName(String[] senderIds) {
+        String flatSenderIds = GCMRegistrar.getFlatSenderId(senderIds);
+        return getName(flatSenderIds);
+    }
+
+    /**
+     * Gets the sender ids.
+     *
+     * <p>By default, it returns the sender ids passed in the constructor, but
+     * it could be overridden to provide a dynamic sender id.
+     *
+     * @throws IllegalStateException if sender id was not set on constructor.
+     */
+    protected String[] getSenderIds(Context context) {
+        if (mSenderIds == null) {
+            throw new IllegalStateException("sender id not set on constructor");
+        }
+        return mSenderIds;
     }
 
     /**
@@ -190,7 +233,8 @@ public abstract class GCMBaseIntentService extends IntentService {
                 if (GCMRegistrar.isRegistered(context)) {
                     GCMRegistrar.internalUnregister(context);
                 } else {
-                    GCMRegistrar.internalRegister(context, mSenderId);
+                    String[] senderIds = getSenderIds(context);
+                    GCMRegistrar.internalRegister(context, senderIds);
                 }
             }
         } finally {
