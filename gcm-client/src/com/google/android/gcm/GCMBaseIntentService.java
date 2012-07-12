@@ -108,7 +108,7 @@ public abstract class GCMBaseIntentService extends IntentService {
     }
 
     private static String getName(String[] senderIds) {
-        String flatSenderIds = GCMRegistrar.getFlatSenderId(senderIds);
+        String flatSenderIds = GCMRegistrar.getFlatSenderIds(senderIds);
         return getName(flatSenderIds);
     }
 

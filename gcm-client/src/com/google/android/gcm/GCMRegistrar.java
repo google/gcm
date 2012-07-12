@@ -218,7 +218,7 @@ public final class GCMRegistrar {
     }
 
     static void internalRegister(Context context, String... senderIds) {
-        String flatSenderIds = getFlatSenderId(senderIds);
+        String flatSenderIds = getFlatSenderIds(senderIds);
         Log.v(TAG, "Registering app "  + context.getPackageName() +
                 " of senders " + flatSenderIds);
         Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_REGISTRATION);
@@ -229,7 +229,7 @@ public final class GCMRegistrar {
         context.startService(intent);
     }
 
-    static String getFlatSenderId(String... senderIds) {
+    static String getFlatSenderIds(String... senderIds) {
         if (senderIds == null || senderIds.length == 0) {
             throw new IllegalArgumentException("No senderIds");
         }
