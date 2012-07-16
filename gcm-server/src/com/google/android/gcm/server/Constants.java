@@ -100,11 +100,24 @@ public final class Constants {
   public static final String ERROR_MISSING_COLLAPSE_KEY = "MissingCollapseKey";
 
   /**
-   * Used to indicate that a particular message could not be sent because
-   * the GCM servers were not available. Used only on JSON requests, as in
-   * plain text requests unavailability is indicated by a 503 response.
+   * A particular message could not be sent because the GCM servers were not
+   * available. Used only on JSON requests, as in plain text requests
+   * unavailability is indicated by a 503 response.
    */
   public static final String ERROR_UNAVAILABLE = "Unavailable";
+
+  /**
+   * A particular message could not be sent because the GCM servers encountered
+   * an error. Used only on JSON requests, as in plain text requests internal
+   * errors are indicated by a 500 response.
+   */
+  public static final String ERROR_INTERNAL_SERVER_ERROR =
+      "InternalServerError";
+
+  /**
+   * Time to Live value passed is less than zero or more than maximum.
+   */
+  public static final String ERROR_INVALID_TTL= "InvalidTtl";
 
   /**
    * Token returned by GCM when a message was successfully sent.

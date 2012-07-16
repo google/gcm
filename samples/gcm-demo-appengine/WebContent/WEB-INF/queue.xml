@@ -17,6 +17,14 @@
 <queue-entries>
   <queue>
     <name>gcm</name>
-    <rate>10/s</rate>
+    <rate>1/s</rate>
+    <max-concurrent-requests>1</max-concurrent-requests>
+    <bucket-size>2</bucket-size>
+    <retry-parameters>
+      <task-retry-limit>7</task-retry-limit>
+      <min-backoff-seconds>10</min-backoff-seconds>
+      <max-backoff-seconds>200</max-backoff-seconds>
+      <max-doublings>2</max-doublings>
+    </retry-parameters>
   </queue>
 </queue-entries>

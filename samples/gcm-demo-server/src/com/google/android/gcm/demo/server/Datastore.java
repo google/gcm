@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 /**
  * Simple implementation of a data store using standard Java collections.
  * <p>
- * This class is neither persistent (it will lost the data when the app is
- * restarted) nor thread safe.
+ * This class is thread-safe but not persistent (it will lost the data when the
+ * app is restarted) - it is meant just as an example.
  */
 public final class Datastore {
 
@@ -37,29 +37,42 @@ public final class Datastore {
 
   /**
    * Registers a device.
-   *
-   * @param regId device's registration id.
    */
   public static void register(String regId) {
     logger.info("Registering " + regId);
-    regIds.add(regId);
+    synchronized (regIds) {
+      regIds.add(regId);
+    }
   }
 
   /**
    * Unregisters a device.
-   *
-   * @param regId device's registration id.
    */
   public static void unregister(String regId) {
     logger.info("Unregistering " + regId);
-    regIds.remove(regId);
+    synchronized (regIds) {
+      regIds.remove(regId);
+    }
+  }
+
+  /**
+   * Updates the registration id of a device.
+   */
+  public static void updateRegistration(String oldId, String newId) {
+    logger.info("Updating " + oldId + " to " + newId);
+    synchronized (regIds) {
+      regIds.remove(oldId);
+      regIds.add(newId);
+    }
   }
 
   /**
    * Gets all registered devices.
    */
   public static List<String> getDevices() {
-    return regIds;
+    synchronized (regIds) {
+      return new ArrayList<String>(regIds);
+    }
   }
 
 }

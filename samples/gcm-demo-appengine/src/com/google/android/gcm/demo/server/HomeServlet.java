@@ -17,7 +17,6 @@ package com.google.android.gcm.demo.server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,11 +50,11 @@ public class HomeServlet extends BaseServlet {
     if (status != null) {
       out.print(status);
     }
-    List<String> devices = Datastore.getDevices();
-    if (devices.isEmpty()) {
+    int total = Datastore.getTotalDevices();
+    if (total == 0) {
       out.print("<h2>No devices registered!</h2>");
     } else {
-      out.print("<h2>" + devices.size() + " device(s) registered!</h2>");
+      out.print("<h2>" + total + " device(s) registered!</h2>");
       out.print("<form name='form' method='POST' action='sendAll'>");
       out.print("<input type='submit' value='Send Message' />");
       out.print("</form>");

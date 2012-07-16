@@ -54,7 +54,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:name="com.google.android.gcm.demo.app.DemoActivity"
+            android:name=".DemoActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
             <intent-filter>

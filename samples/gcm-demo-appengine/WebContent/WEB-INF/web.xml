@@ -75,7 +75,7 @@
 
   <servlet-mapping>
     <servlet-name>SendMessageServlet</servlet-name>
-    <url-pattern>/sendMessage</url-pattern>
+    <url-pattern>/send</url-pattern>
   </servlet-mapping>
 
   <servlet>

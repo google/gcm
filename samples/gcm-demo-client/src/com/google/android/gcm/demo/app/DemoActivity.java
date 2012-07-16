@@ -61,8 +61,7 @@ public class DemoActivity extends Activity {
             // Automatically registers application on startup.
             GCMRegistrar.register(this, SENDER_ID);
         } else {
-            // Device is already registered on GCM, needs to check if it is
-            // registered on our server as well.
+            // Device is already registered on GCM, check server.
             if (GCMRegistrar.isRegisteredOnServer(this)) {
                 // Skips registration.
                 mDisplay.append(getString(R.string.already_registered) + "\n");
