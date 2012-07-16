@@ -16,7 +16,7 @@
 -->
 <project name="gcm-server" default="dist">
 
-  <property name="version" value="1.0.0"/>
+  <property name="version" value="dev"/>
   <property name="src" location="src"/>
   <property name="test" location="test"/>
   <property name="lib"  location="lib"/>
@@ -38,13 +38,13 @@
 
   <path id="compile.test.classpath">
     <path refid="compile.classpath"/>
-    <pathelement location="${classes}" />
+    <pathelement location="${classes}"/>
 
   </path>
 
   <path id="test.classpath">
     <path refid="compile.test.classpath"/>
-    <pathelement location="${test-classes}" />
+    <pathelement location="${test-classes}"/>
   </path>
 
   <target name="clean" description="Clean all artifacts except the dist files.">
@@ -78,7 +78,7 @@
 
   <target name="tests" depends="compile-tests" description="Run the unit tests.">
     <junit printsummary="yes" haltonfailure="yes">
-      <classpath refid="test.classpath" />
+      <classpath refid="test.classpath"/>
       <formatter type="plain"/>
       <formatter type="xml"/>
       <batchtest fork="yes" todir="${test-reports}">
