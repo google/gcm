@@ -395,10 +395,18 @@ public class Sender {
       MulticastResult multicastResult = builder.build();
       return multicastResult;
     } catch (ParseException e) {
-      throw new IOException("Error parsing JSON response: " + responseBody, e);
+      throw newIoException(responseBody, e);
     } catch (CustomParserException e) {
-      throw new IOException("Error parsing JSON response: " + responseBody, e);
+      throw newIoException(responseBody, e);
     }
+  }
+
+  private IOException newIoException(String responseBody, Exception e) {
+    // log exception, as IOException constructor that takes a message and cause
+    // is only available on Java 6
+    logger.log(Level.WARNING,
+        "Error parsing JSON response (" + responseBody + ")", e);
+    return new IOException(e);
   }
 
   /**

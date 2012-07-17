@@ -38,7 +38,6 @@ public class ApiKeyInitializer implements ServletContextListener {
 
   private final Logger logger = Logger.getLogger(getClass().getName());
 
-  @Override
   public void contextInitialized(ServletContextEvent event) {
     logger.info("Reading " + PATH + " from resources (probably from " +
         "WEB-INF/classes");
@@ -71,7 +70,6 @@ public class ApiKeyInitializer implements ServletContextListener {
     }
   }
 
-  @Override
   public void contextDestroyed(ServletContextEvent event) {
   }
 

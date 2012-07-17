@@ -48,7 +48,7 @@ abstract class BaseServlet extends HttpServlet {
   protected String getParameter(HttpServletRequest req, String parameter)
       throws ServletException {
     String value = req.getParameter(parameter);
-    if (value == null || value.trim().isEmpty()) {
+    if (isEmptyOrNull(value)) {
       if (DEBUG) {
         StringBuilder parameters = new StringBuilder();
         @SuppressWarnings("unchecked")
@@ -68,7 +68,7 @@ abstract class BaseServlet extends HttpServlet {
   protected String getParameter(HttpServletRequest req, String parameter,
       String defaultValue) {
     String value = req.getParameter(parameter);
-    if (value == null || value.trim().isEmpty()) {
+    if (isEmptyOrNull(value)) {
       value = defaultValue;
     }
     return value.trim();
@@ -82,6 +82,10 @@ abstract class BaseServlet extends HttpServlet {
     resp.setStatus(HttpServletResponse.SC_OK);
     resp.setContentType("text/plain");
     resp.setContentLength(size);
+  }
+
+  protected boolean isEmptyOrNull(String value) {
+    return value == null || value.trim().length() == 0;
   }
 
 }

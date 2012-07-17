@@ -111,7 +111,6 @@ public class SendAllMessagesServlet extends BaseServlet {
     final List<String> devices = new ArrayList<String>(partialDevices);
     threadPool.execute(new Runnable() {
 
-      @Override
       public void run() {
         Message message = new Message.Builder().build();
         MulticastResult multicastResult;

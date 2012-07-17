@@ -40,7 +40,6 @@ public class ApiKeyInitializer implements ServletContextListener {
 
   private final Logger logger = Logger.getLogger(getClass().getName());
 
-  @Override
   public void contextInitialized(ServletContextEvent event) {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Key key = KeyFactory.createKey(ENTITY_KIND, ENTITY_KEY);
@@ -65,7 +64,6 @@ public class ApiKeyInitializer implements ServletContextListener {
     event.getServletContext().setAttribute(ATTRIBUTE_ACCESS_KEY, accessKey);
   }
 
-  @Override
   public void contextDestroyed(ServletContextEvent event) {
   }
 
