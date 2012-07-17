@@ -404,9 +404,9 @@ public class Sender {
   private IOException newIoException(String responseBody, Exception e) {
     // log exception, as IOException constructor that takes a message and cause
     // is only available on Java 6
-    logger.log(Level.WARNING,
-        "Error parsing JSON response (" + responseBody + ")", e);
-    return new IOException(e);
+    String msg = "Error parsing JSON response (" + responseBody + ")";
+    logger.log(Level.WARNING, msg, e);
+    return new IOException(msg + ":" + e);
   }
 
   /**
