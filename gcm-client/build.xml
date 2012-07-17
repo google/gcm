@@ -47,7 +47,7 @@
 
   <target name="compile" depends="init" description="Generate the GCM client library.">
 
-    <javac destdir="${classes}" debug="true" srcdir="${src}"
+    <javac destdir="${classes}" debug="true" srcdir="${src}" target="1.5"
       includeantruntime="false">
       <classpath refid="compile.classpath"/>
     </javac>
