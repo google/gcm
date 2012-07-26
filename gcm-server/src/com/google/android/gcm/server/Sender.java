@@ -360,11 +360,14 @@ public class Sender {
     HttpURLConnection conn =
         post(GCM_SEND_ENDPOINT, "application/json", requestBody);
     int status = conn.getResponseCode();
-    String responseBody = getString(conn.getInputStream());
-    logger.finest("JSON response: " + responseBody);
+    String responseBody;
     if (status != 200) {
+      responseBody = getString(conn.getErrorStream());
+      logger.finest("JSON error response: " + responseBody);
       throw new InvalidRequestException(status, responseBody);
     }
+    responseBody = getString(conn.getInputStream());
+    logger.finest("JSON response: " + responseBody);
     JSONParser parser = new JSONParser();
     JSONObject jsonResponse;
     try {

@@ -621,7 +621,11 @@ public class SenderTest {
       throws IOException {
     when(mockedConn.getResponseCode()).thenReturn(statusCode);
     InputStream inputStream = new ByteArrayInputStream(response.getBytes());
-    when(mockedConn.getInputStream()).thenReturn(inputStream);
+    if (statusCode == 200) {
+      when(mockedConn.getInputStream()).thenReturn(inputStream);
+    } else {
+      when(mockedConn.getErrorStream()).thenReturn(inputStream);
+    }
     when(mockedConn.getOutputStream()).thenReturn(outputStream);
     doReturn(mockedConn).when(sender)
         .getConnection(Constants.GCM_SEND_ENDPOINT);
