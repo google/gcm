@@ -193,6 +193,7 @@ public abstract class GCMBaseIntentService extends IntentService {
             Context context = getApplicationContext();
             String action = intent.getAction();
             if (action.equals(INTENT_FROM_GCM_REGISTRATION_CALLBACK)) {
+                GCMRegistrar.setRetryBroadcastReceiver(context);
                 handleRegistration(context, intent);
             } else if (action.equals(INTENT_FROM_GCM_MESSAGE)) {
                 // checks for special messages

@@ -74,6 +74,8 @@ public final class GCMRegistrar {
      */
     private static GCMBroadcastReceiver sRetryReceiver;
 
+    private static String sRetryReceiverClassName;
+
     /**
      * Checks if the device has the proper dependencies installed.
      * <p>
@@ -212,7 +214,6 @@ public final class GCMRegistrar {
      *             dependencies installed.
      */
     public static void register(Context context, String... senderIds) {
-        setRetryBroadcastReceiver(context);
         GCMRegistrar.resetBackoff(context);
         internalRegister(context, senderIds);
     }
@@ -248,7 +249,6 @@ public final class GCMRegistrar {
      * {@link GCMConstants#EXTRA_UNREGISTERED} extra.
      */
     public static void unregister(Context context) {
-        setRetryBroadcastReceiver(context);
         GCMRegistrar.resetBackoff(context);
         internalUnregister(context);
     }
@@ -280,9 +280,23 @@ public final class GCMRegistrar {
     /**
      * Lazy initializes the {@link GCMBroadcastReceiver} instance.
      */
-    private static synchronized void setRetryBroadcastReceiver(Context context) {
+    static synchronized void setRetryBroadcastReceiver(Context context) {
         if (sRetryReceiver == null) {
-            sRetryReceiver = new GCMBroadcastReceiver();
+            if (sRetryReceiverClassName == null) {
+                Log.w(TAG, "sRetryReceiverClassName not set yet");
+                sRetryReceiverClassName = GCMBroadcastReceiver
+                        .getDefaultIntentServiceClassName(context);
+            }
+            Class<?> clazz;
+            try {
+                clazz = Class.forName(sRetryReceiverClassName);
+                sRetryReceiver = (GCMBroadcastReceiver) clazz.newInstance();
+            } catch (Exception e) {
+                Log.e(TAG, "Could not create instance of " +
+                        sRetryReceiverClassName + ". Using " +
+                        GCMBroadcastReceiver.class.getName() + " directly.");
+                sRetryReceiver = new GCMBroadcastReceiver();
+            }
             String category = context.getPackageName();
             IntentFilter filter = new IntentFilter(
                     GCMConstants.INTENT_FROM_GCM_LIBRARY_RETRY);
@@ -292,6 +306,14 @@ public final class GCMRegistrar {
             Log.v(TAG, "Registering receiver");
             context.registerReceiver(sRetryReceiver, filter, permission, null);
         }
+    }
+
+    /**
+     * Sets the name of the retry receiver class.
+     */
+    static void setRetryReceiverClassName(String className) {
+        Log.v(TAG, "Setting the name of retry receiver class to " + className);
+        sRetryReceiverClassName = className;
     }
 
     /**
