@@ -16,7 +16,7 @@
 -->
 <project name="gcm-server" default="dist">
 
-  <property name="version" value="1.0.1"/>
+  <property name="version" value="1.0.2"/>
   <property name="src" location="src"/>
   <property name="test" location="test"/>
   <property name="lib"  location="lib"/>
