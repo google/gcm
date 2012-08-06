@@ -111,9 +111,14 @@ public class SendMessageServlet extends BaseServlet {
     return;
   }
 
+  private Message createMessage() {
+    Message message = new Message.Builder().build();
+    return message;
+  }
+
   private void sendSingleMessage(String regId, HttpServletResponse resp) {
     logger.info("Sending message to device " + regId);
-    Message message = new Message.Builder().build();
+    Message message = createMessage();
     Result result;
     try {
       result = sender.sendNoRetry(message, regId);
@@ -150,7 +155,7 @@ public class SendMessageServlet extends BaseServlet {
       HttpServletResponse resp) {
     // Recover registration ids from datastore
     List<String> regIds = Datastore.getMulticast(multicastKey);
-    Message message = new Message.Builder().build();
+    Message message = createMessage();
     MulticastResult multicastResult;
     try {
       multicastResult = sender.sendNoRetry(message, regIds);
