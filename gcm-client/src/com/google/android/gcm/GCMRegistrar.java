@@ -111,10 +111,9 @@ public final class GCMRegistrar {
      *      {@code PACKAGE_NAME}.
      *    <li>The {@link BroadcastReceiver}(s) uses the
      *      {@value GCMConstants#PERMISSION_GCM_INTENTS} permission.
-     *    <li>The {@link BroadcastReceiver}(s) handles the 3 GCM intents
-     *      ({@value GCMConstants#INTENT_FROM_GCM_MESSAGE},
-     *      {@value GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK},
-     *      and {@value GCMConstants#INTENT_FROM_GCM_LIBRARY_RETRY}).
+     *    <li>The {@link BroadcastReceiver}(s) handles the 2 GCM intents
+     *      ({@value GCMConstants#INTENT_FROM_GCM_MESSAGE} and
+     *      {@value GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK}).
      * </ol>
      * ...where {@code PACKAGE_NAME} is the application package.
      * <p>
