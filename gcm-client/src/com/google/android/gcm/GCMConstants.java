@@ -53,32 +53,32 @@ public final class GCMConstants {
             "com.google.android.c2dm.intent.RECEIVE";
 
     /**
-     * Extra used on {@link #INTENT_TO_GCM_REGISTRATION} to indicate the sender
-     * account (a Google email) that owns the application.
+     * Extra used on {@value #INTENT_TO_GCM_REGISTRATION} to indicate which
+     * senders (Google API project ids) can send messages to the application.
      */
     public static final String EXTRA_SENDER = "sender";
 
     /**
-     * Extra used on {@link #INTENT_TO_GCM_REGISTRATION} to get the application
-     * id.
+     * Extra used on {@value #INTENT_TO_GCM_REGISTRATION} to get the
+     * application info.
      */
     public static final String EXTRA_APPLICATION_PENDING_INTENT = "app";
 
     /**
-     * Extra used on {@link #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
+     * Extra used on {@value #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
      * that the application has been unregistered.
      */
     public static final String EXTRA_UNREGISTERED = "unregistered";
 
     /**
-     * Extra used on {@link #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
+     * Extra used on {@value #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
      * an error when the registration fails. See constants starting with ERROR_
      * for possible values.
      */
     public static final String EXTRA_ERROR = "error";
 
     /**
-     * Extra used on {@link #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
+     * Extra used on {@value #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
      * the registration id when the registration succeeds.
      */
     public static final String EXTRA_REGISTRATION_ID = "registration_id";
@@ -101,6 +101,12 @@ public final class GCMConstants {
      * {@link #VALUE_DELETED_MESSAGES}
      */
     public static final String EXTRA_TOTAL_DELETED = "total_deleted";
+
+    /**
+     * Extra used on {@value #INTENT_FROM_GCM_MESSAGE} to indicate which
+     * sender (Google API project id) sent the message.
+     */
+    public static final String EXTRA_FROM = "from";
 
     /**
      * Permission necessary to receive GCM intents.
