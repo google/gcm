@@ -195,6 +195,19 @@ public class SenderTest {
   }
 
   @Test
+  public void testSendNoRetry_unauthorized_nullStream() throws Exception {
+    setResponseExpectations(401, null);
+    try {
+      sender.sendNoRetry(message, regId);
+      fail("Should have thrown InvalidRequestException");
+    } catch (InvalidRequestException e) {
+      assertEquals(401, e.getHttpStatusCode());
+      assertEquals("", e.getDescription());
+    }
+    assertRequestBody();
+  }
+
+  @Test
   public void testSendNoRetry_error() throws Exception {
     setResponseExpectations(200, "Error=D'OH!");
     Result result = sender.sendNoRetry(message, regId);
@@ -250,6 +263,7 @@ public class SenderTest {
       sender.sendNoRetry(message, regId);
     } catch (InvalidRequestException e) {
       assertEquals(108, e.getHttpStatusCode());
+      assertEquals("id=4815162342", e.getDescription());
     }
   }
 
@@ -417,6 +431,18 @@ public class SenderTest {
     }
   }
 
+  @Test
+  public void testSendNoRetry_json_badRequest_nullError() throws Exception {
+    setResponseExpectations(42, null);
+    try {
+      sender.sendNoRetry(message, Arrays.asList("108"));
+    } catch (InvalidRequestException e) {
+      assertEquals(42, e.getHttpStatusCode());
+      assertEquals("", e.getDescription());
+      assertRequestJsonBody("108");
+    }
+  }
+  
   @Test()
   public void testSendNoRetry_json_ok() throws Exception {
     String json = replaceQuotes("\n"
@@ -568,9 +594,8 @@ public class SenderTest {
     assertEquals(expected, actual);
   }
 
- @Test(expected = IllegalArgumentException.class)
   public void testGetString_nullValue() throws Exception {
-    Sender.getString(null);
+    assertEquals("", Sender.getString(null));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -620,7 +645,8 @@ public class SenderTest {
   private void setResponseExpectations(int statusCode, String response) 
       throws IOException {
     when(mockedConn.getResponseCode()).thenReturn(statusCode);
-    InputStream inputStream = new ByteArrayInputStream(response.getBytes());
+    InputStream inputStream = (response == null) ?
+        null : new ByteArrayInputStream(response.getBytes());
     if (statusCode == 200) {
       when(mockedConn.getInputStream()).thenReturn(inputStream);
     } else {

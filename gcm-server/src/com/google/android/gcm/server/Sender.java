@@ -174,7 +174,9 @@ public class Sender {
       return null;
     }
     if (status != 200) {
-      throw new InvalidRequestException(status);
+      String responseBody = getString(conn.getErrorStream());
+      logger.finest("Plain post error response: " + responseBody);
+      throw new InvalidRequestException(status, responseBody);
     }
     try {
       BufferedReader reader =
@@ -529,10 +531,15 @@ public class Sender {
    *
    * <p>
    * If the stream ends in a newline character, it will be stripped.
+   * <p>
+   * If the stream is {@literal null}, returns an empty string.
    */
   protected static String getString(InputStream stream) throws IOException {
+    if (stream == null) {
+      return "";
+    }
     BufferedReader reader =
-        new BufferedReader(new InputStreamReader(nonNull(stream)));
+        new BufferedReader(new InputStreamReader(stream));
     StringBuilder content = new StringBuilder();
     String newLine;
     do {
