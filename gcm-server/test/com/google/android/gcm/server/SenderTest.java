@@ -68,6 +68,8 @@ public class SenderTest {
           .collapseKey(collapseKey)
           .delayWhileIdle(delayWhileIdle)
           .timeToLive(ttl)
+          .addData("k0", null)
+          .addData(null, "v0")
           .addData("k1", "v1")
           .addData("k2", "v2")
           .addData("k3", "v3")
@@ -442,7 +444,7 @@ public class SenderTest {
       assertRequestJsonBody("108");
     }
   }
-  
+
   @Test()
   public void testSendNoRetry_json_ok() throws Exception {
     String json = replaceQuotes("\n"
@@ -500,7 +502,9 @@ public class SenderTest {
     @SuppressWarnings("unchecked")
     Map<String, Object> payload = (Map<String, Object>) json.get("data");
     assertNotNull("no payload", payload);
-    assertEquals("wrong payload size", 3, payload.size());
+    assertEquals("wrong payload size", 5, payload.size());
+    assertEquals("v0", payload.get("null"));
+    assertNull(payload.get("v0"));
     assertEquals("v1", payload.get("k1"));
     assertEquals("v2", payload.get("k2"));
     assertEquals("v3", payload.get("k3"));
@@ -674,7 +678,7 @@ public class SenderTest {
       params.put(split[0], split[1]);
     }
     // check parameters
-    assertEquals(7, params.size());
+    assertEquals("wrong parameters size for " + body, 7, params.size());
     assertParameter(params, "registration_id", regId);
     assertParameter(params, "collapse_key", collapseKey);
     assertParameter(params, "delay_while_idle", delayWhileIdle ? "1" : "0");

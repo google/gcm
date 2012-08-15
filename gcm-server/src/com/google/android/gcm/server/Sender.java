@@ -161,9 +161,14 @@ public class Sender {
       addParameter(body, PARAM_TIME_TO_LIVE, Integer.toString(timeToLive));
     }
     for (Entry<String, String> entry : message.getData().entrySet()) {
-      String key = PARAM_PAYLOAD_PREFIX + entry.getKey();
+      String key = entry.getKey();
       String value = entry.getValue();
-      addParameter(body, key, URLEncoder.encode(value, UTF8));
+      if (key == null || value == null) {
+        logger.warning("Ignoring payload entry thas has null: " + entry);
+      } else {
+        key = PARAM_PAYLOAD_PREFIX + key;
+        addParameter(body, key, URLEncoder.encode(value, UTF8));
+      }
     }
     String requestBody = body.toString();
     logger.finest("Request body: " + requestBody);
