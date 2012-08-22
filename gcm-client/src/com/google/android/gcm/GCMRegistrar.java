@@ -110,10 +110,12 @@ public final class GCMRegistrar {
      *    <li>It defines at least one {@link BroadcastReceiver} with category
      *      {@code PACKAGE_NAME}.
      *    <li>The {@link BroadcastReceiver}(s) uses the
-     *      {@value GCMConstants#PERMISSION_GCM_INTENTS} permission.
+     *      {@value com.google.android.gcm.GCMConstants#PERMISSION_GCM_INTENTS}
+     *      permission.
      *    <li>The {@link BroadcastReceiver}(s) handles the 2 GCM intents
-     *      ({@value GCMConstants#INTENT_FROM_GCM_MESSAGE} and
-     *      {@value GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK}).
+     *      ({@value com.google.android.gcm.GCMConstants#INTENT_FROM_GCM_MESSAGE}
+     *      and
+     *      {@value com.google.android.gcm.GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK}).
      * </ol>
      * ...where {@code PACKAGE_NAME} is the application package.
      * <p>

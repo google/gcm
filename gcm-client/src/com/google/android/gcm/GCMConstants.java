@@ -84,7 +84,7 @@ public final class GCMConstants {
     public static final String EXTRA_REGISTRATION_ID = "registration_id";
 
     /**
-     * Type of message present in the {@link #INTENT_FROM_GCM_MESSAGE} intent.
+     * Type of message present in the {@value #INTENT_FROM_GCM_MESSAGE} intent.
      * This extra is only set for special messages sent from GCM, not for
      * messages originated from the application.
      */
@@ -98,7 +98,7 @@ public final class GCMConstants {
     /**
      * Number of messages deleted by the server because the device was idle.
      * Present only on messages of special type
-     * {@link #VALUE_DELETED_MESSAGES}
+     * {@value #VALUE_DELETED_MESSAGES}
      */
     public static final String EXTRA_TOTAL_DELETED = "total_deleted";
 
