@@ -55,6 +55,7 @@
 
   <target name="full-clean" depends="clean" description="Clean all artifacts including the dist files.">
     <delete dir="${dist}"/>
+    <delete file="${web-lib}/gcm-server.jar"/>
   </target>
 
   <target name="init">

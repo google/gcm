@@ -1,0 +1,14 @@
+GCM demo server
+---------------
+
+1.To build the server's .war file, run:
+
+  ant clean dist
+
+ If the compilation fails because of missing classes from the com.google.android.gcm.server package, check if the WebContent/WEB-INF/lib directory contains the gcm-server.jar file. If it doesn't, then run:
+
+  ant -f ../../gcm-server/build.xml update-demo
+
+ Then run 'ant clean dist' again.
+
+3.To run the server, copy the dist/gcm-demo.war to the proper place in your application server.

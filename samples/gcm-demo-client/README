@@ -11,6 +11,12 @@ GCM demo app
 
 (but set SENDER_ID and SERVER_URL on /src/com/google/android/gcm/demo/app/CommonUtilities.java first)
 
+ If the compilation fails because of missing classes from the com.google.android.gcm package, check if the libs directory contains the gcm.jar file. If it doesn't, then run:
+
+  ant -f ../../gcm-client/build.xml update-demo
+
+ Then run 'ant clean debug' again.
+
 3.To install the app, type
 
   ant installd
