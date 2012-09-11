@@ -248,7 +248,6 @@ public abstract class GCMBaseIntentService extends IntentService {
             synchronized (LOCK) {
                 // sanity check for null as this is a public method
                 if (sWakeLock != null) {
-                    Log.v(TAG, "Releasing wakelock");
                     sWakeLock.release();
                 } else {
                     // should never happen during normal workflow
@@ -276,13 +275,13 @@ public abstract class GCMBaseIntentService extends IntentService {
                         WAKELOCK_KEY);
             }
         }
-        Log.v(TAG, "Acquiring wakelock");
         sWakeLock.acquire();
         intent.setClassName(context, className);
         context.startService(intent);
     }
 
     private void handleRegistration(final Context context, Intent intent) {
+        GCMRegistrar.cancelAppPendingIntent();
         String registrationId = intent.getStringExtra(EXTRA_REGISTRATION_ID);
         String error = intent.getStringExtra(EXTRA_ERROR);
         String unregistered = intent.getStringExtra(EXTRA_UNREGISTERED);

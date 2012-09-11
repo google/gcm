@@ -72,9 +72,16 @@ public final class GCMRegistrar {
      * This instance cannot be the same as the one defined in the manifest
      * because it needs a different permission.
      */
+    // guarded by GCMRegistrar.class
     private static GCMBroadcastReceiver sRetryReceiver;
 
+    // guarded by GCMRegistrar.class
+    private static Context sRetryReceiverContext;
+    // guarded by GCMRegistrar.class
     private static String sRetryReceiverClassName;
+
+    // guarded by GCMRegistrar.class
+    private static PendingIntent sAppPendingIntent;
 
     /**
      * Checks if the device has the proper dependencies installed.
@@ -225,9 +232,28 @@ public final class GCMRegistrar {
                 " of senders " + flatSenderIds);
         Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_REGISTRATION);
         intent.setPackage(GSF_PACKAGE);
-        intent.putExtra(GCMConstants.EXTRA_APPLICATION_PENDING_INTENT,
-                PendingIntent.getBroadcast(context, 0, new Intent(), 0));
+        setPackageNameExtra(context, intent);
         intent.putExtra(GCMConstants.EXTRA_SENDER, flatSenderIds);
+        context.startService(intent);
+    }
+
+    /**
+     * Unregister the application.
+     * <p>
+     * The result will be returned as an
+     * {@link GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK} intent with an
+     * {@link GCMConstants#EXTRA_UNREGISTERED} extra.
+     */
+    public static void unregister(Context context) {
+        GCMRegistrar.resetBackoff(context);
+        internalUnregister(context);
+    }
+
+    static void internalUnregister(Context context) {
+        Log.v(TAG, "Unregistering app "  + context.getPackageName());
+        Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_UNREGISTRATION);
+        intent.setPackage(GSF_PACKAGE);
+        setPackageNameExtra(context, intent);
         context.startService(intent);
     }
 
@@ -243,18 +269,6 @@ public final class GCMRegistrar {
     }
 
     /**
-     * Unregister the application.
-     * <p>
-     * The result will be returned as an
-     * {@link GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK} intent with an
-     * {@link GCMConstants#EXTRA_UNREGISTERED} extra.
-     */
-    public static void unregister(Context context) {
-        GCMRegistrar.resetBackoff(context);
-        internalUnregister(context);
-    }
-
-    /**
      * Clear internal resources.
      *
      * <p>
@@ -263,19 +277,29 @@ public final class GCMRegistrar {
      */
     public static synchronized void onDestroy(Context context) {
         if (sRetryReceiver != null) {
-            Log.v(TAG, "Unregistering receiver");
-            context.unregisterReceiver(sRetryReceiver);
+            Log.v(TAG, "Unregistering retry receiver");
+            sRetryReceiverContext.unregisterReceiver(sRetryReceiver);
             sRetryReceiver = null;
+            sRetryReceiverContext = null;
         }
     }
 
-    static void internalUnregister(Context context) {
-        Log.v(TAG, "Unregistering app "  + context.getPackageName());
-        Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_UNREGISTRATION);
-        intent.setPackage(GSF_PACKAGE);
+    static synchronized void cancelAppPendingIntent() {
+        if (sAppPendingIntent != null) {
+            sAppPendingIntent.cancel();
+            sAppPendingIntent = null;
+        }
+    }
+
+    private synchronized static void setPackageNameExtra(Context context,
+            Intent intent) {
+        if (sAppPendingIntent == null) {
+            Log.v(TAG, "Creating pending intent to get package name");
+            sAppPendingIntent = PendingIntent.getBroadcast(context, 0,
+                    new Intent(), 0);
+        }
         intent.putExtra(GCMConstants.EXTRA_APPLICATION_PENDING_INTENT,
-                PendingIntent.getBroadcast(context, 0, new Intent(), 0));
-        context.startService(intent);
+                sAppPendingIntent);
     }
 
     /**
@@ -306,15 +330,17 @@ public final class GCMRegistrar {
             filter.addCategory(category);
             // must use a permission that is defined on manifest for sure
             String permission = category + ".permission.C2D_MESSAGE";
-            Log.v(TAG, "Registering receiver");
-            context.registerReceiver(sRetryReceiver, filter, permission, null);
+            Log.v(TAG, "Registering retry receiver");
+            sRetryReceiverContext = context;
+            sRetryReceiverContext.registerReceiver(sRetryReceiver, filter,
+                    permission, null);
         }
     }
 
     /**
      * Sets the name of the retry receiver class.
      */
-    static void setRetryReceiverClassName(String className) {
+    static synchronized void setRetryReceiverClassName(String className) {
         Log.v(TAG, "Setting the name of retry receiver class to " + className);
         sRetryReceiverClassName = className;
     }
@@ -468,7 +494,7 @@ public final class GCMRegistrar {
      * @param context application's context.
      */
     static void resetBackoff(Context context) {
-        Log.d(TAG, "resetting backoff for " + context.getPackageName());
+        Log.d(TAG, "Resetting backoff for " + context.getPackageName());
         setBackoff(context, DEFAULT_BACKOFF_MS);
     }
 
