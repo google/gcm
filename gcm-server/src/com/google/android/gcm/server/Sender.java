@@ -42,6 +42,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -75,7 +76,8 @@ public class Sender {
   protected static final int MAX_BACKOFF_DELAY = 1024000;
 
   protected final Random random = new Random();
-  protected final Logger logger = Logger.getLogger(getClass().getName());
+  protected static final Logger logger =
+      Logger.getLogger(Sender.class.getName());
 
   private final String key;
 
@@ -100,10 +102,10 @@ public class Sender {
    * @param registrationId device where the message will be sent.
    * @param retries number of retries in case of service unavailability errors.
    *
-   * @return result of the request (see its javadoc for more details)
+   * @return result of the request (see its javadoc for more details).
    *
    * @throws IllegalArgumentException if registrationId is {@literal null}.
-   * @throws InvalidRequestException if GCM didn't returned a 200 or 503 status.
+   * @throws InvalidRequestException if GCM didn't returned a 200 or 5xx status.
    * @throws IOException if message could not be sent.
    */
   public Result send(Message message, String registrationId, int retries)
@@ -140,9 +142,9 @@ public class Sender {
    * {@link #send(Message, String, int)} for more info.
    *
    * @return result of the post, or {@literal null} if the GCM service was
-   *         unavailable.
+   *         unavailable or any network exception caused the request to fail.
    *
-   * @throws InvalidRequestException if GCM didn't returned a 200 or 503 status.
+   * @throws InvalidRequestException if GCM didn't returned a 200 or 5xx status.
    * @throws IllegalArgumentException if registrationId is {@literal null}.
    */
   public Result sendNoRetry(Message message, String registrationId)
@@ -172,59 +174,71 @@ public class Sender {
     }
     String requestBody = body.toString();
     logger.finest("Request body: " + requestBody);
-    HttpURLConnection conn = post(GCM_SEND_ENDPOINT, requestBody);
-    int status = conn.getResponseCode();
-    if (status == 503) {
-      logger.fine("GCM service is unavailable");
+    HttpURLConnection conn;
+    int status;
+    try {
+      conn = post(GCM_SEND_ENDPOINT, requestBody);
+      status = conn.getResponseCode();
+    } catch (IOException e) {
+      logger.log(Level.FINE, "IOException posting to GCM", e);
       return null;
     }
-    if (status != 200) {
-      String responseBody = getString(conn.getErrorStream());
-      logger.finest("Plain post error response: " + responseBody);
-      throw new InvalidRequestException(status, responseBody);
+    if (status / 100 == 5) {
+      logger.fine("GCM service is unavailable (status " + status + ")");
+      return null;
     }
-    try {
-      BufferedReader reader =
-          new BufferedReader(new InputStreamReader(conn.getInputStream()));
+    String responseBody;
+    if (status != 200) {
       try {
-        String line = reader.readLine();
-
-        if (line == null || line.equals("")) {
-          throw new IOException("Received empty response from GCM service.");
-        }
-        String[] responseParts = split(line);
-        String token = responseParts[0];
-        String value = responseParts[1];
-        if (token.equals(TOKEN_MESSAGE_ID)) {
-          Builder builder = new Result.Builder().messageId(value);
-          // check for canonical registration id
-          line = reader.readLine();
-          if (line != null) {
-            responseParts = split(line);
-            token = responseParts[0];
-            value = responseParts[1];
-            if (token.equals(TOKEN_CANONICAL_REG_ID)) {
-              builder.canonicalRegistrationId(value);
-            } else {
-              logger.warning("Received invalid second line from GCM: " + line);
-            }
-          }
-
-          Result result = builder.build();
-          if (logger.isLoggable(Level.FINE)) {
-            logger.fine("Message created succesfully (" + result + ")");
-          }
-          return result;
-        } else if (token.equals(TOKEN_ERROR)) {
-          return new Result.Builder().errorCode(value).build();
-        } else {
-          throw new IOException("Received invalid response from GCM: " + line);
-        }
-      } finally {
-        reader.close();
+        responseBody = getAndClose(conn.getErrorStream());
+        logger.finest("Plain post error response: " + responseBody);
+      } catch (IOException e) {
+        // ignore the exception since it will thrown an InvalidRequestException
+        // anyways
+        responseBody = "N/A";
+        logger.log(Level.FINE, "Exception reading response: ", e);
       }
-    } finally {
-      conn.disconnect();
+      throw new InvalidRequestException(status, responseBody);
+    } else {
+      try {
+        responseBody = getAndClose(conn.getInputStream());
+      } catch (IOException e) {
+        logger.log(Level.WARNING, "Exception reading response: ", e);
+        // return null so it can retry
+        return null;
+      }
+    }
+    String[] lines = responseBody.split("\n");
+    if (lines.length == 0 || lines[0].equals("")) {
+      throw new IOException("Received empty response from GCM service.");
+    }
+    String firstLine = lines[0];
+    String[] responseParts = split(firstLine);
+    String token = responseParts[0];
+    String value = responseParts[1];
+    if (token.equals(TOKEN_MESSAGE_ID)) {
+      Builder builder = new Result.Builder().messageId(value);
+      // check for canonical registration id
+      if (lines.length > 1) {
+        String secondLine = lines[1];
+        responseParts = split(secondLine);
+        token = responseParts[0];
+        value = responseParts[1];
+        if (token.equals(TOKEN_CANONICAL_REG_ID)) {
+          builder.canonicalRegistrationId(value);
+        } else {
+          logger.warning("Invalid response from GCM: " + responseBody);
+        }
+      }
+      Result result = builder.build();
+      if (logger.isLoggable(Level.FINE)) {
+        logger.fine("Message created succesfully (" + result + ")");
+      }
+      return result;
+    } else if (token.equals(TOKEN_ERROR)) {
+      return new Result.Builder().errorCode(value).build();
+    } else {
+      throw new IOException("Invalid response from GCM: " + responseBody);
     }
   }
 
@@ -251,7 +265,7 @@ public class Sender {
   public MulticastResult send(Message message, List<String> regIds, int retries)
       throws IOException {
     int attempt = 0;
-    MulticastResult multicastResult = null;
+    MulticastResult multicastResult;
     int backoff = BACKOFF_INITIAL_DELAY;
     // Map of results by registration id, it will be updated after each attempt
     // to send the messages
@@ -260,18 +274,28 @@ public class Sender {
     boolean tryAgain;
     List<Long> multicastIds = new ArrayList<Long>();
     do {
+      multicastResult = null;
       attempt++;
       if (logger.isLoggable(Level.FINE)) {
         logger.fine("Attempt #" + attempt + " to send message " +
             message + " to regIds " + unsentRegIds);
       }
-      multicastResult = sendNoRetry(message, unsentRegIds);
-      long multicastId = multicastResult.getMulticastId();
-      logger.fine("multicast_id on attempt # " + attempt + ": " +
-          multicastId);
-      multicastIds.add(multicastId);
-      unsentRegIds = updateStatus(unsentRegIds, results, multicastResult);
-      tryAgain = !unsentRegIds.isEmpty() && attempt <= retries;
+      try {
+        multicastResult = sendNoRetry(message, unsentRegIds);
+      } catch(IOException e) {
+        // no need for WARNING since exception might be already logged
+        logger.log(Level.FINEST, "IOException on attempt " + attempt, e);
+      }
+      if (multicastResult != null) {
+        long multicastId = multicastResult.getMulticastId();
+        logger.fine("multicast_id on attempt # " + attempt + ": " +
+            multicastId);
+        multicastIds.add(multicastId);
+        unsentRegIds = updateStatus(unsentRegIds, results, multicastResult);
+        tryAgain = !unsentRegIds.isEmpty() && attempt <= retries;
+      } else {
+        tryAgain = attempt <= retries;
+      }
       if (tryAgain) {
         int sleepTime = backoff / 2 + random.nextInt(backoff);
         sleep(sleepTime);
@@ -280,6 +304,11 @@ public class Sender {
         }
       }
     } while (tryAgain);
+    if (multicastIds.isEmpty()) {
+      // all JSON posts failed due to GCM unavailability
+      throw new IOException("Could not post JSON requests to GCM after "
+          + attempt + " attempts");
+    }
     // calculate summary
     int success = 0, failure = 0 , canonicalIds = 0;
     for (Result result : results.values()) {
@@ -328,7 +357,8 @@ public class Sender {
       Result result = results.get(i);
       allResults.put(regId, result);
       String error = result.getErrorCodeName();
-      if (error != null && error.equals(Constants.ERROR_UNAVAILABLE)) {
+      if (error != null && (error.equals(Constants.ERROR_UNAVAILABLE)
+          || error.equals(Constants.ERROR_INTERNAL_SERVER_ERROR))) {
         newUnsentRegIds.add(regId);
       }
     }
@@ -339,13 +369,13 @@ public class Sender {
    * Sends a message without retrying in case of service unavailability. See
    * {@link #send(Message, List, int)} for more info.
    *
-   * @return {@literal true} if the message was sent successfully,
-   *         {@literal false} if it failed but could be retried.
+   * @return multicast results if the message was sent successfully,
+   *         {@literal null} if it failed but could be retried.
    *
    * @throws IllegalArgumentException if registrationIds is {@literal null} or
    *         empty.
    * @throws InvalidRequestException if GCM didn't returned a 200 status.
-   * @throws IOException if message could not be sent or received.
+   * @throws IOException if there was a JSON parsing error
    */
   public MulticastResult sendNoRetry(Message message,
       List<String> registrationIds) throws IOException {
@@ -364,16 +394,34 @@ public class Sender {
     }
     String requestBody = JSONValue.toJSONString(jsonRequest);
     logger.finest("JSON request: " + requestBody);
-    HttpURLConnection conn =
-        post(GCM_SEND_ENDPOINT, "application/json", requestBody);
-    int status = conn.getResponseCode();
+    HttpURLConnection conn;
+    int status;
+    try {
+      conn = post(GCM_SEND_ENDPOINT, "application/json", requestBody);
+      status = conn.getResponseCode();
+    } catch (IOException e) {
+      logger.log(Level.FINE, "IOException posting to GCM", e);
+      return null;
+    }
     String responseBody;
     if (status != 200) {
-      responseBody = getString(conn.getErrorStream());
-      logger.finest("JSON error response: " + responseBody);
+      try {
+        responseBody = getAndClose(conn.getErrorStream());
+        logger.finest("JSON error response: " + responseBody);
+      } catch (IOException e) {
+        // ignore the exception since it will thrown an InvalidRequestException
+        // anyways
+        responseBody = "N/A";
+        logger.log(Level.FINE, "Exception reading response: ", e);
+      }
       throw new InvalidRequestException(status, responseBody);
     }
-    responseBody = getString(conn.getInputStream());
+    try {
+      responseBody = getAndClose(conn.getInputStream());
+    } catch(IOException e) {
+      logger.log(Level.WARNING, "IOException reading response", e);
+      return null;
+    }
     logger.finest("JSON response: " + responseBody);
     JSONParser parser = new JSONParser();
     JSONObject jsonResponse;
@@ -417,6 +465,17 @@ public class Sender {
     String msg = "Error parsing JSON response (" + responseBody + ")";
     logger.log(Level.WARNING, msg, e);
     return new IOException(msg + ":" + e);
+  }
+
+  private static void close(Closeable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (IOException e) {
+        // ignore error
+        logger.log(Level.FINEST, "IOException closing stream", e);
+      }
+    }
   }
 
   /**
@@ -465,6 +524,21 @@ public class Sender {
     return post(url, "application/x-www-form-urlencoded;charset=UTF-8", body);
   }
 
+  /**
+   * Makes an HTTP POST request to a given endpoint.
+   *
+   * <p>
+   * <strong>Note: </strong> the returned connected should not be disconnected,
+   * otherwise it would kill persistent connections made using Keep-Alive.
+   *
+   * @param url endpoint to post the request.
+   * @param contentType type of request.
+   * @param body body of the request.
+   *
+   * @return the underlying connection.
+   *
+   * @throws IOException propagated from underlying methods.
+   */
   protected HttpURLConnection post(String url, String contentType, String body)
       throws IOException {
     if (url == null || body == null) {
@@ -484,8 +558,11 @@ public class Sender {
     conn.setRequestProperty("Content-Type", contentType);
     conn.setRequestProperty("Authorization", "key=" + key);
     OutputStream out = conn.getOutputStream();
-    out.write(bytes);
-    out.close();
+    try {
+      out.write(bytes);
+    } finally {
+      close(out);
+    }
     return conn;
   }
 
@@ -513,9 +590,9 @@ public class Sender {
   /**
    * Adds a new parameter to the HTTP POST body.
    *
-   * @param body HTTP POST body
-   * @param name parameter's name
-   * @param value parameter's value
+   * @param body HTTP POST body.
+   * @param name parameter's name.
+   * @param value parameter's value.
    */
   protected static void addParameter(StringBuilder body, String name,
       String value) {
@@ -533,7 +610,6 @@ public class Sender {
 
   /**
    * Convenience method to convert an InputStream to a String.
-   *
    * <p>
    * If the stream ends in a newline character, it will be stripped.
    * <p>
@@ -560,6 +636,16 @@ public class Sender {
     return content.toString();
   }
 
+  private static String getAndClose(InputStream stream) throws IOException {
+    try {
+      return getString(stream);
+    } finally {
+      if (stream != null) {
+        close(stream);
+      }
+    }
+  }
+
   static <T> T nonNull(T argument) {
     if (argument == null) {
       throw new IllegalArgumentException("argument cannot be null");
@@ -574,5 +660,4 @@ public class Sender {
       Thread.currentThread().interrupt();
     }
   }
-
 }

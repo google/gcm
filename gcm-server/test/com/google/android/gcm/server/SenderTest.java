@@ -17,6 +17,7 @@ package com.google.android.gcm.server;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -74,6 +75,13 @@ public class SenderTest {
           .addData("k2", "v2")
           .addData("k3", "v3")
           .build();
+
+  private final InputStream exceptionalStream = new InputStream() {
+
+    @Override
+    public int read() throws IOException {
+      throw new IOException();
+    }};
 
   // creates a Mockito Spy so we can stub internal methods
   @Spy private Sender sender = new Sender(authKey);
@@ -169,7 +177,6 @@ public class SenderTest {
     assertNull(result.getCanonicalRegistrationId());
     assertNull(result.getErrorCodeName());
     assertRequestBody();
-    verify(mockedConn).disconnect();
   }
 
   @Test
@@ -181,7 +188,6 @@ public class SenderTest {
     assertEquals("108", result.getCanonicalRegistrationId());
     assertNull(result.getErrorCodeName());
     assertRequestBody();
-    verify(mockedConn).disconnect();
   }
 
   @Test
@@ -217,7 +223,6 @@ public class SenderTest {
     assertNull(result.getCanonicalRegistrationId());
     assertEquals("D'OH!", result.getErrorCodeName());
     assertRequestBody();
-    verify(mockedConn).disconnect();
   }
 
   @Test
@@ -228,34 +233,73 @@ public class SenderTest {
     assertRequestBody();
   }
 
+  @Test
+  public void testSendNoRetry_internalServerError() throws Exception {
+    setResponseExpectations(500, "");
+    Result result = sender.sendNoRetry(message, regId);
+    assertNull(result);
+    assertRequestBody();
+  }
+
+  @Test
+  public void testSendNoRetry_ioException_post() throws Exception {
+    when(mockedConn.getOutputStream()).thenThrow(new IOException());
+    doReturn(mockedConn).when(sender)
+        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    Result result = sender.sendNoRetry(message, regId);
+    assertNull(result);
+    assertRequestBody();
+  }
+
+  @Test
+  public void testSendNoRetry_ioException_errorStream() throws Exception {
+    when(mockedConn.getResponseCode()).thenReturn(42);
+    when(mockedConn.getOutputStream()).thenReturn(outputStream);
+    when(mockedConn.getErrorStream()).thenReturn(exceptionalStream);
+    doReturn(mockedConn).when(sender)
+        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    try {
+      sender.sendNoRetry(message, regId);
+    } catch (InvalidRequestException e) {
+      assertEquals(42, e.getHttpStatusCode());
+    }
+    assertRequestBody();
+  }
+
+  @Test
+  public void testSendNoRetry_ioException_inputStream() throws Exception {
+    when(mockedConn.getResponseCode()).thenReturn(200);
+    when(mockedConn.getOutputStream()).thenReturn(outputStream);
+    when(mockedConn.getInputStream()).thenReturn(exceptionalStream);
+    doReturn(mockedConn).when(sender)
+        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    Result result = sender.sendNoRetry(message, regId);
+    assertNull(result);
+    assertRequestBody();
+  }
+
   @Test(expected = IOException.class)
   public void testSendNoRetry_emptyBody() throws Exception {
     setResponseExpectations(200, "");
     sender.sendNoRetry(message, regId);
-    assertRequestBody();
-    verify(mockedConn).disconnect();
   }
 
   @Test(expected = IOException.class)
   public void testSendNoRetry_noToken() throws Exception {
     setResponseExpectations(200, "no token");
     sender.sendNoRetry(message, regId);
-    assertRequestBody();
-    verify(mockedConn).disconnect();
   }
 
   @Test(expected = IOException.class)
   public void testSendNoRetry_invalidToken() throws Exception {
     setResponseExpectations(200, "bad=token");
     sender.sendNoRetry(message, regId);
-    verify(mockedConn).disconnect();
   }
 
   @Test(expected = IOException.class)
   public void testSendNoRetry_emptyToken() throws Exception {
     setResponseExpectations(200, "token=");
     sender.sendNoRetry(message, regId);
-    verify(mockedConn).disconnect();
   }
 
   @Test
@@ -272,6 +316,32 @@ public class SenderTest {
   @Test(expected = IllegalArgumentException.class)
   public void testSendNoRetry_noRegistrationId() throws Exception {
     sender.sendNoRetry(new Message.Builder().build(), (String) null);
+  }
+
+  @Test()
+  public void testSend_json_failsPostingJSON_null() throws Exception {
+    List<String> regIds = Arrays.asList("108");
+    doReturn(null).when(sender).sendNoRetry(message, regIds);
+    try {
+      sender.send(message, regIds, 0);
+    } catch(IOException e) {
+      assertNotNull(e.getMessage());
+    }
+    verify(sender, times(1)).sendNoRetry(message, regIds);
+  }
+
+  @Test()
+  public void testSend_json_failsPostingJSON_IOException() throws Exception {
+    List<String> regIds = Arrays.asList("108");
+    IOException gcmException = new IOException();
+    doThrow(gcmException).when(sender).sendNoRetry(message, regIds);
+    try {
+      sender.send(message, regIds, 0);
+    } catch(IOException e) {
+      assertNotNull(e.getMessage());
+      assertNotSame(gcmException, e);
+    }
+    verify(sender, times(1)).sendNoRetry(message, regIds);
   }
 
   @Test()
@@ -337,16 +407,20 @@ public class SenderTest {
      *
      * input: 4, 8, 15, 16, 23, 42
      *
-     * 1st call (multicast_id:100): 4,16:ok 8,15,23:unavailable, 42:error,
-     * 2nd call (multicast_id:200): 8,15: unavailable, 23:ok
-     * 3rd call (multicast_id:300): 8:error, 15:unavailable
-     * 4th call (multicast_id:400): 15:unavailable
+     * 1st call (multicast_id:100): 4,16:ok 8,15: unavailable
+     *                              23:internalServerError, 42:error,
+     * 2nd call: whole post failed
+     * 3rd call (multicast_id:200): 8,15: unavailable, 23:ok
+     * 4th call (multicast_id:300): 8:error, 15:unavailable
+     * 5th call (multicast_id:400): 15:unavailable
      *
      * output: total:6, success:3, error: 3, canonicals: 0, multicast_id: 100
      *         results: ok, error, unavailable, ok, ok, error
      */
     Result unaivalableResult =
         new Result.Builder().errorCode("Unavailable").build();
+    Result internalServerErrorResult =
+        new Result.Builder().errorCode("InternalServerError").build();
     Result errorResult =
         new Result.Builder().errorCode("D'OH!").build();
     Result okResultMsg4 =
@@ -360,33 +434,35 @@ public class SenderTest {
         .addResult(unaivalableResult)
         .addResult(unaivalableResult)
         .addResult(okResultMsg16)
-        .addResult(unaivalableResult)
+        .addResult(internalServerErrorResult)
         .addResult(errorResult)
         .build();
     doReturn(result1stCall).when(sender).sendNoRetry(message,
         Arrays.asList("4", "8", "15", "16", "23", "42"));
-    MulticastResult result2ndCall = new MulticastResult.Builder(0, 0, 0, 200)
+    MulticastResult result2ndCall = null;
+    MulticastResult result3rdCall = new MulticastResult.Builder(0, 0, 0, 200)
       .addResult(unaivalableResult)
       .addResult(unaivalableResult)
       .addResult(okResultMsg23)
       .build();
-    doReturn(result2ndCall).when(sender).sendNoRetry(message,
-        Arrays.asList("8", "15", "23"));
-    MulticastResult result3rdCall = new MulticastResult.Builder(0, 0, 0, 300)
+    // must next 2nd and 3rd calls on same mock setup since input is the same
+    doReturn(result2ndCall).doReturn(result3rdCall).when(sender)
+        .sendNoRetry(message, Arrays.asList("8", "15", "23"));
+    MulticastResult result4thCall = new MulticastResult.Builder(0, 0, 0, 300)
       .addResult(errorResult)
       .addResult(unaivalableResult)
       .build();
-    doReturn(result3rdCall).when(sender).sendNoRetry(message,
+    doReturn(result4thCall).when(sender).sendNoRetry(message,
         Arrays.asList("8", "15"));
-    MulticastResult result4thCall = new MulticastResult.Builder(0, 0, 0, 400)
+    MulticastResult result5thCall = new MulticastResult.Builder(0, 0, 0, 400)
       .addResult(unaivalableResult)
       .build();
-    doReturn(result4thCall).when(sender).sendNoRetry(message,
+    doReturn(result5thCall).when(sender).sendNoRetry(message,
         Arrays.asList("15"));
 
     // call it
     MulticastResult actualResult = sender.send(message,
-        Arrays.asList("4", "8", "15", "16", "23", "42"), 3);
+        Arrays.asList("4", "8", "15", "16", "23", "42"), 4);
 
     // assert results
     assertNotNull(actualResult);
@@ -408,7 +484,7 @@ public class SenderTest {
     assertEquals(200, retryMulticastIds.get(0).longValue());
     assertEquals(300, retryMulticastIds.get(1).longValue());
     assertEquals(400, retryMulticastIds.get(2).longValue());
-    verify(sender, times(4)).sendNoRetry(eq(message), anyListOf(String.class));
+    verify(sender, times(5)).sendNoRetry(eq(message), anyListOf(String.class));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -443,6 +519,42 @@ public class SenderTest {
       assertEquals("", e.getDescription());
       assertRequestJsonBody("108");
     }
+  }
+
+  @Test
+  public void testSendNoRetry_json_ioException_post() throws Exception {
+    when(mockedConn.getOutputStream()).thenThrow(new IOException());
+    doReturn(mockedConn).when(sender)
+        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    MulticastResult multicastResult = sender.sendNoRetry(message,
+        Arrays.asList("4", "8", "15"));
+    assertNull(multicastResult);
+  }
+
+  @Test
+  public void testSendNoRetry_json_ioException_errorStream() throws Exception {
+    when(mockedConn.getResponseCode()).thenReturn(42);
+    when(mockedConn.getOutputStream()).thenReturn(outputStream);
+    when(mockedConn.getErrorStream()).thenReturn(exceptionalStream);
+    doReturn(mockedConn).when(sender)
+        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    try {
+      sender.sendNoRetry(message, Arrays.asList("4", "8", "15"));
+    } catch (InvalidRequestException e) {
+      assertEquals(42, e.getHttpStatusCode());
+    }
+  }
+
+  @Test
+  public void testSendNoRetry_json_ioException_inputStream() throws Exception {
+    when(mockedConn.getResponseCode()).thenReturn(200);
+    when(mockedConn.getOutputStream()).thenReturn(outputStream);
+    when(mockedConn.getInputStream()).thenReturn(exceptionalStream);
+    doReturn(mockedConn).when(sender)
+        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    MulticastResult multicastResult = sender.sendNoRetry(message,
+        Arrays.asList("4", "8", "15"));
+    assertNull(multicastResult);
   }
 
   @Test()
@@ -673,7 +785,7 @@ public class SenderTest {
     // parse body
     String body = capturedBody.getValue();
     Map<String, String> params = new HashMap<String, String>();
-    for(String param : body.split("&")) {
+    for (String param : body.split("&")) {
       String[] split = param.split("=");
       params.put(split[0], split[1]);
     }
