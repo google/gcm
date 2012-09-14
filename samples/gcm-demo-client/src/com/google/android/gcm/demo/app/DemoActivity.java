@@ -74,17 +74,7 @@ public class DemoActivity extends Activity {
 
                     @Override
                     protected Void doInBackground(Void... params) {
-                        boolean registered =
-                                ServerUtilities.register(context, regId);
-                        // At this point all attempts to register with the app
-                        // server failed, so we need to unregister the device
-                        // from GCM - the app will try to register again when
-                        // it is restarted. Note that GCM will send an
-                        // unregistered callback upon completion, but
-                        // GCMIntentService.onUnregistered() will ignore it.
-                        if (!registered) {
-                            GCMRegistrar.unregister(context);
-                        }
+                        ServerUtilities.register(context, regId);
                         return null;
                     }
 
