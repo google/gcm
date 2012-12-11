@@ -49,6 +49,8 @@ public class MessageTest {
         .collapseKey("108")
         .delayWhileIdle(true)
         .timeToLive(42)
+        .dryRun(true)
+        .restrictedPackageName("package.name")
         .addData("k1", "old value")
         .addData("k1", "v1")
         .addData("k2", "v2")
@@ -56,6 +58,8 @@ public class MessageTest {
     assertEquals("108", message.getCollapseKey());
     assertTrue(message.isDelayWhileIdle());
     assertEquals(42, message.getTimeToLive().intValue());
+    assertTrue(message.isDryRun());
+    assertEquals("package.name", message.getRestrictedPackageName());
     Map<String, String> data = message.getData();
     assertEquals(2, data.size());
     assertEquals("v1", data.get("k1"));
@@ -66,6 +70,8 @@ public class MessageTest {
     assertTrue(toString.contains("delayWhileIdle=true"));
     assertTrue(toString.contains("k1=v1"));
     assertTrue(toString.contains("k2=v2"));
+    assertTrue(toString.contains("dryRun=true"));
+    assertTrue(toString.contains("restrictedPackageName=package.name"));
   }
 
   @Test(expected = UnsupportedOperationException.class)

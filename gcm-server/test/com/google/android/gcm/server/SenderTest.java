@@ -59,6 +59,8 @@ public class SenderTest {
   private final String regId = "15;16";
   private final String collapseKey = "collapseKey";
   private final boolean delayWhileIdle = true;
+  private final boolean dryRun = true;
+  private final String restrictedPackageName = "package.name";
   private final int retries = 42;
   private final int ttl = 108;
   private final String authKey = "4815162342";
@@ -68,6 +70,8 @@ public class SenderTest {
       new Message.Builder()
           .collapseKey(collapseKey)
           .delayWhileIdle(delayWhileIdle)
+          .dryRun(dryRun)
+          .restrictedPackageName(restrictedPackageName)
           .timeToLive(ttl)
           .addData("k0", null)
           .addData(null, "v0")
@@ -611,6 +615,8 @@ public class SenderTest {
     assertEquals(ttl, ((Long) json.get("time_to_live")).intValue());
     assertEquals(collapseKey, json.get("collapse_key"));
     assertEquals(delayWhileIdle, json.get("delay_while_idle"));
+    assertEquals(dryRun, json.get("dry_run"));
+    assertEquals(restrictedPackageName, json.get("restricted_package_name"));
     @SuppressWarnings("unchecked")
     Map<String, Object> payload = (Map<String, Object>) json.get("data");
     assertNotNull("no payload", payload);
@@ -780,8 +786,7 @@ public class SenderTest {
 
   private void assertRequestBody() throws Exception {
     ArgumentCaptor<String> capturedBody = ArgumentCaptor.forClass(String.class);
-    verify(sender).post(eq(Constants.GCM_SEND_ENDPOINT),
-        capturedBody.capture());
+    verify(sender).post(eq(Constants.GCM_SEND_ENDPOINT), capturedBody.capture());
     // parse body
     String body = capturedBody.getValue();
     Map<String, String> params = new HashMap<String, String>();
@@ -790,10 +795,12 @@ public class SenderTest {
       params.put(split[0], split[1]);
     }
     // check parameters
-    assertEquals("wrong parameters size for " + body, 7, params.size());
+    assertEquals("wrong parameters size for " + body, 9, params.size());
     assertParameter(params, "registration_id", regId);
     assertParameter(params, "collapse_key", collapseKey);
     assertParameter(params, "delay_while_idle", delayWhileIdle ? "1" : "0");
+    assertParameter(params, "dry_run", dryRun ? "1" : "0");
+    assertParameter(params, "restricted_package_name", restrictedPackageName);
     assertParameter(params, "time_to_live", "" + ttl);
     assertParameter(params, "data.k1", "v1");
     assertParameter(params, "data.k2", "v2");

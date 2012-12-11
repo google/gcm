@@ -38,6 +38,8 @@ import java.util.Map;
  *    .collapseKey(collapseKey)
  *    .timeToLive(3)
  *    .delayWhileIdle(true)
+ *    .dryRun(true)
+ *    .restrictedPackageName(restrictedPackageName)
  *    .build();
  * </pre></code>
  *
@@ -47,6 +49,8 @@ import java.util.Map;
  *    .collapseKey(collapseKey)
  *    .timeToLive(3)
  *    .delayWhileIdle(true)
+ *    .dryRun(true)
+ *    .restrictedPackageName(restrictedPackageName)
  *    .addData("key1", "value1")
  *    .addData("key2", "value2")
  *    .build();
@@ -58,6 +62,8 @@ public final class Message implements Serializable {
   private final Boolean delayWhileIdle;
   private final Integer timeToLive;
   private final Map<String, String> data;
+  private final Boolean dryRun;
+  private final String restrictedPackageName;
 
   public static final class Builder {
 
@@ -67,6 +73,8 @@ public final class Message implements Serializable {
     private String collapseKey;
     private Boolean delayWhileIdle;
     private Integer timeToLive;
+    private Boolean dryRun;
+    private String restrictedPackageName;
 
     public Builder() {
       this.data = new LinkedHashMap<String, String>();
@@ -104,6 +112,22 @@ public final class Message implements Serializable {
       return this;
     }
 
+    /**
+     * Sets the dryRun property (default value is {@literal false}).
+     */
+    public Builder dryRun(boolean value) {
+      dryRun = value;
+      return this;
+    }
+
+    /**
+     * Sets the restrictedPackageName property.
+     */
+    public Builder restrictedPackageName(String value) {
+      restrictedPackageName = value;
+      return this;
+    }
+
     public Message build() {
       return new Message(this);
     }
@@ -115,6 +139,8 @@ public final class Message implements Serializable {
     delayWhileIdle = builder.delayWhileIdle;
     data = Collections.unmodifiableMap(builder.data);
     timeToLive = builder.timeToLive;
+    dryRun = builder.dryRun;
+    restrictedPackageName = builder.restrictedPackageName;
   }
 
   /**
@@ -139,6 +165,20 @@ public final class Message implements Serializable {
   }
 
   /**
+   * Gets the dryRun flag.
+   */
+  public Boolean isDryRun() {
+    return dryRun;
+  }
+
+  /**
+   * Gets the restricted package name.
+   */
+  public String getRestrictedPackageName() {
+    return restrictedPackageName;
+  }
+
+  /**
    * Gets the payload data, which is immutable.
    */
   public Map<String, String> getData() {
@@ -156,6 +196,12 @@ public final class Message implements Serializable {
     }
     if (delayWhileIdle != null) {
       builder.append("delayWhileIdle=").append(delayWhileIdle).append(", ");
+    }
+    if (dryRun != null) {
+      builder.append("dryRun=").append(dryRun).append(", ");
+    }
+    if (restrictedPackageName != null) {
+      builder.append("restrictedPackageName=").append(restrictedPackageName).append(", ");
     }
     if (!data.isEmpty()) {
       builder.append("data: {");

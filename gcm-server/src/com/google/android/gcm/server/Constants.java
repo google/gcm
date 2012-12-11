@@ -42,6 +42,17 @@ public final class Constants {
   public static final String PARAM_DELAY_WHILE_IDLE = "delay_while_idle";
 
   /**
+   * HTTP parameter for telling gcm to validate the message without actually sending it.
+   */
+  public static final String PARAM_DRY_RUN = "dry_run";
+
+  /**
+   * HTTP parameter for package name that can be used to restrict message delivery by matching
+   * against the package name used to generate the registration id.
+   */
+  public static final String PARAM_RESTRICTED_PACKAGE_NAME = "restricted_package_name";
+
+  /**
    * Prefix to HTTP parameter used to pass key-values in the message payload.
    */
   public static final String PARAM_PAYLOAD_PREFIX = "data.";

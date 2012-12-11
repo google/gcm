@@ -27,8 +27,10 @@ import static com.google.android.gcm.server.Constants.JSON_RESULTS;
 import static com.google.android.gcm.server.Constants.JSON_SUCCESS;
 import static com.google.android.gcm.server.Constants.PARAM_COLLAPSE_KEY;
 import static com.google.android.gcm.server.Constants.PARAM_DELAY_WHILE_IDLE;
+import static com.google.android.gcm.server.Constants.PARAM_DRY_RUN;
 import static com.google.android.gcm.server.Constants.PARAM_PAYLOAD_PREFIX;
 import static com.google.android.gcm.server.Constants.PARAM_REGISTRATION_ID;
+import static com.google.android.gcm.server.Constants.PARAM_RESTRICTED_PACKAGE_NAME;
 import static com.google.android.gcm.server.Constants.PARAM_TIME_TO_LIVE;
 import static com.google.android.gcm.server.Constants.TOKEN_CANONICAL_REG_ID;
 import static com.google.android.gcm.server.Constants.TOKEN_ERROR;
@@ -154,9 +156,17 @@ public class Sender {
     if (delayWhileIdle != null) {
       addParameter(body, PARAM_DELAY_WHILE_IDLE, delayWhileIdle ? "1" : "0");
     }
+    Boolean dryRun = message.isDryRun();
+    if (dryRun != null) {
+      addParameter(body, PARAM_DRY_RUN, dryRun ? "1" : "0");
+    }
     String collapseKey = message.getCollapseKey();
     if (collapseKey != null) {
       addParameter(body, PARAM_COLLAPSE_KEY, collapseKey);
+    }
+    String restrictedPackageName = message.getRestrictedPackageName();
+    if (restrictedPackageName != null) {
+      addParameter(body, PARAM_RESTRICTED_PACKAGE_NAME, restrictedPackageName);
     }
     Integer timeToLive = message.getTimeToLive();
     if (timeToLive != null) {
@@ -385,8 +395,10 @@ public class Sender {
     Map<Object, Object> jsonRequest = new HashMap<Object, Object>();
     setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
     setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, message.getCollapseKey());
+    setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME, message.getRestrictedPackageName());
     setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE,
         message.isDelayWhileIdle());
+    setJsonField(jsonRequest, PARAM_DRY_RUN, message.isDryRun());
     jsonRequest.put(JSON_REGISTRATION_IDS, registrationIds);
     Map<String, String> payload = message.getData();
     if (!payload.isEmpty()) {

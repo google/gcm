@@ -32,7 +32,7 @@ public final class MulticastResult implements Serializable {
   private final List<Result> results;
   private final List<Long> retryMulticastIds;
 
-  static final class Builder {
+  public static final class Builder {
 
     private final List<Result> results = new ArrayList<Result>();
 
