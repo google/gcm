@@ -42,7 +42,8 @@ public class GCMIntentService extends GCMBaseIntentService {
     @Override
     protected void onRegistered(Context context, String registrationId) {
         Log.i(TAG, "Device registered: regId = " + registrationId);
-        displayMessage(context, getString(R.string.gcm_registered));
+        displayMessage(context, getString(R.string.gcm_registered,
+                registrationId));
         ServerUtilities.register(context, registrationId);
     }
 
@@ -55,7 +56,7 @@ public class GCMIntentService extends GCMBaseIntentService {
 
     @Override
     protected void onMessage(Context context, Intent intent) {
-        Log.i(TAG, "Received message");
+        Log.i(TAG, "Received message. Extras: " + intent.getExtras());
         String message = getString(R.string.gcm_message);
         displayMessage(context, message);
         // notifies user

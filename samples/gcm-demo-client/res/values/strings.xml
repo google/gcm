@@ -19,7 +19,7 @@
     <string name="app_name">GCM Demo</string>
     <string name="error_config">Please set the %1$s constant and recompile the app.</string>
     <string name="already_registered">Device is already registered on server.</string>
-    <string name="gcm_registered">From GCM: device successfully registered!</string>
+    <string name="gcm_registered">From GCM: device successfully registered (regId = %1$s)!</string>
     <string name="gcm_unregistered">From GCM: device successfully unregistered!</string>
     <string name="gcm_message">From GCM: you got message!</string>
     <string name="gcm_error">From GCM: error (%1$s).</string>
