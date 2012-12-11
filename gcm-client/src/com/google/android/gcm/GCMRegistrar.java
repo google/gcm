@@ -159,10 +159,8 @@ public final class GCMRegistrar {
             throw new IllegalStateException("No receiver for package " +
                     packageName);
         }
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            Log.v(TAG, "number of receivers for " + packageName + ": " +
-                    receivers.length);
-        }
+        log(context, Log.VERBOSE, "number of receivers for %s: %d",
+                packageName, receivers.length);
         Set<String> allowedReceivers = new HashSet<String>();
         for (ActivityInfo receiver : receivers) {
             if (GCMConstants.PERMISSION_GCM_INTENTS.equals(
@@ -192,10 +190,8 @@ public final class GCMRegistrar {
             throw new IllegalStateException("No receivers for action " +
                     action);
         }
-        if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            Log.v(TAG, "Found " + receivers.size() + " receivers for action " +
-                    action);
-        }
+        log(context, Log.VERBOSE, "Found %d receivers for action %s",
+                receivers.size(), action);
         // make sure receivers match
         for (ResolveInfo receiver : receivers) {
             String name = receiver.activityInfo.name;
@@ -228,8 +224,8 @@ public final class GCMRegistrar {
 
     static void internalRegister(Context context, String... senderIds) {
         String flatSenderIds = getFlatSenderIds(senderIds);
-        Log.v(TAG, "Registering app "  + context.getPackageName() +
-                " of senders " + flatSenderIds);
+        log(context, Log.VERBOSE, "Registering app for senders %s",
+                flatSenderIds);
         Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_REGISTRATION);
         intent.setPackage(GSF_PACKAGE);
         setPackageNameExtra(context, intent);
@@ -250,7 +246,7 @@ public final class GCMRegistrar {
     }
 
     static void internalUnregister(Context context) {
-        Log.v(TAG, "Unregistering app "  + context.getPackageName());
+        log(context, Log.VERBOSE, "Unregistering app");
         Intent intent = new Intent(GCMConstants.INTENT_TO_GCM_UNREGISTRATION);
         intent.setPackage(GSF_PACKAGE);
         setPackageNameExtra(context, intent);
@@ -277,7 +273,7 @@ public final class GCMRegistrar {
      */
     public static synchronized void onDestroy(Context context) {
         if (sRetryReceiver != null) {
-            Log.v(TAG, "Unregistering retry receiver");
+            log(context, Log.VERBOSE, "Unregistering retry receiver");
             sRetryReceiverContext.unregisterReceiver(sRetryReceiver);
             sRetryReceiver = null;
             sRetryReceiverContext = null;
@@ -294,7 +290,8 @@ public final class GCMRegistrar {
     private synchronized static void setPackageNameExtra(Context context,
             Intent intent) {
         if (sAppPendingIntent == null) {
-            Log.v(TAG, "Creating pending intent to get package name");
+            log(context, Log.VERBOSE,
+                    "Creating pending intent to get package name");
             sAppPendingIntent = PendingIntent.getBroadcast(context, 0,
                     new Intent(), 0);
         }
@@ -309,7 +306,8 @@ public final class GCMRegistrar {
         if (sRetryReceiver == null) {
             if (sRetryReceiverClassName == null) {
                 // should never happen
-                Log.e(TAG, "internal error: retry receiver class not set yet");
+                log(context, Log.ERROR,
+                        "internal error: retry receiver class not set yet");
                 sRetryReceiver = new GCMBroadcastReceiver();
             } else {
                 Class<?> clazz;
@@ -317,10 +315,9 @@ public final class GCMRegistrar {
                     clazz = Class.forName(sRetryReceiverClassName);
                     sRetryReceiver = (GCMBroadcastReceiver) clazz.newInstance();
                 } catch (Exception e) {
-                    Log.e(TAG, "Could not create instance of " +
-                            sRetryReceiverClassName + ". Using " +
-                            GCMBroadcastReceiver.class.getName() +
-                            " directly.");
+                    log(context, Log.ERROR, "Could not create instance of %s. "
+                            + "Using %s directly.", sRetryReceiverClassName,
+                            GCMBroadcastReceiver.class.getName());
                     sRetryReceiver = new GCMBroadcastReceiver();
                 }
             }
@@ -328,20 +325,19 @@ public final class GCMRegistrar {
             IntentFilter filter = new IntentFilter(
                     GCMConstants.INTENT_FROM_GCM_LIBRARY_RETRY);
             filter.addCategory(category);
-            // must use a permission that is defined on manifest for sure
-            String permission = category + ".permission.C2D_MESSAGE";
-            Log.v(TAG, "Registering retry receiver");
+            log(context, Log.VERBOSE, "Registering retry receiver");
             sRetryReceiverContext = context;
-            sRetryReceiverContext.registerReceiver(sRetryReceiver, filter,
-                    permission, null);
+            sRetryReceiverContext.registerReceiver(sRetryReceiver, filter);
         }
     }
 
     /**
      * Sets the name of the retry receiver class.
      */
-    static synchronized void setRetryReceiverClassName(String className) {
-        Log.v(TAG, "Setting the name of retry receiver class to " + className);
+    static synchronized void setRetryReceiverClassName(Context context,
+            String className) {
+        log(context, Log.VERBOSE,
+                "Setting the name of retry receiver class to %s", className);
         sRetryReceiverClassName = className;
     }
 
@@ -361,8 +357,8 @@ public final class GCMRegistrar {
         int oldVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
         int newVersion = getAppVersion(context);
         if (oldVersion != Integer.MIN_VALUE && oldVersion != newVersion) {
-            Log.v(TAG, "App version changed from " + oldVersion + " to " +
-                    newVersion + "; resetting registration id");
+            log(context, Log.VERBOSE, "App version changed from %d to %d;"
+                    + "resetting registration id", oldVersion, newVersion);
             clearRegistrationId(context);
             registrationId = "";
         }
@@ -380,10 +376,13 @@ public final class GCMRegistrar {
     /**
      * Clears the registration id in the persistence store.
      *
+     * <p>As a side-effect, it also expires the registeredOnServer property.
+     *
      * @param context application's context.
      * @return old registration id.
      */
     static String clearRegistrationId(Context context) {
+        setRegisteredOnServer(context, null, 0);
         return setRegistrationId(context, "");
     }
 
@@ -397,7 +396,7 @@ public final class GCMRegistrar {
         final SharedPreferences prefs = getGCMPreferences(context);
         String oldRegistrationId = prefs.getString(PROPERTY_REG_ID, "");
         int appVersion = getAppVersion(context);
-        Log.v(TAG, "Saving regId on app version " + appVersion);
+        log(context, Log.VERBOSE, "Saving regId on app version %d", appVersion);
         Editor editor = prefs.edit();
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
@@ -409,14 +408,26 @@ public final class GCMRegistrar {
      * Sets whether the device was successfully registered in the server side.
      */
     public static void setRegisteredOnServer(Context context, boolean flag) {
-        final SharedPreferences prefs = getGCMPreferences(context);
-        Editor editor = prefs.edit();
-        editor.putBoolean(PROPERTY_ON_SERVER, flag);
         // set the flag's expiration date
         long lifespan = getRegisterOnServerLifespan(context);
         long expirationTime = System.currentTimeMillis() + lifespan;
-        Log.v(TAG, "Setting registeredOnServer status as " + flag + " until " +
-                new Timestamp(expirationTime));
+        setRegisteredOnServer(context, flag, expirationTime);
+    }
+
+    private static void setRegisteredOnServer(Context context, Boolean flag,
+            long expirationTime) {
+        final SharedPreferences prefs = getGCMPreferences(context);
+        Editor editor = prefs.edit();
+        if (flag != null) {
+            editor.putBoolean(PROPERTY_ON_SERVER, flag);
+            log(context, Log.VERBOSE,
+                    "Setting registeredOnServer flag as %b until %s",
+                    flag, new Timestamp(expirationTime));
+        } else {
+            log(context, Log.VERBOSE,
+                    "Setting registeredOnServer expiration to %s",
+                    new Timestamp(expirationTime));
+        }
         editor.putLong(PROPERTY_ON_SERVER_EXPIRATION_TIME, expirationTime);
         editor.commit();
     }
@@ -433,13 +444,14 @@ public final class GCMRegistrar {
     public static boolean isRegisteredOnServer(Context context) {
         final SharedPreferences prefs = getGCMPreferences(context);
         boolean isRegistered = prefs.getBoolean(PROPERTY_ON_SERVER, false);
-        Log.v(TAG, "Is registered on server: " + isRegistered);
+        log(context, Log.VERBOSE, "Is registered on server: %b", isRegistered);
         if (isRegistered) {
             // checks if the information is not stale
             long expirationTime =
                     prefs.getLong(PROPERTY_ON_SERVER_EXPIRATION_TIME, -1);
             if (System.currentTimeMillis() > expirationTime) {
-                Log.v(TAG, "flag expired on: " + new Timestamp(expirationTime));
+                log(context, Log.VERBOSE, "flag expired on: %s",
+                        new Timestamp(expirationTime));
                 return false;
             }
         }
@@ -464,7 +476,7 @@ public final class GCMRegistrar {
      * Sets how long (in milliseconds) the {@link #isRegistered(Context)}
      * flag is valid.
      */
-    public static void setRegisterOnServerLifespan(Context context, 
+    public static void setRegisterOnServerLifespan(Context context,
             long lifespan) {
         final SharedPreferences prefs = getGCMPreferences(context);
         Editor editor = prefs.edit();
@@ -494,7 +506,7 @@ public final class GCMRegistrar {
      * @param context application's context.
      */
     static void resetBackoff(Context context) {
-        Log.d(TAG, "Resetting backoff for " + context.getPackageName());
+        log(context, Log.VERBOSE, "Resetting backoff");
         setBackoff(context, DEFAULT_BACKOFF_MS);
     }
 
@@ -527,6 +539,23 @@ public final class GCMRegistrar {
 
     private static SharedPreferences getGCMPreferences(Context context) {
         return context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+    }
+
+    /**
+     * Logs a message on logcat.
+     *
+     * @param context application's context.
+     * @param priority logging priority
+     * @param template message's template
+     * @param args list of arguments
+     */
+    private static void log(Context context, int priority, String template,
+            Object... args) {
+        if (Log.isLoggable(TAG, priority)) {
+            String message = String.format(template, args);
+            Log.println(priority, TAG, "[" + context.getPackageName() + "]: "
+                    + message);
+        }
     }
 
     private GCMRegistrar() {

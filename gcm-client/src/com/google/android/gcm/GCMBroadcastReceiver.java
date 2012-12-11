@@ -35,19 +35,22 @@ import android.util.Log;
  */
 public class GCMBroadcastReceiver extends BroadcastReceiver {
 
-    private static final String TAG = "GCMBroadcastReceiver";
     private static boolean mReceiverSet = false;
+
+    private final GCMLogger mLogger = new GCMLogger("GCMBroadcastReceiver",
+            "[" + getClass().getName() + "]: ");
 
     @Override
     public final void onReceive(Context context, Intent intent) {
-        Log.v(TAG, "onReceive: " + intent.getAction());
+        mLogger.log(Log.VERBOSE, "onReceive: %s", intent.getAction());
         // do a one-time check if app is using a custom GCMBroadcastReceiver
         if (!mReceiverSet) {
             mReceiverSet = true;
-            GCMRegistrar.setRetryReceiverClassName(getClass().getName());
+            GCMRegistrar.setRetryReceiverClassName(context,
+                    getClass().getName());
         }
         String className = getGCMIntentServiceClassName(context);
-        Log.v(TAG, "GCM IntentService class: " + className);
+        mLogger.log(Log.VERBOSE, "GCM IntentService class: %s", className);
         // Delegates to the application-specific intent service.
         GCMBaseIntentService.runIntentInService(context, intent, className);
         setResult(Activity.RESULT_OK, null /* data */, null /* extra */);
