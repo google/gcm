@@ -53,38 +53,46 @@ public final class GCMConstants {
             "com.google.android.c2dm.intent.RECEIVE";
 
     /**
-     * Extra used on {@value #INTENT_TO_GCM_REGISTRATION} to indicate which
-     * senders (Google API project ids) can send messages to the application.
+     * Extra used on
+     * {@value com.google.android.gcm.GCMConstants#INTENT_TO_GCM_REGISTRATION}
+     * to indicate which senders (Google API project ids) can send messages to
+     * the application.
      */
     public static final String EXTRA_SENDER = "sender";
 
     /**
-     * Extra used on {@value #INTENT_TO_GCM_REGISTRATION} to get the
-     * application info.
+     * Extra used on
+     * {@value com.google.android.gcm.GCMConstants#INTENT_TO_GCM_REGISTRATION}
+     * to get the application info.
      */
     public static final String EXTRA_APPLICATION_PENDING_INTENT = "app";
 
     /**
-     * Extra used on {@value #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
-     * that the application has been unregistered.
+     * Extra used on
+     * {@value com.google.android.gcm.GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK}
+     * to indicate that the application has been unregistered.
      */
     public static final String EXTRA_UNREGISTERED = "unregistered";
 
     /**
-     * Extra used on {@value #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
-     * an error when the registration fails. See constants starting with ERROR_
-     * for possible values.
+     * Extra used on
+     * {@value com.google.android.gcm.GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK}
+     * to indicate an error when the registration fails.
+     * See constants starting with ERROR_ for possible values.
      */
     public static final String EXTRA_ERROR = "error";
 
     /**
-     * Extra used on {@value #INTENT_FROM_GCM_REGISTRATION_CALLBACK} to indicate
-     * the registration id when the registration succeeds.
+     * Extra used on
+     * {@value com.google.android.gcm.GCMConstants#INTENT_FROM_GCM_REGISTRATION_CALLBACK}
+     * to indicate the registration id when the registration succeeds.
      */
     public static final String EXTRA_REGISTRATION_ID = "registration_id";
 
     /**
-     * Type of message present in the {@value #INTENT_FROM_GCM_MESSAGE} intent.
+     * Type of message present in the
+     * {@value com.google.android.gcm.GCMConstants#INTENT_FROM_GCM_MESSAGE}
+     * intent.
      * This extra is only set for special messages sent from GCM, not for
      * messages originated from the application.
      */
@@ -98,13 +106,14 @@ public final class GCMConstants {
     /**
      * Number of messages deleted by the server because the device was idle.
      * Present only on messages of special type
-     * {@value #VALUE_DELETED_MESSAGES}
+     * {@value com.google.android.gcm.GCMConstants#VALUE_DELETED_MESSAGES}
      */
     public static final String EXTRA_TOTAL_DELETED = "total_deleted";
 
     /**
-     * Extra used on {@value #INTENT_FROM_GCM_MESSAGE} to indicate which
-     * sender (Google API project id) sent the message.
+     * Extra used on
+     * {@value com.google.android.gcm.GCMConstants#INTENT_FROM_GCM_MESSAGE}
+     * to indicate which sender (Google API project id) sent the message.
      */
     public static final String EXTRA_FROM = "from";
 
