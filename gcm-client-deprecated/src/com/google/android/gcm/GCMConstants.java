@@ -18,7 +18,11 @@ package com.google.android.gcm;
 
 /**
  * Constants used by the GCM library.
+ *
+  * @deprecated GCM library has been moved to Google Play Services
+ * (com.google.android.gms.gcm), and this version is no longer supported.
  */
+@Deprecated
 public final class GCMConstants {
 
     /**

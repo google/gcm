@@ -49,7 +49,11 @@ import java.util.concurrent.TimeUnit;
  * be blocked.
  * <p>
  * Subclasses must provide a public no-arg constructor.
+ *
+ * @deprecated GCM library has been moved to Google Play Services
+ * (com.google.android.gms.gcm), and this version is no longer supported.
  */
+@Deprecated
 public abstract class GCMBaseIntentService extends IntentService {
 
     /**

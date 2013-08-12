@@ -20,7 +20,11 @@ import android.util.Log;
 
 /**
  * Custom logger.
+ *
+ * @deprecated GCM library has been moved to Google Play Services
+ * (com.google.android.gms.gcm), and this version is no longer supported.
  */
+@Deprecated
 class GCMLogger {
 
     private final String mTag;

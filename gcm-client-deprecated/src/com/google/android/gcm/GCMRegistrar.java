@@ -41,7 +41,11 @@ import java.util.Set;
  * <p>
  * <strong>Note:</strong> this class uses a private {@link SharedPreferences}
  * object to keep track of the registration token.
+ *
+ * @deprecated GCM library has been moved to Google Play Services
+ * (com.google.android.gms.gcm), and this version is no longer supported.
  */
+@Deprecated
 public final class GCMRegistrar {
 
     /**

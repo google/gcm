@@ -32,7 +32,11 @@ import android.util.Log;
  * main package and is named
  * {@link GCMConstants#DEFAULT_INTENT_SERVICE_CLASS_NAME}. To use a new class,
  * the {@link #getGCMIntentServiceClassName(Context)} must be overridden.
+ *
+ * @deprecated GCM library has been moved to Google Play Services
+ * (com.google.android.gms.gcm), and this version is no longer supported.
  */
+@Deprecated
 public class GCMBroadcastReceiver extends BroadcastReceiver {
 
     private static boolean mReceiverSet = false;

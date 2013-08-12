@@ -16,56 +16,30 @@
 package com.google.android.gcm.demo.app;
 
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.WakefulBroadcastReceiver;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 /**
- * Handling of GCM messages.
+ * This {@code WakefulBroadcastReceiver} takes care of creating and managing a
+ * partial wake lock for your app. It passes off the work of processing the GCM
+ * message to an {@code IntentService}, while ensuring that the device does not
+ * go back to sleep in the transition. The {@code IntentService} calls
+ * {@code GcmBroadcastReceiver.completeWakefulIntent()} when it is ready to
+ * release the wake lock.
  */
-public class GcmBroadcastReceiver extends BroadcastReceiver {
-    static final String TAG = "GCMDemo";
-    public static final int NOTIFICATION_ID = 1;
-    private NotificationManager mNotificationManager;
-    NotificationCompat.Builder builder;
-    Context ctx;
+
+public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
+
     @Override
     public void onReceive(Context context, Intent intent) {
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
-        ctx = context;
-        String messageType = gcm.getMessageType(intent);
-        if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-            sendNotification("Send error: " + intent.getExtras().toString());
-        } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-            sendNotification("Deleted messages on server: " + intent.getExtras().toString());
-        } else {
-            sendNotification("Received: " + intent.getExtras().toString());
-        }
+        // Explicitly specify that GcmIntentService will handle the intent.
+        ComponentName comp = new ComponentName(context.getPackageName(),
+                GcmIntentService.class.getName());
+        // Start the service, keeping the device awake while it is launching.
+        startWakefulService(context, (intent.setComponent(comp)));
         setResultCode(Activity.RESULT_OK);
-    }
-
-    // Put the GCM message into a notification and post it.
-    private void sendNotification(String msg) {
-        mNotificationManager = (NotificationManager)
-                ctx.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
-                new Intent(ctx, DemoActivity.class), 0);
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(ctx)
-        .setSmallIcon(R.drawable.ic_stat_gcm)
-        .setContentTitle("GCM Notification")
-        .setStyle(new NotificationCompat.BigTextStyle()
-        .bigText(msg))
-        .setContentText(msg);
-
-        mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  - Copyright 2012 Google Inc.
+  - Copyright 2013 Google Inc.
   -
   - Licensed under the Apache License, Version 2.0 (the "License"); you may not
   - use this file except in compliance with the License. You may obtain a copy
@@ -37,7 +37,7 @@
      NOTE: the permission *must* be called PACKAGE.permission.C2D_MESSAGE,
            where PACKAGE is the application's package name.
     -->
-    <permission android:name="com.google.android.gcm.demo.app.permission.C2D_MESSAGE" 
+    <permission android:name="com.google.android.gcm.demo.app.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
     <uses-permission android:name="com.google.android.gcm.demo.app.permission.C2D_MESSAGE" />
 
@@ -62,8 +62,8 @@
         </activity>
 
         <!--
-          BroadcastReceiver that will receive intents from GCM
-          services and handle them to the custom IntentService.
+          WakefulBroadcastReceiver that will receive intents from GCM
+          services and hand them to the custom IntentService.
 
           The com.google.android.c2dm.permission.SEND permission is necessary
           so only GCM services can send data messages for the app.
@@ -77,7 +77,7 @@
                 <category android:name="com.google.android.gcm.demo.app" />
             </intent-filter>
         </receiver>
-
+        <service android:name=".GcmIntentService" />
     </application>
 
 </manifest>
