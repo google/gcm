@@ -7,10 +7,9 @@ applications to contact the server directly, to fetch updated application or
 user data. The GCM service handles all aspects of queueing of messages and
 delivery to the target Android application running on the target device.
 
-This project contains an app application that demonstrates the GCM APIs for
-registering, sending downstream, upstream and notification messages, subscribing
-to topics, creating notification groups and using the network manager to schedule
-tasks.
+This project contains an app that demonstrates the GCM APIs for registering,
+sending downstream, upstream and notification messages, subscribing to topics,
+creating notification groups and using the network manager to schedule tasks.
 
 More information on GCM, including an overview and integration instructions, can
 be found on the Android Developers website:
