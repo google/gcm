@@ -16,6 +16,25 @@ be found on the Android Developers website:
 
 http://developer.android.com/guide/google/gcm/index.html
 
+## Getting Started
+
+This sample uses the Gradle build system. To build this project, use the
+"gradlew build" command or use "Import Project" in Android Studio.
+To use the app you will need a sender id to be able to register and test client
+side APIs, and an API key to be able to test server side APIs. Refer to the
+guidelines available at https://developer.android.com/google/gcm/gs.html.
+
+## Screenshots
+
+![Menu](screenshots/menu.png "The app's menu")
+![Registration](screenshots/registration1.png "Registration page - unregistered")
+![Registration - registered](screenshots/registration2.png "Registration page - registered")
+![Downstream](screenshots/downstream.png "Sending downstream messages")
+![Groups](screenshots/groups.png "Groups page")
+![Topics](screenshots/topics.png "Topics page")
+![Add topic](screenshots/add_topuc.png "Add a topic")
+![Tasks](screenshots/tasks.png "Network manager tasks page")
+
 ## Support
 
 - Google+ Community: https://plus.sandbox.google.com/communities/105153134372062985968
