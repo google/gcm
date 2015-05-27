@@ -31,6 +31,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.SpannableString;
@@ -204,6 +205,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mLogger.log(Log.INFO, String.format(format, data));
         }
     }
+
+    @Override
+    public void onSupportActionModeStarted(ActionMode mode) {
+        super.onSupportActionModeStarted(mode);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Set a status bar color while in action mode (text copy&paste)
+            getWindow().setStatusBarColor(getResources().getColor(R.color.blue_900));
+        }
+    }
+
+    @Override
+    public void onSupportActionModeFinished(ActionMode mode) {
+        super.onSupportActionModeFinished(mode);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Reset status bar to transparent when leaving action mode (text copy&paste)
+            getWindow().setStatusBarColor(getResources().getColor(R.color.transparent));
+        }
+    }
+
 
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
