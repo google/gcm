@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<resources>
+    <string name="application_name">GCM Demo</string>
+    <string name="main_activity_title_prefix">"GCM: "</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="logs">Logs</string>
+
+    <!-- Main Menu -->
+    <string name="main_menu_instanceid">Registrations</string>
+    <string name="main_menu_downstream">Downstream</string>
+    <string name="main_menu_upstream">Upstream</string>
+    <string name="main_menu_notification">Notifications</string>
+    <string name="main_menu_groups">Device Groups</string>
+    <string name="main_menu_topics">Topics</string>
+    <string name="main_menu_network_scheduler">Network Scheduler</string>
+
+    <!-- Overflow Menu -->
+    <string name="show_logs">Show Logs</string>
+    <string name="hide_logs">Hide Logs</string>
+    <string name="clear_logs">Clear logs</string>
+
+    <!-- Downstream Fragment -->
+    <string name="downstream_collapse_key_hint">Collapse key</string>
+    <string name="downstream_restricted_package_name_hint">Restricted package name</string>
+    <string name="downstream_ttl_hint">Time To Live</string>
+    <string name="downstream_delay_while_idle_text">Delay while idle</string>
+    <string name="downstream_dry_run_text">Dry run</string>
+    <string name="downstream_data_hint">Data</string>
+    <string name="downstream_sender_id_label">Sender ID</string>
+    <string name="downstream_json_text">JSON</string>
+    <string name="downstream_cleartext_text">Clear text</string>
+    <string name="downstream_send_text">Send</string>
+    <string name="downstream_api_key">API Key:</string>
+    <string name="downstream_registration_id">Registration Id:</string>
+    <string name="downstream_select_reg_id">Select registration id</string>
+    <string name="downstream_select_api_key">Select API key</string>
+
+    <!-- Upstream Fragment -->
+    <string name="upstream_message_id_hint">Message ID</string>
+    <string name="upstream_ttl_hint">TTL</string>
+    <string name="upstream_send_text">Send</string>
+    <string name="upstream_sender_id">Sender Id:</string>
+    <string name="upstream_registration_id">Registration Id:</string>
+    <string name="upstream_unregistered">Unregistered</string>
+
+    <!-- Instance Id Fragment -->
+    <string name="iid_sender_id">Sender ID:</string>
+    <string name="iid_execute_quick_test">run</string>
+    <string name="iid_register">Register</string>
+    <string name="iid_unregister">Unregister</string>
+    <string name="iid_about_quicktest">▶ About the Quick Test</string>
+    <string name="iid_about_quicktest_open">▼ About the Quick Test</string>
+    <string name="iid_about_quick_test_full_text">Quick tests offer a fast way to check that the application is correctly registered and messages are getting through. For more details on the APIs see their corresponding pages.</string>
+    <string name="iid_about_apis">▶ About the registration APIs</string>
+    <string name="iid_about_apis_open">▼ About the registration APIs</string>
+    <string name="iid_about_apis_full_text">Registration has to be done by the client in order for it to receive a registration token. The client must communicate this token back to its server. The server will then use the token to send messages to the client.</string>
+    <string name="iid_unregistered">Unregistered</string>
+    <string name="iid_quick_test">Quick test:</string>
+    <string name="iid_api_key">API Key:</string>
+    <string name="iid_token">Token:</string>
+
+    <!-- Topics Fragment -->
+    <string name="topics_sender_id">Sender ID: %1$s</string>
+    <string name="topics_description">With Pub/Sub APIs you can subscribe multiple topics and receive messages broadcasted by senders to a very large number of devices.  &lt;a href="http://www.google.com">More info&lt;/a></string>
+    <string name="topics_active_subscriptions">Active topic subscriptions:</string>
+    <string name="topics_subscribe">Subscribe a new topic</string>
+    <string name="topics_unsubscribe">Unsubscribe</string>
+    <string name="topics_sender_not_registered">You need to be registered with this sender before to subscribe its topics.</string>
+    <string name="topics_already_subscribed">Topic already subscribed.</string>
+    <string name="topics_subscribing">Subscribing %1$s</string>
+    <string name="topics_unsubscribing">Unsubscribing from %1$s</string>
+    <string name="topics_no_sender_registered">You need to have at least a GCM token in order to use Pub/Sub APIs</string>
+    <string name="topics_no_topic_subscribed">no topic has been subscribed for this sender id</string>
+
+    <!-- Groups Fragment -->
+    <string name="groups_sender_id">Sender ID: %1$s</string>
+    <string name="groups_description">With device group messaging, you can send a single message to multiple devices belonging to a group. Like different devices that belong to a single user.  &lt;a href="http://www.google.com">More info&lt;/a></string>
+    <string name="groups_no_groups_available">Start creating a new Device Group, you can later add/remove additional Gcm Tokens to it.</string>
+    <string name="groups_delete">Delete</string>
+    <string name="groups_create_new">Create a Device Group</string>
+
+    <!-- Notification Fragment -->
+    <string name="notification_icon_hint">Icon, e.g. icon</string>
+    <string name="notification_title_hint">Title text</string>
+    <string name="notification_title_default">GCM Test App Notification Title</string>
+    <string name="notification_body_hint">Body text</string>
+    <string name="notification_click_action_hint">Click action, e.g. gcm_test_app_start</string>
+    <string name="notification_sound_hint">Sound, e.g. default</string>
+    <string name="notification_tag_hint">Tag</string>
+    <string name="notification_color_hint">Color, e.g. #0030ff</string>
+    <string name="notification_send_text">Send</string>
+    <string name="notification_send_fail_icon_required">Not sending, notification icon is required</string>
+    <string name="notification_send_fail_title_required">Not sending, notification title is required</string>
+    <string name="notification_send_failed">Send notification failed: %1s</string>
+    <string name="notification_intent_received">Received notification intent: %1s</string>
+    <string name="notification_select_reg_id">Select registration Id</string>
+    <string name="notification_select_api_key">Select API key</string>
+    <string name="notification_api_key">API Key:</string>
+    <string name="notification_registration_id">Registration Id:</string>
+
+    <!-- Network scheduler fragment -->
+    <string name="scheduler_about_apis">▶ About the network scheduler APIs</string>
+    <string name="scheduler_about_apis_open">▼ About the network scheduler APIs</string>
+    <string name="scheduler_about_apis_full_text">Apps can schedule background tasks that run when network radio is in use. Reduces radio wake ups. Reduces APP server load using exponential backoff for failed retries. Supports one-off and periodic tasks.</string>
+    <string name="scheduler_cancel">Cancel</string>
+    <string name="scheduler_add_oneoff_message">A one-off task is executed only once. A window during which the task should be executed is specified, as well as constraints on network state and device state.</string>
+    <string name="scheduler_run_from">Run from:</string>
+    <string name="scheduler_run_by">Run by:</string>
+    <string name="scheduler_add_periodic_message">Periodic tasks are executed repeatedly. The interval between executions is specified by giving a period and a flexibility amount. Constraints on network and device state can also be applied</string>
+    <string name="scheduler_period">Period:</string>
+    <string name="scheduler_flex">Flex:</string>
+    <string name="scheduler_active_tasks">Active tasks:</string>
+    <string name="scheduler_add_oneoff">Schedule one-off task</string>
+    <string name="scheduler_add_periodic">Schedule periodic task</string>
+    <string name="scheduler_delete">Delete</string>
+    <string name="scheduler_created">Created:</string>
+    <string name="scheduler_last_executed">Last executed:</string>
+    <string name="scheduler_status">Status:</string>
+    <string name="scheduler_content_icon">Task icon</string>
+    <string name="scheduler_error_nan">Invalid parameter, must be a number</string>
+    <string name="scheduler_error_flex">Invalid parameters: flex larger than period</string>
+    <string name="scheduler_error_window">Invalid parameters: window start larger than window end</string>
+    <string name="scheduler_oneoff">One-off task %1$s</string>
+    <string name="scheduler_periodic">Periodic task %1$s</string>
+    <string name="scheduler_na">N/A</string>
+    <string name="scheduler_secs_ago">%1$s seconds ago</string>
+    <string name="scheduler_cancelled">Canceled</string>
+    <string name="scheduler_executed">Executed</string>
+    <string name="scheduler_pending">Pending</string>
+    <string name="scheduler_oneoff_params">Window start: %1$d, Window end: %2$d</string>
+    <string name="scheduler_periodic_params">Interval: %1$d, Flex: %2$d</string>
+
+    <!-- Add task dialog widget -->
+    <string name="task_constraints_connectivity">Connectivity</string>
+    <string name="task_connectivity_connected">Connected</string>
+    <string name="task_connectivity_unmetered">Unmetered</string>
+    <string name="task_connectivity_any">N/A</string>
+    <string name="task_constraints_charging">Charging</string>
+    <string name="task_constraints_persistence">Persistence</string>
+
+    <!-- Quick Tests -->
+    <string name="quicktest_downstream_http_json">Downstream HTTP JSON</string>
+
+    <!-- Editable Map View -->
+    <string name="data_title">Data</string>
+    <string name="data_add_row">Add row</string>
+    <string name="data_hint_key">Key</string>
+    <string name="data_hint_value">Value</string>
+    <string name="data_delete">Del</string>
+
+    <!-- Choosers -->
+    <string name="chooser_api_key">Sender API Key</string>
+    <string name="chooser_reg_id">Registration ID</string>
+    <string name="chooser_sender_id">for sender ID</string>
+
+    <!-- Address book -->
+    <string name="address_book_add_sender_title">Add sender id</string>
+    <string name="address_book_add_sender_message">The sender id identifies a server that can send GCM messages to devices. An application must know the id of its\' server in order to register.</string>
+    <string name="address_book_add_sender_nameHint">Name</string>
+    <string name="address_book_add_sender_idhint">Sender ID</string>
+    <string name="address_book_dialog_add">Add</string>
+    <string name="address_book_dialog_cancel">Cancel</string>
+    <string name="address_book_add_sender_invalid_sender_id">Sender ID already exists!</string>
+    <string name="address_book_add_api_key_title">Add API Key</string>
+    <string name="address_book_add_api_key_message">API Keys are used by the server to identify itself when sending GCM messages. They should be kept secret and stored only on the server side.</string>
+    <string name="address_book_add_api_key_hint">API Key</string>
+    <string name="address_book_add_other_token_title">Add registration id</string>
+    <string name="address_book_add_other_token_message">A registration id identifies an application registered to receive messages from your server.</string>
+    <string name="address_book_add_other_token_nameHint">Name</string>
+    <string name="address_book_add_other_token_idhint">Registration ID</string>
+    <string name="address_book_add_topic_title">Add Topic</string>
+    <string name="address_book_add_topic_message">Topic are used by cloud sender to broadcast messages to a very large number of users.</string>
+    <string name="address_book_add_topic_hint">/topics/[a–zA–Z0–9-_.~%]{1,900}</string>
+    <string name="address_book_add_registration_invalid_name">Registration name already exists.</string>
+    <string name="address_book_registered">Registered</string>
+    <string name="address_book_unregistered">Unregistered</string>
+    <string name="address_book_copied_to_clipboard">has been copied in the clipboard</string>
+    <string name="address_book_sender_id">Sender id:</string>
+    <string name="address_book_api_key_title">API Keys</string>
+    <string name="address_book_api_key_add">Add API Key</string>
+    <string name="address_book_group_title">Groups</string>
+    <string name="address_book_token_title">Tokens</string>
+    <string name="address_book_token_add">Add Token</string>
+    <string name="address_book_topic_title">Topics</string>
+    <string name="address_book_topic_add">Add Topic</string>
+    <string name="address_book_sender_id_add">Add Sender ID</string>
+    <string name="address_book_select_api_key">Select an API Key:</string>
+    <string name="address_book_select_destination">Select a recipient (token, notfication group or topic):</string>
+    <string name="address_book_select_sender_id">Select a sender ID:</string>
+    <string name="address_book_select_token">Select a registration token:</string>
+    <string name="address_book_select_topic">Select a topic:</string>
+    <string name="address_book_select_group">Select a group:</string>
+    <string name="address_book_delete">Delete</string>
+    <string name="address_book_add_sender_invalid_token">Token already exists.</string>
+    <string name="address_book_add_sender_invalid_topic">Topic already exists.</string>
+    <string name="address_book_add_sender_invalid_api_key">API Key already exists.</string>
+
+    <!-- Group Activity -->
+    <string name="group_activity_title_new_group">New Device Group</string>
+    <string name="group_activity_title_edit_group">Edit Device Group</string>
+    <string name="group_sender_id">Sender ID:</string>
+    <string name="group_sender_id_hint">Choose a Sender ID</string>
+    <string name="group_sender_api_key">Sender API Key:</string>
+    <string name="group_sender_api_key_hint">Select the API Key to use</string>
+    <string name="group_sender_api_key_disable">Choose the sender id first</string>
+    <string name="group_name">Group Name:</string>
+    <string name="group_new_name_hint">my group name</string>
+    <string name="group_key">Group Key:</string>
+    <string name="group_current_members">Members of the group:</string>
+    <string name="group_removed_members">Members being removed:</string>
+    <string name="group_new_members">New members:</string>
+    <string name="group_no_new_members">You can select some tokens to be part of the group, or you can add them later.</string>
+    <string name="group_add_member">Add member</string>
+    <string name="group_undo_add_member">Remove</string>
+    <string name="group_remove_member">Remove</string>
+    <string name="group_undo_remove_member">Undo</string>
+    <string name="group_submit_new_group">Create group</string>
+    <string name="group_submit_edit_group">Apply changes</string>
+    <string name="group_toast_group_creation_succeeded">Group creation succeeded</string>
+    <string name="group_toast_group_creation_failed">Group creation failed.\nError: %1s</string>
+    <string name="group_toast_add_members_succeeded">Members added successfully</string>
+    <string name="group_toast_add_members_failed">Error while adding new members.\n%1s</string>
+    <string name="group_toast_remove_members_succeeded">Members removed successfully</string>
+    <string name="group_toast_remove_members_failed">Error while removing the members.\n%1s</string>
+    <string name="group_toast_sender_id_not_selected">Please choose a Sender Id</string>
+    <string name="group_toast_api_key_not_selected">Please choose a Sender API Key</string>
+    <string name="group_toast_name_invalid">Group name is invalid</string>
+    <string name="group_alert_group_will_be_deleted">Removing all the members will delete the group itself</string>
+    <string name="group_alert_cancel">Cancel</string>
+    <string name="group_alert_delete_group">Delete the group</string>
+</resources>

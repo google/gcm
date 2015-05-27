@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="1">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height ="match_parent"
+            android:text="@string/iid_sender_id"
+            android:layout_weight="0.3"
+            android:textStyle="bold" />
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:id="@+id/iid_sender_id"
+            android:textColor="#0000FF"
+            android:textStyle="italic"
+            android:layout_weight="0.6" />
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?android:attr/selectableItemBackground"
+            android:src="@drawable/list_grey600"
+            android:id="@+id/iid_select_sender_id" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0px"
+            android:layout_height ="match_parent"
+            android:textStyle="bold"
+            android:text="@string/iid_token"
+            android:layout_weight="0.2" />
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:id="@+id/iid_token"
+            android:longClickable="true"
+            android:layout_weight="0.8" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:weightSum="1">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:text="@string/iid_register"
+            android:id="@+id/iid_get_token"/>
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_height="wrap_content"
+            android:text="@string/iid_unregister"
+            android:id="@+id/iid_delete_token"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/iid_about_apis"
+        android:text="@string/iid_about_apis" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:visibility="gone"
+        android:id="@+id/iid_about_apis_full_text"
+        android:text="@string/iid_about_apis_full_text" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/iid_quick_test"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp" />
+        <Spinner
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="0.7"
+            android:id="@+id/iid_quick_test"
+            android:spinnerMode="dropdown" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.3"
+            android:layout_height="wrap_content"
+            android:text="@string/iid_api_key"
+            android:textStyle="bold"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:layout_height="wrap_content"
+            android:id="@+id/iid_api_key"
+            android:textColor="#0000FF"
+            android:textStyle="italic" />
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_weight="0.1"
+            android:layout_height="match_parent"
+            android:id="@+id/iid_select_api_key"
+            android:background="?android:attr/selectableItemBackground"
+            android:src="@drawable/list_grey600" />
+        </LinearLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/iid_execute_quick_test"
+        android:id="@+id/iid_execute_quick_test"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:id="@+id/iid_about_quicktest"
+        android:text="@string/iid_about_quicktest"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:visibility="gone"
+        android:id="@+id/iid_about_quicktest_full_text"
+        android:text="@string/iid_about_quick_test_full_text"/>
+</LinearLayout>
+

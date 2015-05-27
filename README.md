@@ -7,18 +7,33 @@ applications to contact the server directly, to fetch updated application or
 user data. The GCM service handles all aspects of queueing of messages and
 delivery to the target Android application running on the target device.
 
-This project contains sample code and legacy client libraries for interfacing
-with GCM. Newer applications should instead include the Google Play Services
-library via their Gradle configuration:
+This project contains an app that demonstrates the GCM APIs for registering,
+sending downstream, upstream and notification messages, subscribing to topics,
+creating notification groups and using the network manager to schedule tasks.
 
-    dependencies {
-      compile "com.google.android.gms:play-services:3.1.+"
-    }
-
-Information on GCM, including an overview and integration instructions, can
+More information on GCM, including an overview and integration instructions, can
 be found on the Android Developers website:
 
 http://developer.android.com/guide/google/gcm/index.html
+
+## Getting Started
+
+This sample uses the Gradle build system. To build this project, use the
+"gradlew build" command or use "Import Project" in Android Studio.
+To use the app you will need a sender id to be able to register and test client
+side APIs, and an API key to be able to test server side APIs. Refer to the
+guidelines available at https://developer.android.com/google/gcm/gs.html.
+
+## Screenshots
+
+![Menu](screenshots/menu.png "The app's menu")
+![Registration](screenshots/registration1.png "Registration page - unregistered")
+![Registration - registered](screenshots/registration2.png "Registration page - registered")
+![Downstream](screenshots/downstream.png "Sending downstream messages")
+![Groups](screenshots/groups.png "Groups page")
+![Topics](screenshots/topics.png "Topics page")
+![Add topic](screenshots/add_topic.png "Add a topic")
+![Tasks](screenshots/tasks.png "Network manager tasks page")
 
 ## Support
 
@@ -27,9 +42,6 @@ http://developer.android.com/guide/google/gcm/index.html
 
 If you've found an error in this project's code, please file an issue:
 https://github.com/google/gcm/issues
-
-Patches are encouraged, and may be submitted by forking this project and
-submitting a pull request through GitHub. See CONTRIBUTING.md for more details.
 
 ## License
 

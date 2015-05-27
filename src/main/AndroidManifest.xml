@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.gcm.demo">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <permission
+        android:name="com.google.android.gcm.demo.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission
+        android:name="com.google.android.gcm.demo.permission.C2D_MESSAGE" />
+
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/application_name"
+        android:theme="@style/Theme.AppTheme">
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/Theme.AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <!-- This intent filter is for click_action in GCM notifications. -->
+            <intent-filter>
+                <action android:name="gcm_test_app_notification_click_action"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.GroupActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName="com.google.android.gcm.demo.ui.MainActivity">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.google.android.gcm.demo.ui.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".ui.addressbook.SelectActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/Theme.AppCompat.Light.Dialog">
+            <intent-filter>
+                <action android:name="android.intent.action.PICK"/>
+                <category android:name="com.google.android.gcm.demo.intent.category.SENDER_ID"/>
+                <category android:name="com.google.android.gcm.demo.intent.category.API_KEY"/>
+                <category android:name="com.google.android.gcm.demo.intent.category.TOKEN"/>
+                <category android:name="com.google.android.gcm.demo.intent.category.TOPIC"/>
+                <category android:name="com.google.android.gcm.demo.intent.category.GROUP"/>
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <!-- for Gingerbread GSF backward compat -->
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.google.android.gcm.demo" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".service.GcmService" android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <service android:name=".service.LoggingService" android:exported="false" />
+
+        <service
+            android:name=".service.TaskSchedulerService"
+            android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.gcm.ACTION_TASK_READY" />
+                <category android:name="com.google.android.gcm.demo" />
+            </intent-filter>
+        </service>
+
+    </application>
+</manifest>
