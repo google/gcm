@@ -21,8 +21,9 @@ limitations under the License.
 
         <item name="colorPrimary">@color/blue_500</item>
         <item name="colorPrimaryDark">@color/blue_700</item>
-        <item name="colorAccent">@color/grey_200</item>
+        <item name="colorAccent">@color/orange_500</item>
 
+        <item name="android:actionModeBackground">@color/blue_700</item>
         <item name="android:windowBackground">@color/grey_50</item>
 
         <!-- Toolbar -->
@@ -32,6 +33,8 @@ limitations under the License.
 
         <item name="android:buttonStyle">@style/Button</item>
         <item name="android:editTextStyle">@style/EditText</item>
+
+        <item name="android:activatedBackgroundIndicator">@drawable/activated_background_indicator</item>
     </style>
 
     <!-- Application Theme -->
@@ -81,4 +84,6 @@ limitations under the License.
     <color name="grey_500">#757575</color>
     <color name="blue_500">#5677FC</color>
     <color name="blue_700">#455EDE</color>
+    <color name="blue_900">#1A237E</color>
+    <color name="orange_500">#FF9800</color>
 </resources>
