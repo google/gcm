@@ -15,24 +15,20 @@ limitations under the License.
  */
 package com.google.android.gcm.demo.logic;
 
-import static com.google.android.gcm.demo.logic.Util.nonNull;
-import static com.google.android.gcm.demo.logic.Util.splitHTTPHeader;
-import static com.google.android.gcm.demo.logic.Util.getString;
+import static com.google.android.gcm.demo.logic.HttpRequest.CONTENT_TYPE_FORM_ENCODED;
+import static com.google.android.gcm.demo.logic.HttpRequest.CONTENT_TYPE_JSON;
+import static com.google.android.gcm.demo.logic.HttpRequest.HEADER_CONTENT_TYPE;
+import static com.google.android.gcm.demo.logic.HttpRequest.HEADER_AUTHORIZATION;
 
 import android.util.Log;
 
 import com.google.android.gcm.demo.service.LoggingService;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+
 import java.net.URLEncoder;
 import java.util.Map;
 
@@ -41,94 +37,29 @@ import java.util.Map;
  */
 public class GcmServerSideSender {
 
-    private static final String TAG = "GCMDemo-Sender";
+    private static final String GCM_SEND_ENDPOINT = "https://gcm-http.googleapis.com/gcm/send";
 
-    /**
-     * Constant for UTF-8 encoding.
-     */
     private static final String UTF8 = "UTF-8";
 
-    /**
-     * Endpoint for sending messages.
-     */
-    private static final String GCM_SEND_ENDPOINT =
-            "https://android.googleapis.com/gcm/send";
-
-    /**
-     * HTTP parameter for registration id.
-     */
-    private static final String PARAM_REGISTRATION_ID = "registration_id";
-
-    /**
-     * JSON parameter for registration ids.
-     */
-    private static final String PARAM_REGISTRATION_IDS = "registration_ids";
-
-    /**
-     * JSON/HTTP parameter for destination.
-     */
     private static final String PARAM_TO = "to";
-
-    /**
-     * HTTP/JSON parameter for collapse key.
-     */
     private static final String PARAM_COLLAPSE_KEY = "collapse_key";
-
-    /**
-     * HTTP/JSON parameter for delaying the message delivery if the device is idle.
-     */
     private static final String PARAM_DELAY_WHILE_IDLE = "delay_while_idle";
-
-    /**
-     * HTTP/JSON parameter for telling gcm to validate the message without actually sending it.
-     */
+    private static final String PARAM_TIME_TO_LIVE = "time_to_live";
     private static final String PARAM_DRY_RUN = "dry_run";
-
-    /**
-     * HTTP/JSON parameter for package name that can be used to restrict message delivery by
-     * matching
-     * against the package name used to generate the registration id.
-     */
     private static final String PARAM_RESTRICTED_PACKAGE_NAME = "restricted_package_name";
 
-    /**
-     * Prefix to HTTP parameter used to pass key-values in the message payload.
-     */
-    private static final String PARAM_PAYLOAD_PREFIX = "data.";
+    private static final String PARAM_PLAINTEXT_PAYLOAD_PREFIX = "data.";
 
-    /**
-     * JSON parameter used to pass key-values in the message payload.
-     */
-    private static final String PARAM_PAYLOAD = "data";
+    private static final String PARAM_JSON_PAYLOAD = "data";
+    private static final String PARAM_JSON_NOTIFICATION_PARAMS = "notification";
 
-    /**
-     * JSON parameter used to pass notification parameters.
-     */
-    private static final String PARAM_NOTIFICATION_PARAMS = "notification";
-
-    /**
-     * Prefix to HTTP parameter used to set the message time-to-live.
-     */
-    private static final String PARAM_TIME_TO_LIVE = "time_to_live";
-
-    /**
-     * Token returned by GCM when a message was successfully sent.
-     */
-    public static final String TOKEN_MESSAGE_ID = "id";
-
-    /**
-     * Token returned by GCM when the requested registration id has a canonical
-     * value.
-     */
-    public static final String TOKEN_CANONICAL_REG_ID = "registration_id";
-
-    /**
-     * Token returned by GCM when there was an error sending a message.
-     */
-    public static final String TOKEN_ERROR = "Error";
+    public static final String RESPONSE_PLAINTEXT_MESSAGE_ID = "id";
+    public static final String RESPONSE_PLAINTEXT_CANONICAL_REG_ID = "registration_id";
+    public static final String RESPONSE_PLAINTEXT_ERROR = "Error";
 
     private final String key;
     private final LoggingService.Logger logger;
+
 
     /**
      * @param key    The API key used to authorize calls to Google
@@ -139,103 +70,128 @@ public class GcmServerSideSender {
         this.logger = logger;
     }
 
-
     /**
-     * Send a downstream message via HTTP cleartext.
+     * Send a downstream message via HTTP plain text.
      *
-     * @param registrationId the registration id of the recipient app.
-     * @param message        the message to be sent
+     * @param destination the registration id of the recipient app.
+     * @param message     the message to be sent
      * @throws IOException
      */
-    public void sendHttpCleartextDownstreamMessage(String registrationId,
-                                                   Message message) throws IOException {
-        String requestBody = getCleartextRequestBody(registrationId, message);
-        String responseBody = doPostAndGetResponse(requestBody,
-                "application/x-www-form-urlencoded;charset=UTF-8");
-        String[] lines = responseBody.split("\n");
+    public void sendHttpPlaintextDownstreamMessage(String destination, Message message)
+            throws IOException {
+
+        StringBuilder request = new StringBuilder();
+        request.append(PARAM_TO).append('=').append(destination);
+        addOptParameter(request, PARAM_DELAY_WHILE_IDLE, message.isDelayWhileIdle());
+        addOptParameter(request, PARAM_DRY_RUN, message.isDryRun());
+        addOptParameter(request, PARAM_COLLAPSE_KEY, message.getCollapseKey());
+        addOptParameter(request, PARAM_RESTRICTED_PACKAGE_NAME, message.getRestrictedPackageName());
+        addOptParameter(request, PARAM_TIME_TO_LIVE, message.getTimeToLive());
+        for (Map.Entry<String, String> entry : message.getData().entrySet()) {
+            if (entry.getKey() != null && entry.getValue() != null) {
+                String prefixedKey = PARAM_PLAINTEXT_PAYLOAD_PREFIX + entry.getKey();
+                addOptParameter(request, prefixedKey, URLEncoder.encode(entry.getValue(), UTF8));
+            }
+        }
+
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.setHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_FORM_ENCODED);
+        httpRequest.setHeader(HEADER_AUTHORIZATION, "key=" + key);
+        httpRequest.doPost(GCM_SEND_ENDPOINT, request.toString());
+
+        if (httpRequest.getResponseCode() != 200) {
+            throw new IOException("Invalid request."
+                    + "\nStatus: " + httpRequest.getResponseCode()
+                    + "\nResponse: " + httpRequest.getResponseBody());
+        }
+
+        String[] lines = httpRequest.getResponseBody().split("\n");
         if (lines.length == 0 || lines[0].equals("")) {
             throw new IOException("Received empty response from GCM service.");
         }
-        String firstLine = lines[0];
-        String[] responseParts = splitHTTPHeader(firstLine);
-        String token = responseParts[0];
-        String value = responseParts[1];
-        switch (token) {
-            case TOKEN_MESSAGE_ID:
-                logger.log(Log.INFO, "Message sent: id = " + value);
+
+        String[] firstLineValues = lines[0].split("=");
+        if (firstLineValues.length != 2) {
+            throw new IOException("Invalid response from GCM: " + httpRequest.getResponseBody());
+        }
+
+        switch (firstLineValues[0]) {
+            case RESPONSE_PLAINTEXT_MESSAGE_ID:
+                logger.log(Log.INFO, "Message sent.\nid: " + firstLineValues[1]);
                 // check for canonical registration id
                 if (lines.length > 1) {
-                    String secondLine = lines[1];
-                    responseParts = splitHTTPHeader(secondLine);
-                    token = responseParts[0];
-                    value = responseParts[1];
-                    if (token.equals(TOKEN_CANONICAL_REG_ID)) {
-                        logger.log(Log.INFO, "Message sent: canonical registration id = " + value);
+                    // If the response includes a 2nd line we expect it to be the CANONICAL REG ID
+                    String[] secondLineValues = lines[1].split("=");
+                    if (secondLineValues.length == 2
+                            && secondLineValues[0].equals(RESPONSE_PLAINTEXT_CANONICAL_REG_ID)) {
+                        logger.log(Log.INFO, "Message sent: canonical registration id = "
+                                + secondLineValues[1]);
                     } else {
-                        logger.log(Log.ERROR, "Invalid response from GCM: " + responseBody);
+                        logger.log(Log.ERROR, "Invalid response from GCM."
+                                + "\nResponse: " + httpRequest.getResponseBody());
                     }
                 }
                 break;
-            case TOKEN_ERROR:
-                logger.log(Log.ERROR, "Message not sent, server error code " + value);
+            case RESPONSE_PLAINTEXT_ERROR:
+                logger.log(Log.ERROR, "Message failed.\nError: " + firstLineValues[1]);
                 break;
             default:
-                logger.log(Log.ERROR, "Failed to parse server response:\n" + responseBody);
+                logger.log(Log.ERROR, "Invalid response from GCM."
+                        + "\nResponse: " + httpRequest.getResponseBody());
                 break;
         }
-
     }
-
 
     /**
      * Send a downstream message via HTTP JSON.
      *
-     * @param registrationId the registration id of the recipient app.
+     * @param destination the registration id of the recipient app.
      * @param message        the message to be sent
      * @throws IOException
      */
-    public void sendHttpJsonDownstreamMessage(String registrationId,
+    public void sendHttpJsonDownstreamMessage(String destination,
                                               Message message) throws IOException {
 
-        String requestBody;
+        JSONObject jsonBody = new JSONObject();
         try {
-            requestBody = getJsonRequestBody(registrationId, message);
+            jsonBody.put(PARAM_TO, destination);
+            jsonBody.putOpt(PARAM_COLLAPSE_KEY, message.getCollapseKey());
+            jsonBody.putOpt(PARAM_RESTRICTED_PACKAGE_NAME, message.getRestrictedPackageName());
+            jsonBody.putOpt(PARAM_TIME_TO_LIVE, message.getTimeToLive());
+            jsonBody.putOpt(PARAM_DELAY_WHILE_IDLE, message.isDelayWhileIdle());
+            jsonBody.putOpt(PARAM_DRY_RUN, message.isDryRun());
+            if (message.getData().size() > 0) {
+                JSONObject jsonPayload = new JSONObject(message.getData());
+                jsonBody.put(PARAM_JSON_PAYLOAD, jsonPayload);
+            }
+            if (message.getNotificationParams().size() > 0) {
+                JSONObject jsonNotificationParams = new JSONObject(message.getNotificationParams());
+                jsonBody.put(PARAM_JSON_NOTIFICATION_PARAMS, jsonNotificationParams);
+            }
         } catch (JSONException e) {
             logger.log(Log.ERROR, "Failed to build JSON body");
             return;
         }
-        String responseBody = doPostAndGetResponse(requestBody, "application/json");
+
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.setHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON);
+        httpRequest.setHeader(HEADER_AUTHORIZATION, "key=" + key);
+        httpRequest.doPost(GCM_SEND_ENDPOINT, jsonBody.toString());
+
+        if (httpRequest.getResponseCode() != 200) {
+            throw new IOException("Invalid request."
+                    + " status: " + httpRequest.getResponseCode()
+                    + " response: " + httpRequest.getResponseBody());
+        }
+
         JSONObject jsonResponse;
         try {
-            jsonResponse = new JSONObject(responseBody);
+            jsonResponse = new JSONObject(httpRequest.getResponseBody());
             logger.log(Log.INFO, "Send message:\n" + jsonResponse.toString(2));
         } catch (JSONException e) {
-            logger.log(Log.ERROR, "Failed to parse server response:\n" + responseBody);
+            logger.log(Log.ERROR, "Failed to parse server response:\n"
+                    + httpRequest.getResponseBody());
         }
-    }
-
-    private String doPostAndGetResponse(String requestBody, String contentTye) throws IOException {
-        int status;
-        HttpURLConnection conn = post(GCM_SEND_ENDPOINT, contentTye, requestBody);
-        status = conn.getResponseCode();
-
-        String responseBody;
-        if (status != 200) {
-            try (InputStream errorStream = conn.getErrorStream()) {
-                responseBody = getString(errorStream);
-            } catch (IOException e) {
-                // ignore the exception since it will thrown an IOException anyway
-                responseBody = "N/A";
-            }
-            throw new IOException("Invalid request: status = " + status + "\n" + responseBody);
-        } else {
-            try (InputStream inputStream = conn.getInputStream()) {
-                responseBody = getString(inputStream);
-            }
-        }
-        conn.disconnect();
-
-        return responseBody;
     }
 
     /**
@@ -245,133 +201,13 @@ public class GcmServerSideSender {
      * @param name  parameter's name.
      * @param value parameter's value.
      */
-    private static void addParameter(StringBuilder body, String name,
-                                     String value) {
-        nonNull(body).append('&')
-                .append(nonNull(name)).append('=').append(nonNull(value));
-    }
-
-
-    /**
-     * Creates a new HTTP request body.
-     *
-     * @param registrationId the registration id of the recipient app.
-     * @param message        the message to be sent
-     * @return a String with the content of the body.
-     * @throws UnsupportedEncodingException
-     */
-    private String getCleartextRequestBody(String registrationId,
-                                           Message message)
-            throws UnsupportedEncodingException {
-        StringBuilder body = new StringBuilder(
-                nonNull(PARAM_TO)).append('=').append(nonNull(registrationId));
-        if (message.isDelayWhileIdle() != null) {
-            addParameter(body, PARAM_DELAY_WHILE_IDLE, message.isDelayWhileIdle() ? "1" : "0");
-        }
-        if (message.isDryRun() != null) {
-            addParameter(body, PARAM_DRY_RUN, message.isDryRun() ? "1" : "0");
-        }
-        if (message.getCollapseKey() != null) {
-            addParameter(body, PARAM_COLLAPSE_KEY, message.getCollapseKey());
-        }
-        if (message.getRestrictedPackageName() != null) {
-            addParameter(body, PARAM_RESTRICTED_PACKAGE_NAME, message.getRestrictedPackageName());
-        }
-        if (message.getTimeToLive() != null) {
-            addParameter(body, PARAM_TIME_TO_LIVE, Integer.toString(message.getTimeToLive()));
-        }
-        if (message.getData() != null) {
-            for (Map.Entry<String, String> entry : message.getData().entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                if (key == null || value == null) {
-                    // skipping null key/value
-                    if (Log.isLoggable(TAG, Log.DEBUG)) {
-                        Log.d(TAG, "Skipping empty key/value: " + key + " " + value);
-                    }
-                } else {
-                    key = PARAM_PAYLOAD_PREFIX + key;
-                    addParameter(body, key, URLEncoder.encode(value, UTF8));
-                }
+    private static void addOptParameter(StringBuilder body, String name, Object value) {
+        if (value != null) {
+            String encodedValue = value.toString();
+            if (value instanceof Boolean) {
+                encodedValue = ((Boolean) value) ? "1" : "0";
             }
+            body.append('&').append(name).append('=').append(encodedValue);
         }
-        if (message.getNotificationParams() != null && message.getNotificationParams().size() > 0) {
-            // This should never be invoked via the UI
-            throw new IllegalArgumentException(
-                    "Notification payload is not supported in clear text requests");
-        }
-        return body.toString();
     }
-
-    /**
-     * Creates a new HTTP request body.
-     *
-     * @param registrationId the registration id of the recipient app.
-     * @param message        the message to be sent
-     * @return a String with the content of the body.
-     * @throws JSONException
-     */
-    private String getJsonRequestBody(String registrationId,
-                                      Message message) throws JSONException {
-        JSONObject jsonBody = new JSONObject();
-        jsonBody.put(PARAM_TO, registrationId);
-        if (message.getCollapseKey() != null) {
-            jsonBody.put(PARAM_COLLAPSE_KEY, message.getCollapseKey());
-        }
-        if (message.getRestrictedPackageName() != null) {
-            jsonBody.put(PARAM_RESTRICTED_PACKAGE_NAME, message.getRestrictedPackageName());
-        }
-        if (message.getTimeToLive() != null) {
-            jsonBody.put(PARAM_TIME_TO_LIVE, message.getTimeToLive());
-        }
-        if (message.isDelayWhileIdle() != null) {
-            jsonBody.put(PARAM_DELAY_WHILE_IDLE, message.isDelayWhileIdle());
-        }
-        if (message.isDelayWhileIdle() != null) {
-            jsonBody.put(PARAM_DRY_RUN, message.isDryRun());
-        }
-        if (message.getData() != null) {
-            JSONObject jsonPayload = new JSONObject(message.getData());
-            jsonBody.put(PARAM_PAYLOAD, jsonPayload);
-        }
-        if (message.getNotificationParams() != null) {
-            JSONObject jsonNotificationParams = new JSONObject(message.getNotificationParams());
-            jsonBody.put(PARAM_NOTIFICATION_PARAMS, jsonNotificationParams);
-        }
-        return jsonBody.toString();
-    }
-
-
-    /**
-     * Makes an HTTP POST request to a given endpoint.
-     * <p/>
-     * <p/>
-     * <strong>Note: </strong> the returned connected should not be disconnected,
-     * otherwise it would kill persistent connections made using Keep-Alive.
-     *
-     * @param url         endpoint to post the request.
-     * @param contentType type of request.
-     * @param body        body of the request.
-     * @return the underlying connection.
-     * @throws IOException propagated from underlying methods.
-     */
-    private HttpURLConnection post(String url, String contentType, String body)
-            throws IOException {
-        if (url == null || body == null) {
-            throw new IllegalArgumentException("arguments cannot be null");
-        }
-        byte[] bytes = body.getBytes();
-        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-        conn.setDoOutput(true);
-        conn.setUseCaches(false);
-        conn.setFixedLengthStreamingMode(bytes.length);
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", contentType);
-        conn.setRequestProperty("Authorization", "key=" + key);
-        try (OutputStream out = conn.getOutputStream()) {
-            out.write(bytes);
-        }
-        return conn;
-    }
-
 }

@@ -15,7 +15,10 @@ limitations under the License.
  */
 package com.google.android.gcm.demo.logic;
 
-import static com.google.android.gcm.demo.logic.HttpRequest.*;
+import static com.google.android.gcm.demo.logic.HttpRequest.CONTENT_TYPE_JSON;
+import static com.google.android.gcm.demo.logic.HttpRequest.HEADER_AUTHORIZATION;
+import static com.google.android.gcm.demo.logic.HttpRequest.HEADER_CONTENT_TYPE;
+import static com.google.android.gcm.demo.logic.HttpRequest.HEADER_PROJECT_ID;
 
 import android.content.Context;
 import android.os.AsyncTask;
