@@ -208,6 +208,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         StringBuilder logs = new StringBuilder();
         for (String log : mLogger.getLogsFromFile()) {
             appendFormattedLogLine(log, logs);
@@ -215,7 +221,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         mLogsUI.setText(Html.fromHtml(logs.toString()));
         mLogger.registerCallback(mLoggerCallback);
-        mDrawerToggle.syncState();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mLogger.unregisterCallback(mLoggerCallback);
     }
 
     /**

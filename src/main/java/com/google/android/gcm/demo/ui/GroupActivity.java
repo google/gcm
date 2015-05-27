@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -170,7 +171,18 @@ public class GroupActivity extends AppCompatActivity
                 refresh();
             }
         };
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         mLogger.registerCallback(mLoggerCallback);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mLogger.unregisterCallback(mLoggerCallback);
     }
 
     @Override
@@ -326,7 +338,7 @@ public class GroupActivity extends AppCompatActivity
             // Reload group if in edit mode.
             // If the group doesn't exist anymore it means it has been deleted.
             sender = mSenders.getSender(sender.senderId);
-            if (sender != null) {
+            if (sender != null && group != null) {
                 group = sender.groups.get(group.notificationKeyName);
             }
             if (sender == null || group == null) {
