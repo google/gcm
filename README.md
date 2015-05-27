@@ -32,7 +32,7 @@ guidelines available at https://developer.android.com/google/gcm/gs.html.
 ![Downstream](screenshots/downstream.png "Sending downstream messages")
 ![Groups](screenshots/groups.png "Groups page")
 ![Topics](screenshots/topics.png "Topics page")
-![Add topic](screenshots/add_topuc.png "Add a topic")
+![Add topic](screenshots/add_topic.png "Add a topic")
 ![Tasks](screenshots/tasks.png "Network manager tasks page")
 
 ## Support
