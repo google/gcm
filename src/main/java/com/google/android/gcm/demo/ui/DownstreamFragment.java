@@ -176,7 +176,7 @@ public class DownstreamFragment extends AbstractFragment
                         sender.sendHttpJsonDownstreamMessage(registrationId,
                                 messageBuilder.build());
                     } else {
-                        sender.sendHttpCleartextDownstreamMessage(registrationId,
+                        sender.sendHttpPlaintextDownstreamMessage(registrationId,
                                 messageBuilder.build());
                     }
                 } catch (final IOException e) {

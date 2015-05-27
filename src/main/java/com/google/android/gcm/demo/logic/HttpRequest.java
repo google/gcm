@@ -15,15 +15,19 @@ limitations under the License.
  */
 package com.google.android.gcm.demo.logic;
 
-import static com.google.android.gcm.demo.logic.Util.getString;
-
 import android.support.v4.util.SimpleArrayMap;
+import android.util.Log;
 
+import com.google.android.gcm.demo.service.LoggingService;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 
 /**
  * Class representing an HTTP request
@@ -71,6 +75,8 @@ public class HttpRequest {
      * @throws IOException
      */
     public void doPost(String url, String requestBody) throws IOException {
+        Log.i(LoggingService.LOG_TAG, "HTTP request. body: " + requestBody);
+
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setDoOutput(true);
         conn.setUseCaches(false);
@@ -79,22 +85,70 @@ public class HttpRequest {
         for (int i = 0; i < mHeaders.size(); i++) {
             conn.setRequestProperty(mHeaders.keyAt(i), mHeaders.valueAt(i));
         }
-        try (OutputStream out = conn.getOutputStream()) {
+        OutputStream out = null;
+        try {
+            out = conn.getOutputStream();
             out.write(requestBody.getBytes());
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    // Ignore.
+                }
+            }
         }
 
         responseCode = conn.getResponseCode();
 
-        if (responseCode != 200) {
-            try (InputStream errorStream = conn.getErrorStream()) {
-                responseBody = getString(errorStream);
+        InputStream inputStream = null;
+        try {
+            if (responseCode == 200) {
+                inputStream = conn.getInputStream();
+            } else {
+                inputStream = conn.getErrorStream();
             }
-        } else {
-            try (InputStream inputStream = conn.getInputStream()) {
-                responseBody = getString(inputStream);
+            responseBody = getString(inputStream);
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // Ignore.
+                }
             }
         }
+
+        Log.i(LoggingService.LOG_TAG, "HTTP response. body: " + responseBody);
+
         conn.disconnect();
     }
 
+    /**
+     * Convenience method to convert an InputStream to a String.
+     * <p/>
+     * If the stream ends in a newline character, it will be stripped.
+     * <p/>
+     * If the stream is {@literal null}, returns an empty string.
+     */
+    private String getString(InputStream stream) throws IOException {
+        if (stream == null) {
+            return "";
+        }
+        BufferedReader reader =
+                new BufferedReader(new InputStreamReader(stream));
+        StringBuilder content = new StringBuilder();
+        String newLine;
+        do {
+            newLine = reader.readLine();
+            if (newLine != null) {
+                content.append(newLine).append('\n');
+            }
+        } while (newLine != null);
+        if (content.length() > 0) {
+            // strip last newline
+            content.setLength(content.length() - 1);
+        }
+        return content.toString();
+    }
 }
