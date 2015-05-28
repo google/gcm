@@ -26,14 +26,14 @@ guidelines available at https://developer.android.com/google/gcm/gs.html.
 
 ## Screenshots
 
-![Menu](screenshots/menu.png "The app's menu")
-![Registration](screenshots/registration1.png "Registration page - unregistered")
-![Registration - registered](screenshots/registration2.png "Registration page - registered")
-![Downstream](screenshots/downstream.png "Sending downstream messages")
-![Groups](screenshots/groups.png "Groups page")
-![Topics](screenshots/topics.png "Topics page")
-![Add topic](screenshots/add_topic.png "Add a topic")
-![Tasks](screenshots/tasks.png "Network manager tasks page")
+![Menu](gcm-demo-app/screenshots/menu.png "The app's menu")
+![Registration](gcm-demo-app/screenshots/registration1.png "Registration page - unregistered")
+![Registration - registered](gcm-demo-app/screenshots/registration2.png "Registration page - registered")
+![Downstream](gcm-demo-app/screenshots/downstream.png "Sending downstream messages")
+![Groups](gcm-demo-app/screenshots/groups.png "Groups page")
+![Topics](gcm-demo-app/screenshots/topics.png "Topics page")
+![Add topic](gcm-demo-app/screenshots/add_topic.png "Add a topic")
+![Tasks](gcm-demo-app/screenshots/tasks.png "Network manager tasks page")
 
 ## Support
 
