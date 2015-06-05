@@ -11,10 +11,10 @@ messages and delivery to client applications running on target devices.
 This project contains an Android app that demonstrates these aspects of GCM:
 
 * Registering a client app
-* Sending downstream, upstream and notification messages.
+* Sending downstream, upstream and notification messages
 * Subscribing to topics
 * Creating notification groups
-* Using the network manager to schedule tasks.
+* Using the network manager to schedule tasks
 
 A full GCM implementation requires both a client implementation and a server
 implementation. For more information on GCM, including an overview and integration
