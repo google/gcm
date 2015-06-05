@@ -1,28 +1,33 @@
 # Google Cloud Messaging
 
-Google Cloud Messaging for Android (GCM) is a service that helps developers send
-data from servers to their Android applications on Android devices. The service
+Google Cloud Messaging (GCM) is a service that lets developers send
+data from servers to users' devices, and receive messages from devices
+on the same connection. The service
 provides a simple, lightweight mechanism that servers can use to tell mobile
-applications to contact the server directly, to fetch updated application or
-user data. The GCM service handles all aspects of queueing of messages and
-delivery to the target Android application running on the target device.
+applications to contact the server directly to fetch updated application or
+user data. The GCM service handles all aspects of queueing of
+messages and delivery to client applications running on target devices.
 
-This project contains an app that demonstrates the GCM APIs for registering,
-sending downstream, upstream and notification messages, subscribing to topics,
-creating notification groups and using the network manager to schedule tasks.
+This project contains an Android app that demonstrates these aspects of GCM:
 
-More information on GCM, including an overview and integration instructions, can
-be found on the Android Developers website:
+* Registering a client app
+* Sending downstream, upstream and notification messages.
+* Subscribing to topics
+* Creating notification groups
+* Using the network manager to schedule tasks.
 
-http://developer.android.com/guide/google/gcm/index.html
+A full GCM implementation requires both a client implementation and a server
+implementation. For more information on GCM, including an overview and integration
+instructions, see [Cloud Messaging](https://developers.google.com/cloud-messaging/).
+
 
 ## Getting Started
 
 This sample uses the Gradle build system. To build this project, use the
 "gradlew build" command or use "Import Project" in Android Studio.
-To use the app you will need a sender id to be able to register and test client
-side APIs, and an API key to be able to test server side APIs. Refer to the
-guidelines available at https://developer.android.com/google/gcm/gs.html.
+To use the app you will need a sender ID to be able to register and test client
+side APIs, and an API key to be able to test server side APIs. For more information,
+see [Implementing GCM Client on Android](https://developers.google.com/cloud-messaging/android/client).
 
 ## Screenshots
 
@@ -38,7 +43,7 @@ guidelines available at https://developer.android.com/google/gcm/gs.html.
 ## Support
 
 - Google+ Community: https://plus.sandbox.google.com/communities/105153134372062985968
-- Stack Overflow: http://stackoverflow.com/questions/tagged/android-gcm
+- Stack Overflow: http://stackoverflow.com/questions/tagged/google-cloud-messaging
 
 If you've found an error in this project's code, please file an issue:
 https://github.com/google/gcm/issues
