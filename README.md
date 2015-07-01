@@ -13,6 +13,10 @@ with and explore the Google Cloud Messaging APIs.
 For more information on GCM, including an overview and integration
 instructions, see [Cloud Messaging](https://developers.google.com/cloud-messaging/).
 
+For help getting started with GCM, see the
+[GCM Quickstart for Android](https://developers.google.com/cloud-messaging/android/start)
+or the [GCM Quickstart for iOS](https://developers.google.com/cloud-messaging/ios/start).
+
 ## Support
 
 - Google+ Community: https://plus.sandbox.google.com/communities/105153134372062985968
