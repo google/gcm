@@ -25,14 +25,14 @@ and an API key to be able to test server side APIs. For more information, see
 
 ## Screenshots
 
-![Menu](samples/android/gcm-demo/screenshots/menu.png "The app's menu")
-![Registration](samples/android/gcm-demo/screenshots/registration1.png "Registration page - unregistered")
-![Registration - registered](samples/android/gcm-demo/screenshots/registration2.png "Registration page - registered")
-![Downstream](samples/android/gcm-demo/screenshots/downstream.png "Sending downstream messages")
-![Groups](samples/android/gcm-demo/screenshots/groups.png "Groups page")
-![Topics](samples/android/gcm-demo/screenshots/topics.png "Topics page")
-![Add topic](samples/android/gcm-demo/screenshots/add_topic.png "Add a topic")
-![Tasks](samples/android/gcm-demo/screenshots/tasks.png "Network manager tasks page")
+![Menu](screenshots/menu.png "The app's menu")
+![Registration](screenshots/registration1.png "Registration page - unregistered")
+![Registration - registered](screenshots/registration2.png "Registration page - registered")
+![Downstream](screenshots/downstream.png "Sending downstream messages")
+![Groups](screenshots/groups.png "Groups page")
+![Topics](screenshots/topics.png "Topics page")
+![Add topic](screenshots/add_topic.png "Add a topic")
+![Tasks](screenshots/tasks.png "Network manager tasks page")
 
 ## Support
 
