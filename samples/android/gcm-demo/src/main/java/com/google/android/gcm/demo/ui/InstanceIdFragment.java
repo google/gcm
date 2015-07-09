@@ -81,7 +81,14 @@ public class InstanceIdFragment extends AbstractFragment
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iid_get_token:
+<<<<<<< HEAD
                 getActivity().startActivity(new Intent(getActivity(), TokenActivity.class));
+=======
+                mInstanceIdHelper.getGcmTokenInBackground(getValue(R.id.iid_sender_id));
+                break;
+            case R.id.iid_delete_token:
+                mInstanceIdHelper.deleteGcmTokenInBackground(getValue(R.id.iid_sender_id));
+>>>>>>> Fix method name typo
                 break;
             case R.id.widget_itbr_button:
                 String authorizedEntity = (String) v.getTag(R.id.tag_senderid);
