@@ -107,7 +107,7 @@ public final class Message implements Serializable {
     /**
      * Adds a key/value pair to the payload data.
      */
-    public Builder addData(String key, String value) {
+    public Builder addData(String key, Object value) {
       data.put(key, value);
       return this;
     }
