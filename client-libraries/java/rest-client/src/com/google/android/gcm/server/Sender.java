@@ -113,7 +113,7 @@ public class Sender {
   public Result send(Message message, String registrationId, int retries)
       throws IOException {
     int attempt = 0;
-    Result result = null;
+    Result result;
     int backoff = BACKOFF_INITIAL_DELAY;
     boolean tryAgain;
     do {
@@ -172,14 +172,14 @@ public class Sender {
     if (timeToLive != null) {
       addParameter(body, PARAM_TIME_TO_LIVE, Integer.toString(timeToLive));
     }
-    for (Entry<String, String> entry : message.getData().entrySet()) {
+    for (Entry<String, Object> entry : message.getData().entrySet()) {
       String key = entry.getKey();
-      String value = entry.getValue();
+      Object value = entry.getValue();
       if (key == null || value == null) {
         logger.warning("Ignoring payload entry thas has null: " + entry);
       } else {
         key = PARAM_PAYLOAD_PREFIX + key;
-        addParameter(body, key, URLEncoder.encode(value, UTF8));
+        addParameter(body, key, URLEncoder.encode((String)value, UTF8));
       }
     }
     String requestBody = body.toString();
@@ -400,7 +400,7 @@ public class Sender {
         message.isDelayWhileIdle());
     setJsonField(jsonRequest, PARAM_DRY_RUN, message.isDryRun());
     jsonRequest.put(JSON_REGISTRATION_IDS, registrationIds);
-    Map<String, String> payload = message.getData();
+    Map<String, Object> payload = message.getData();
     if (!payload.isEmpty()) {
       jsonRequest.put(JSON_PAYLOAD, payload);
     }
@@ -462,8 +462,7 @@ public class Sender {
           builder.addResult(result);
         }
       }
-      MulticastResult multicastResult = builder.build();
-      return multicastResult;
+      return builder.build();
     } catch (ParseException e) {
       throw newIoException(responseBody, e);
     } catch (CustomParserException e) {
@@ -581,7 +580,7 @@ public class Sender {
   /**
    * Creates a map with just one key-value pair.
    */
-  protected static final Map<String, String> newKeyValues(String key,
+  protected static Map<String, String> newKeyValues(String key,
       String value) {
     Map<String, String> keyValues = new HashMap<String, String>(1);
     keyValues.put(nonNull(key), nonNull(value));
@@ -616,8 +615,7 @@ public class Sender {
    * Gets an {@link HttpURLConnection} given an URL.
    */
   protected HttpURLConnection getConnection(String url) throws IOException {
-    HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-    return conn;
+    return (HttpURLConnection) new URL(url).openConnection();
   }
 
   /**

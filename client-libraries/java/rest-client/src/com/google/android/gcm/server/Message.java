@@ -61,13 +61,13 @@ public final class Message implements Serializable {
   private final String collapseKey;
   private final Boolean delayWhileIdle;
   private final Integer timeToLive;
-  private final Map<String, String> data;
+  private final Map<String, Object> data;
   private final Boolean dryRun;
   private final String restrictedPackageName;
 
   public static final class Builder {
 
-    private final Map<String, String> data;
+    private final Map<String, Object> data;
 
     // optional parameters
     private String collapseKey;
@@ -77,7 +77,7 @@ public final class Message implements Serializable {
     private String restrictedPackageName;
 
     public Builder() {
-      this.data = new LinkedHashMap<String, String>();
+      this.data = new LinkedHashMap<String, Object>();
     }
 
     /**
@@ -181,7 +181,7 @@ public final class Message implements Serializable {
   /**
    * Gets the payload data, which is immutable.
    */
-  public Map<String, String> getData() {
+  public Map<String, Object> getData() {
     return data;
   }
 
@@ -205,7 +205,7 @@ public final class Message implements Serializable {
     }
     if (!data.isEmpty()) {
       builder.append("data: {");
-      for (Map.Entry<String, String> entry : data.entrySet()) {
+      for (Map.Entry<String, Object> entry : data.entrySet()) {
         builder.append(entry.getKey()).append("=").append(entry.getValue())
             .append(",");
       }

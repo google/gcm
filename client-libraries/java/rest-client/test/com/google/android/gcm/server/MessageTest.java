@@ -60,7 +60,7 @@ public class MessageTest {
     assertEquals(42, message.getTimeToLive().intValue());
     assertTrue(message.isDryRun());
     assertEquals("package.name", message.getRestrictedPackageName());
-    Map<String, String> data = message.getData();
+    Map<String, Object> data = message.getData();
     assertEquals(2, data.size());
     assertEquals("v1", data.get("k1"));
     assertEquals("v2", data.get("k2"));
