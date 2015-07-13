@@ -8,6 +8,11 @@
     <artifactId>rest-client</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <build>
+        <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>test</testSourceDirectory>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
