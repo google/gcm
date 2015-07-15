@@ -172,6 +172,71 @@ public final class Constants {
   public static final String JSON_PAYLOAD = "data";
 
   /**
+   * JSON-only field representing the notification payload.
+   */
+  public static final String JSON_NOTIFICATION = "notification";
+
+  /**
+   * JSON-only field representing the notification title.
+   */
+  public static final String JSON_NOTIFICATION_TITLE = "title";
+
+  /**
+   * JSON-only field representing the notification body.
+   */
+  public static final String JSON_NOTIFICATION_BODY = "body";
+
+  /**
+   * JSON-only field representing the notification icon.
+   */
+  public static final String JSON_NOTIFICATION_ICON = "icon";
+
+  /**
+   * JSON-only field representing the notification sound.
+   */
+  public static final String JSON_NOTIFICATION_SOUND = "sound";
+
+  /**
+   * JSON-only field representing the notification badge.
+   */
+  public static final String JSON_NOTIFICATION_BADGE = "badge";
+
+  /**
+   * JSON-only field representing the notification tag.
+   */
+  public static final String JSON_NOTIFICATION_TAG = "tag";
+
+  /**
+   * JSON-only field representing the notification color.
+   */
+  public static final String JSON_NOTIFICATION_COLOR = "color";
+
+  /**
+   * JSON-only field representing the notification click action.
+   */
+  public static final String JSON_NOTIFICATION_CLICK_ACTION = "click_action";
+
+  /**
+   * JSON-only field representing the notification body localization key.
+   */
+  public static final String JSON_NOTIFICATION_BODY_LOC_KEY = "body_loc_key";
+
+  /**
+   * JSON-only field representing the notification body localization values.
+   */
+  public static final String JSON_NOTIFICATION_BODY_LOC_ARGS = "body_loc_args";
+
+  /**
+   * JSON-only field representing the notification title localization key.
+   */
+  public static final String JSON_NOTIFICATION_TITLE_LOC_KEY = "title_loc_key";
+
+  /**
+   * JSON-only field representing the notification title localization values.
+   */
+  public static final String JSON_NOTIFICATION_TITLE_LOC_ARGS = "title_loc_args";
+
+  /**
    * JSON-only field representing the number of successful messages.
    */
   public static final String JSON_SUCCESS = "success";
