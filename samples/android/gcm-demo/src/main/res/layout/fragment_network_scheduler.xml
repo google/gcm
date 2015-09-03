@@ -20,22 +20,12 @@ limitations under the License.
     android:layout_height="match_parent"
     android:padding="8dp">
 
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/scheduler_about_apis"
-        android:text="@string/scheduler_about_apis" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:visibility="gone"
-        android:id="@+id/scheduler_about_apis_full_text"
-        android:text="@string/scheduler_about_apis_full_text" />
-
+        android:id="@+id/scheduler_description"
+        android:text="@string/scheduler_description"
+        android:layout_marginBottom="8dp"/>
 
     <TextView
         android:layout_width="wrap_content"

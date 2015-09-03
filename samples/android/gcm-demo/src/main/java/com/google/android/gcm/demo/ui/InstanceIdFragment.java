@@ -34,7 +34,7 @@ import com.google.android.gcm.demo.model.SenderCollection;
 import com.google.android.gcm.demo.ui.addressbook.SelectActivity;
 
 /**
- * Fragment for registering and unregistering GCM tokens, as well as running quick tests.
+ * Fragment for registering and un-registering GCM tokens, as well as running quick tests.
  * This is the default fragment shown when the app starts.
  */
 public class InstanceIdFragment extends AbstractFragment
@@ -43,21 +43,24 @@ public class InstanceIdFragment extends AbstractFragment
     private QuickTestHelper mQuickTestHelper;
     private InstanceIdHelper mInstanceIdHelper;
     private SenderCollection mSenders;
-    private String mCurrentSenderId;
-    private String mCurrentApiKey;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
         View view = inflater.inflate(R.layout.fragment_instanceid, container, false);
+        view.findViewById(R.id.iid_sender_id).setOnClickListener(this);
         view.findViewById(R.id.iid_get_token).setOnClickListener(this);
         view.findViewById(R.id.iid_delete_token).setOnClickListener(this);
+        view.findViewById(R.id.iid_api_key).setOnClickListener(this);
         view.findViewById(R.id.iid_execute_quick_test).setOnClickListener(this);
-        view.findViewById(R.id.iid_about_apis).setOnClickListener(this);
-        view.findViewById(R.id.iid_about_quicktest).setOnClickListener(this);
+
         view.findViewById(R.id.iid_sender_id).setOnLongClickListener(this);
-        view.findViewById(R.id.iid_select_sender_id).setOnClickListener(this);
         view.findViewById(R.id.iid_api_key).setOnLongClickListener(this);
-        view.findViewById(R.id.iid_select_api_key).setOnClickListener(this);
+
+        setHtmlMode(view, R.id.fragment_description);
+
+        loadSavedState(savedState);
+        setValueFromFragmentState(view.findViewById(R.id.iid_sender_id), SENDER_ID);
+        setValueFromFragmentState(view.findViewById(R.id.iid_api_key), API_KEY);
 
         mInstanceIdHelper = new InstanceIdHelper(getActivity());
         mQuickTestHelper = new QuickTestHelper(getActivity());
@@ -69,21 +72,6 @@ public class InstanceIdFragment extends AbstractFragment
         quickTestsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         quickTests.setAdapter(quickTestsAdapter);
 
-        if (savedState != null) {
-            mCurrentSenderId = savedState.getString(SENDER_ID);
-            mCurrentApiKey = savedState.getString(API_KEY);
-        }
-        if (mCurrentSenderId != null) {
-            TextView senderIdView = (TextView) view.findViewById(R.id.iid_sender_id);
-            senderIdView.setText(truncateToLongString(mCurrentSenderId));
-            senderIdView.setTag(R.id.tag_clipboard_value, mCurrentSenderId);
-        }
-        if (mCurrentApiKey != null) {
-            TextView apiKeyView = (TextView) view.findViewById(R.id.iid_api_key);
-            apiKeyView.setText(truncateToLongString(mCurrentApiKey));
-            apiKeyView.setTag(R.id.tag_clipboard_value, mCurrentApiKey);
-        }
-
         return view;
     }
 
@@ -93,21 +81,22 @@ public class InstanceIdFragment extends AbstractFragment
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedState) {
-        super.onSaveInstanceState(savedState);
-        savedState.putString(SENDER_ID, mCurrentSenderId);
-        savedState.putString(API_KEY, mCurrentApiKey);
-    }
-
-    @Override
     public void onClick(View v) {
-        Intent startSelectActivityIntent;
+        Intent intent;
         switch (v.getId()) {
+            case R.id.iid_sender_id:
+                intent = SelectActivity.pickSenderId(getActivity(), R.id.iid_sender_id);
+                startActivityForResult(intent, 0);
+                break;
             case R.id.iid_get_token:
                 mInstanceIdHelper.getGcmTokenInBackground(getValue(R.id.iid_sender_id));
                 break;
             case R.id.iid_delete_token:
                 mInstanceIdHelper.deleteGcmTokeInBackground(getValue(R.id.iid_sender_id));
+                break;
+            case R.id.iid_api_key:
+                intent = SelectActivity.pickApiKey(getActivity(), R.id.iid_api_key);
+                startActivityForResult(intent, 0);
                 break;
             case R.id.iid_execute_quick_test:
                 mQuickTestHelper.runTest(
@@ -115,23 +104,19 @@ public class InstanceIdFragment extends AbstractFragment
                         getValue(R.id.iid_api_key),
                         getValue(R.id.iid_token));
                 break;
-            case R.id.iid_select_sender_id:
-                startSelectActivityIntent = SelectActivity.pickSenderId(getActivity(),
-                        R.id.iid_sender_id);
-                startActivityForResult(startSelectActivityIntent, 0);
-                break;
-            case R.id.iid_select_api_key:
-                startSelectActivityIntent = SelectActivity.pickApiKey(getActivity(),
-                        R.id.iid_api_key);
-                startActivityForResult(startSelectActivityIntent, 0);
-                break;
-            case R.id.iid_about_apis:
-                toggleAboutApi();
-                break;
-            case R.id.iid_about_quicktest:
-                toggleAboutQuicktest();
-                break;
         }
+    }
+
+    @Override
+    public void handleAddressBookSelection(int id, String name, String value) {
+        if (id == R.id.iid_sender_id) {
+            mFragmentState.putStringArray(SENDER_ID, new String[]{name, value});
+            setValue(R.id.iid_sender_id, name, value);
+        } else if (id == R.id.iid_api_key) {
+            mFragmentState.putStringArray(API_KEY, new String[]{name, value});
+            setValue(R.id.iid_api_key, name, value);
+        }
+        refresh();
     }
 
     @Override
@@ -140,17 +125,16 @@ public class InstanceIdFragment extends AbstractFragment
         if (server == null) {
             server = mSenders.getSender(SenderCollection.DEFAULT_SENDER_ID);
         }
+        // Check if the view exists, if so refresh it.
         if (getView() != null) {
-            TextView senderIdView = (TextView) getView().findViewById(R.id.iid_sender_id);
+            setValue(R.id.iid_sender_id, server.name, server.senderId);
             TextView tokenView = (TextView) getView().findViewById(R.id.iid_token);
-            senderIdView.setText(truncateToLongString(server.senderId));
-            senderIdView.setTag(R.id.tag_clipboard_value, server.senderId);
             if (server.testAppToken != null) {
+                setValue(R.id.iid_token, null, server.testAppToken);
                 tokenView.setText(truncateToLongString(server.testAppToken));
-                tokenView.setTag(R.id.tag_clipboard_value, server.testAppToken);
-                tokenView.setTextColor(Color.BLUE);
                 tokenView.setOnLongClickListener(this);
                 getView().findViewById(R.id.iid_execute_quick_test).setEnabled(true);
+                tokenView.setTextAppearance(getActivity(), R.style.TextAppearance_AppCompat);
             } else {
                 tokenView.setText(getString(R.string.iid_unregistered));
                 tokenView.setTextColor(Color.RED);
@@ -160,35 +144,9 @@ public class InstanceIdFragment extends AbstractFragment
             String currentAPIKey = getValue(R.id.iid_api_key);
             if (!server.apiKeys.contains(currentAPIKey)) {
                 TextView apiKeyView = ((TextView) getView().findViewById(R.id.iid_api_key));
-                apiKeyView.setText(getString(R.id.iid_select_api_key));
+                apiKeyView.setText(R.string.iid_api_key_hint);
                 apiKeyView.setTag(R.id.tag_clipboard_value, "");
             }
-        } else {
-            //do nothing, fragment has been destroyd
         }
     }
-
-    private void toggleAboutApi() {
-        toggleText((TextView) getActivity().findViewById(R.id.iid_about_apis),
-                R.string.iid_about_apis, R.string.iid_about_apis_open);
-        toggleVisibility(getActivity().findViewById(R.id.iid_about_apis_full_text));
-    }
-
-    private void toggleAboutQuicktest() {
-        toggleText((TextView) getActivity().findViewById(R.id.iid_about_quicktest),
-                R.string.iid_about_quicktest, R.string.iid_about_quicktest_open);
-        toggleVisibility(getActivity().findViewById(R.id.iid_about_quicktest_full_text));
-    }
-
-    @Override
-    public void handleAddressBookSelection(int id, String name, String value) {
-        super.handleAddressBookSelection(id, name, value);
-        if (id == R.id.iid_sender_id) {
-            mCurrentSenderId = value;
-        } else if (id == R.id.iid_api_key) {
-            mCurrentApiKey = value;
-        }
-        refresh();
-    }
-
 }

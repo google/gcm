@@ -28,7 +28,7 @@ limitations under the License.
     <string name="main_menu_notification">Notifications</string>
     <string name="main_menu_groups">Device Groups</string>
     <string name="main_menu_topics">Topics</string>
-    <string name="main_menu_network_scheduler">Network Scheduler</string>
+    <string name="main_menu_network_manager">Network Manager</string>
 
     <!-- Overflow Menu -->
     <string name="show_logs">Show Logs</string>
@@ -36,66 +36,67 @@ limitations under the License.
     <string name="clear_logs">Clear logs</string>
 
     <!-- Downstream Fragment -->
+    <string name="downstream_description">With Downstream APIs you can send messages from the cloud to a user\'s device.  &lt;a href="https://developers.google.com/cloud-messaging/server#send-msg">More info&lt;/a></string>
     <string name="downstream_collapse_key_hint">Collapse key</string>
     <string name="downstream_restricted_package_name_hint">Restricted package name</string>
     <string name="downstream_ttl_hint">Time To Live</string>
+    <string name="downstream_more_options">More options:</string>
+    <string name="downstream_request_format">Request format:</string>
     <string name="downstream_delay_while_idle_text">Delay while idle</string>
     <string name="downstream_dry_run_text">Dry run</string>
     <string name="downstream_data_hint">Data</string>
     <string name="downstream_sender_id_label">Sender ID</string>
-    <string name="downstream_json_text">JSON</string>
-    <string name="downstream_cleartext_text">Clear text</string>
+    <string name="downstream_json_request">JSON</string>
+    <string name="downstream_plaintext_request">Plain text</string>
     <string name="downstream_send_text">Send</string>
-    <string name="downstream_api_key">API Key:</string>
-    <string name="downstream_registration_id">Registration Id:</string>
-    <string name="downstream_select_reg_id">Select registration id</string>
-    <string name="downstream_select_api_key">Select API key</string>
+    <string name="downstream_api_key">Sender API Key:</string>
+    <string name="downstream_api_key_hint">Select a Sender API key</string>
+    <string name="downstream_token">Registration token:</string>
+    <string name="downstream_token_hint">Select a Registration token</string>
 
     <!-- Upstream Fragment -->
+    <string name="upstream_description">With Upstream APIs you can send messages from a user\'s device to a Sender Id.  &lt;a href="https://developers.google.com/cloud-messaging/ccs#upstream">More info&lt;/a></string>
     <string name="upstream_message_id_hint">Message ID</string>
+    <string name="upstream_message_id_not_provided">Message Id cannot be empty</string>
     <string name="upstream_ttl_hint">TTL</string>
     <string name="upstream_send_text">Send</string>
     <string name="upstream_sender_id">Sender Id:</string>
-    <string name="upstream_registration_id">Registration Id:</string>
-    <string name="upstream_unregistered">Unregistered</string>
+    <string name="upstream_sender_id_hint">Choose a Sender Id:</string>
+    <string name="upstream_sender_id_not_select">Sender Id not selected</string>
+    <string name="upstream_sender_id_not_registered">The device needs to hold a registration token for this sender id, in order to send upstream messages to it.</string>
 
     <!-- Instance Id Fragment -->
+    <string name="iid_description">In order to receive messages from the cloud you need to obtain a registration token. &lt;a href="https://developers.google.com/cloud-messaging/registration">More info&lt;/a></string>
     <string name="iid_sender_id">Sender ID:</string>
     <string name="iid_execute_quick_test">run</string>
     <string name="iid_register">Register</string>
     <string name="iid_unregister">Unregister</string>
-    <string name="iid_about_quicktest">▶ About the Quick Test</string>
-    <string name="iid_about_quicktest_open">▼ About the Quick Test</string>
-    <string name="iid_about_quick_test_full_text">Quick tests offer a fast way to check that the application is correctly registered and messages are getting through. For more details on the APIs see their corresponding pages.</string>
-    <string name="iid_about_apis">▶ About the registration APIs</string>
-    <string name="iid_about_apis_open">▼ About the registration APIs</string>
-    <string name="iid_about_apis_full_text">Registration has to be done by the client in order for it to receive a registration token. The client must communicate this token back to its server. The server will then use the token to send messages to the client.</string>
     <string name="iid_unregistered">Unregistered</string>
     <string name="iid_quick_test">Quick test:</string>
     <string name="iid_api_key">API Key:</string>
+    <string name="iid_api_key_hint">Select a Sender API Key:</string>
     <string name="iid_token">Token:</string>
 
     <!-- Topics Fragment -->
     <string name="topics_sender_id">Sender ID: %1$s</string>
-    <string name="topics_description">With Pub/Sub APIs you can subscribe multiple topics and receive messages broadcasted by senders to a very large number of devices.  &lt;a href="http://www.google.com">More info&lt;/a></string>
-    <string name="topics_active_subscriptions">Active topic subscriptions:</string>
+    <string name="topics_description">With Topics APIs you can subscribe multiple topics and receive messages broadcasted by senders to a very large number of devices.  &lt;a href="https://developers.google.com/cloud-messaging/topic-messaging">More info&lt;/a></string>
     <string name="topics_subscribe">Subscribe a new topic</string>
     <string name="topics_unsubscribe">Unsubscribe</string>
     <string name="topics_sender_not_registered">You need to be registered with this sender before to subscribe its topics.</string>
     <string name="topics_already_subscribed">Topic already subscribed.</string>
     <string name="topics_subscribing">Subscribing %1$s</string>
     <string name="topics_unsubscribing">Unsubscribing from %1$s</string>
-    <string name="topics_no_sender_registered">You need to have at least a GCM token in order to use Pub/Sub APIs</string>
-    <string name="topics_no_topic_subscribed">no topic has been subscribed for this sender id</string>
+    <string name="topics_no_topic_subscribed">You don\'t have any topic subscription active at the moment. Try this API subscribing a new Topic.</string>
 
     <!-- Groups Fragment -->
     <string name="groups_sender_id">Sender ID: %1$s</string>
-    <string name="groups_description">With device group messaging, you can send a single message to multiple devices belonging to a group. Like different devices that belong to a single user.  &lt;a href="http://www.google.com">More info&lt;/a></string>
+    <string name="groups_description">With device group messaging, you can send a single message to multiple devices belonging to a group. Like different devices that belong to a single user.  &lt;a href="https://developers.google.com/cloud-messaging/notifications">More info&lt;/a></string>
     <string name="groups_no_groups_available">Start creating a new Device Group, you can later add/remove additional Gcm Tokens to it.</string>
     <string name="groups_delete">Delete</string>
     <string name="groups_create_new">Create a Device Group</string>
 
     <!-- Notification Fragment -->
+    <string name="notification_description">With Notification APIs you can send messages from the cloud to a user\'s device.  &lt;a href="https://developers.google.com/cloud-messaging">More info&lt;/a></string>
     <string name="notification_icon_hint">Icon, e.g. icon</string>
     <string name="notification_title_hint">Title text</string>
     <string name="notification_title_default">GCM Test App Notification Title</string>
@@ -115,9 +116,7 @@ limitations under the License.
     <string name="notification_registration_id">Registration Id:</string>
 
     <!-- Network scheduler fragment -->
-    <string name="scheduler_about_apis">▶ About the network scheduler APIs</string>
-    <string name="scheduler_about_apis_open">▼ About the network scheduler APIs</string>
-    <string name="scheduler_about_apis_full_text">Apps can schedule background tasks that run when network radio is in use. Reduces radio wake ups. Reduces APP server load using exponential backoff for failed retries. Supports one-off and periodic tasks.</string>
+    <string name="scheduler_description">Apps can schedule background tasks that run when network radio is in use, or when the device is charging, thus optimizing the battery usage. &lt;a href="https://developers.google.com/cloud-messaging/network-manager">More info&lt;/a></string>
     <string name="scheduler_cancel">Cancel</string>
     <string name="scheduler_add_oneoff_message">A one-off task is executed only once. A window during which the task should be executed is specified, as well as constraints on network state and device state.</string>
     <string name="scheduler_run_from">Run from:</string>
@@ -217,8 +216,7 @@ limitations under the License.
     <string name="group_sender_id">Sender ID:</string>
     <string name="group_sender_id_hint">Choose a Sender ID</string>
     <string name="group_sender_api_key">Sender API Key:</string>
-    <string name="group_sender_api_key_hint">Select the API Key to use</string>
-    <string name="group_sender_api_key_disable">Choose the sender id first</string>
+    <string name="group_sender_api_key_hint">Choose the API Key</string>
     <string name="group_name">Group Name:</string>
     <string name="group_new_name_hint">my group name</string>
     <string name="group_key">Group Key:</string>

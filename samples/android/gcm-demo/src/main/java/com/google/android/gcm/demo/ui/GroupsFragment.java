@@ -20,8 +20,6 @@ import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.util.SimpleArrayMap;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,18 +54,16 @@ public class GroupsFragment extends AbstractFragment
     private String mGroupToBeDeletedSenderId;
     private String mGroupToBeDeletedName;
     private DeviceGroupsHelper mDeviceGroupsHelper;
-
-
     private SenderCollection mSenders;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
         mSenders = SenderCollection.getInstance(getActivity());
+        mDeviceGroupsHelper = new DeviceGroupsHelper(getActivity());
 
         View view = inflater.inflate(R.layout.fragment_groups, container, false);
-        TextView description = (TextView) view.findViewById(R.id.groups_description);
-        description.setMovementMethod(LinkMovementMethod.getInstance());
-        description.setText(Html.fromHtml(getActivity().getString(R.string.groups_description)));
+        setHtmlMode(view, R.id.groups_description);
         view.findViewById(R.id.groups_create_new).setOnClickListener(this);
 
         if (savedState != null) {
@@ -78,8 +74,6 @@ public class GroupsFragment extends AbstractFragment
         int[] attrs = new int[]{R.attr.selectableItemBackground};
         TypedArray typedArray = getActivity().obtainStyledAttributes(attrs);
         selectableBackgroundResource = typedArray.getResourceId(0, 0);
-
-        mDeviceGroupsHelper = new DeviceGroupsHelper(getActivity());
 
         return view;
     }
@@ -121,7 +115,6 @@ public class GroupsFragment extends AbstractFragment
         }
     }
 
-
     @Override
     public void refresh() {
         float density = getActivity().getResources().getDisplayMetrics().density;
@@ -132,7 +125,7 @@ public class GroupsFragment extends AbstractFragment
             Sender sender = senders.valueAt(i);
             if (sender.groups.size() > 0) {
                 LinearLayout senderRow = (LinearLayout) getActivity().getLayoutInflater()
-                        .inflate(R.layout.widget_icon_text_button_row, null);
+                        .inflate(R.layout.widget_icon_text_button_row, sendersList, false);
                 ImageView senderIcon = (ImageView) senderRow.findViewById(R.id.widget_itbr_icon);
                 TextView senderText = (TextView) senderRow.findViewById(R.id.widget_itbr_text);
                 senderRow.findViewById(R.id.widget_itbr_button).setVisibility(View.GONE);
@@ -142,7 +135,7 @@ public class GroupsFragment extends AbstractFragment
                 sendersList.addView(senderRow);
                 for (DeviceGroup deviceGroup : sender.groups.values()) {
                     LinearLayout row = (LinearLayout) getActivity().getLayoutInflater()
-                            .inflate(R.layout.widget_icon_text_button_row, null);
+                            .inflate(R.layout.widget_icon_text_button_row, sendersList, false);
                     ImageView icon = (ImageView) row.findViewById(R.id.widget_itbr_icon);
                     TextView label = (TextView) row.findViewById(R.id.widget_itbr_text);
                     Button button = (Button) row.findViewById(R.id.widget_itbr_button);

@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onSupportActionModeStarted(mode);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // Set a status bar color while in action mode (text copy&paste)
-            getWindow().setStatusBarColor(getResources().getColor(R.color.blue_900));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.google_blue_900));
         }
     }
 
@@ -245,8 +245,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     protected void onPause() {
-        super.onPause();
         mLogger.unregisterCallback(mLoggerCallback);
+        super.onPause();
     }
 
     /**

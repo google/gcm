@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -67,8 +66,6 @@ public class GroupActivity extends AppCompatActivity
     private String senderApiKey;
     private DeviceGroup group = new DeviceGroup();
 
-    private int disabledTextColor;
-    private int enabledTextColor;
     private View newMembersView;
     private View noNewMembersView;
     private View removedMembersView;
@@ -77,7 +74,8 @@ public class GroupActivity extends AppCompatActivity
     private LinearLayout removedMembersList;
     private LinearLayout currentMembersList;
     private TextView senderIdTexView;
-    private TextView apiKeyTextView;
+    private TextView chooseSenderIdTexView;
+    private TextView chooseApiKeyTextView;
     private EditText newNameEditText;
 
     private SenderCollection mSenders;
@@ -110,16 +108,14 @@ public class GroupActivity extends AppCompatActivity
             group.notificationKeyName = savedState.getString(STATE_SELECTED_SENDER_ID);
         }
 
-        enabledTextColor = getResources().getColor(R.color.black);
-        disabledTextColor = getResources().getColor(R.color.grey_500);
-
         newMembersView = findViewById(R.id.group_new_members);
         noNewMembersView = findViewById(R.id.group_no_new_members);
         removedMembersView = findViewById(R.id.group_removed_members);
         currentMembersView = findViewById(R.id.group_current_members);
 
         senderIdTexView = (TextView) findViewById(R.id.group_sender_id);
-        apiKeyTextView = (TextView) findViewById(R.id.group_api_key);
+        chooseSenderIdTexView = (TextView) findViewById(R.id.group_choose_sender_id);
+        chooseApiKeyTextView = (TextView) findViewById(R.id.group_api_key);
         newNameEditText = (EditText) findViewById(R.id.group_new_name);
 
         newMembersList = (LinearLayout) findViewById(R.id.group_new_members_list);
@@ -137,16 +133,14 @@ public class GroupActivity extends AppCompatActivity
             sender = mSenders.getSender(senderId);
             group = sender.groups.get(groupName);
 
+            senderIdTexView.setVisibility(View.VISIBLE);
             senderIdTexView.setText(sender.senderId);
-            senderIdTexView.setTextColor(disabledTextColor);
+            chooseSenderIdTexView.setVisibility(View.GONE);
 
             TextView nameTextView = (TextView) findViewById(R.id.group_name);
             TextView keyTextView = (TextView) findViewById(R.id.group_key);
             nameTextView.setText(group.notificationKeyName);
-            nameTextView.setTextColor(disabledTextColor);
             keyTextView.setText(AbstractFragment.truncateToMediumString(group.notificationKey));
-            keyTextView.setTextColor(disabledTextColor);
-
             submit.setText(R.string.group_submit_edit_group);
 
             newNameEditText.setVisibility(View.GONE);
@@ -155,7 +149,8 @@ public class GroupActivity extends AppCompatActivity
             editMode = false;
             getSupportActionBar().setTitle(R.string.group_activity_title_new_group);
             findViewById(R.id.group_key_view).setVisibility(View.GONE);
-            senderIdTexView.setOnClickListener(this);
+            senderIdTexView.setVisibility(View.GONE);
+            chooseSenderIdTexView.setOnClickListener(this);
             submit.setText(R.string.group_submit_new_group);
         }
 
@@ -210,14 +205,14 @@ public class GroupActivity extends AppCompatActivity
             String name = data.getStringExtra(SelectActivity.INTENT_EXTRA_NAME);
             String value = data.getStringExtra(SelectActivity.INTENT_EXTRA_VALUE);
             switch (id) {
-                case R.id.group_sender_id:
+                case R.id.group_choose_sender_id:
                     sender = mSenders.getSender(value);
-                    senderIdTexView.setText(value);
+                    chooseSenderIdTexView.setText(value);
                     refresh();
                     break;
                 case R.id.group_api_key:
                     senderApiKey = value;
-                    apiKeyTextView.setText(AbstractFragment.truncateToMediumString(value));
+                    chooseApiKeyTextView.setText(AbstractFragment.truncateToMediumString(value));
                     break;
                 case R.id.group_new_member:
                     newMembers.putString(name, value);
@@ -231,8 +226,8 @@ public class GroupActivity extends AppCompatActivity
     public void onClick(View view) {
         Intent intent;
         switch (view.getId()) {
-            case R.id.group_sender_id:
-                intent = SelectActivity.pickSenderId(this, R.id.group_sender_id);
+            case R.id.group_choose_sender_id:
+                intent = SelectActivity.pickSenderId(this, R.id.group_choose_sender_id);
                 startActivityForResult(intent, 0);
                 break;
             case R.id.group_api_key:
@@ -356,17 +351,17 @@ public class GroupActivity extends AppCompatActivity
         }
 
         if (sender.senderId == null) {
-            apiKeyTextView.setText(R.string.group_sender_api_key_disable);
-            apiKeyTextView.setTextColor(disabledTextColor);
+            chooseApiKeyTextView.setText(R.string.group_sender_api_key_hint);
+            chooseApiKeyTextView.setEnabled(false);
         } else {
-            apiKeyTextView.setOnClickListener(this);
-            apiKeyTextView.setTextColor(enabledTextColor);
+            chooseApiKeyTextView.setOnClickListener(this);
+            chooseApiKeyTextView.setEnabled(true);
             if (senderApiKey == null) {
                 if (sender.apiKeys.size() > 0) {
                     senderApiKey = sender.apiKeys.get(0);
-                    apiKeyTextView.setText(AbstractFragment.truncateToMediumString(senderApiKey));
+                    chooseApiKeyTextView.setText(AbstractFragment.truncateToMediumString(senderApiKey));
                 } else {
-                    apiKeyTextView.setText(R.string.group_sender_api_key_hint);
+                    chooseApiKeyTextView.setText(R.string.group_sender_api_key_hint);
                 }
             }
         }

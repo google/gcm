@@ -26,9 +26,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gcm.demo.R;
@@ -39,88 +37,62 @@ import com.google.android.gcm.demo.ui.addressbook.SelectActivity;
 
 import java.io.IOException;
 
+
 /**
  * Fragment for sending downstream GCM messages
  */
-public class DownstreamFragment extends AbstractFragment
-        implements View.OnClickListener {
+public class DownstreamFragment extends AbstractFragment implements View.OnClickListener {
 
     protected LoggingService.Logger mLogger;
-    private String mCurrentToken;
-    private String mCurrentApiKey;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
         mLogger = new LoggingService.Logger(getActivity());
         View view = inflater.inflate(getLayoutId(), container, false);
+
+        view.findViewById(R.id.downstream_api_key).setOnClickListener(this);
+        view.findViewById(R.id.downstream_token).setOnClickListener(this);
         view.findViewById(R.id.downstream_send_button).setOnClickListener(this);
+
         view.findViewById(R.id.downstream_api_key).setOnLongClickListener(this);
-        view.findViewById(R.id.downstream_select_api_key).setOnClickListener(this);
         view.findViewById(R.id.downstream_token).setOnLongClickListener(this);
-        view.findViewById(R.id.downstream_select_token).setOnClickListener(this);
 
-        // Set default values
-        TextView tokenView = (TextView) view.findViewById(R.id.downstream_token);
-        tokenView.setText(getString(R.string.downstream_select_reg_id));
-        tokenView.setTag(R.id.tag_clipboard_value, "");
+        setHtmlMode(view, R.id.fragment_description);
 
-        TextView apiKeyView = (TextView) view.findViewById(R.id.downstream_api_key);
-        apiKeyView.setText(getString(R.string.downstream_select_api_key));
-        apiKeyView.setTag(R.id.tag_clipboard_value, "");
-
-        // Set saved value if they exist
-        if (savedState != null) {
-            mCurrentToken = savedState.getString(TOKEN);
-            mCurrentApiKey = savedState.getString(API_KEY);
-        }
-        if (mCurrentToken != null) {
-            tokenView.setText(truncateToLongString(mCurrentToken));
-            tokenView.setTag(R.id.tag_clipboard_value, mCurrentToken);
-        }
-        if (mCurrentApiKey != null) {
-            apiKeyView.setText(truncateToLongString(mCurrentApiKey));
-            apiKeyView.setTag(R.id.tag_clipboard_value, mCurrentApiKey);
-        }
+        loadSavedState(savedState);
+        setValueFromFragmentState(view.findViewById(R.id.downstream_api_key), API_KEY);
+        setValueFromFragmentState(view.findViewById(R.id.downstream_token), TOKEN);
 
         return view;
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedState) {
-        super.onSaveInstanceState(savedState);
-        savedState.putString(TOKEN, mCurrentToken);
-        savedState.putString(API_KEY, mCurrentApiKey);
-    }
-
-    @Override
     public void handleAddressBookSelection(int id, String name, String value) {
-        super.handleAddressBookSelection(id, name, value);
-        if (id == R.id.downstream_token) {
-            mCurrentToken = value;
-        } else if (id == R.id.downstream_api_key) {
-            mCurrentApiKey = value;
+        if (id == R.id.downstream_api_key) {
+            setValue(R.id.downstream_api_key, name, value);
+            mFragmentState.putStringArray(API_KEY, new String[]{name, value});
+        } else if (id == R.id.downstream_token) {
+            setValue(R.id.downstream_token, name, value);
+            mFragmentState.putStringArray(TOKEN, new String[]{name, value});
         }
     }
 
     @Override
     public void onClick(View v) {
-        Intent startSelectActivityIntent;
+        Intent intent;
         switch (v.getId()) {
             case R.id.downstream_send_button:
                 doGcmSend();
                 break;
-            case R.id.downstream_select_api_key:
-                startSelectActivityIntent = SelectActivity.pickApiKey(getActivity(),
-                        R.id.downstream_api_key);
-                startActivityForResult(startSelectActivityIntent, 0);
+            case R.id.downstream_api_key:
+                intent = SelectActivity.pickApiKey(getActivity(), R.id.downstream_api_key);
+                startActivityForResult(intent, 0);
                 break;
-            case R.id.downstream_select_token:
-                startSelectActivityIntent = SelectActivity.pickDestination(getActivity(),
-                        R.id.downstream_token);
-                startActivityForResult(startSelectActivityIntent, 0);
+            case R.id.downstream_token:
+                intent = SelectActivity.pickDestination(getActivity(), R.id.downstream_token);
+                startActivityForResult(intent, 0);
                 break;
         }
-
     }
 
     protected int getLayoutId() {
@@ -130,18 +102,15 @@ public class DownstreamFragment extends AbstractFragment
     protected void doGcmSend() {
         final Activity activity = this.getActivity();
         final Message.Builder messageBuilder = new Message.Builder();
-        String collapseKey = ((EditText) activity
-                .findViewById(R.id.downstream_collapse_key)).getText().toString();
+        String collapseKey = getValue(R.id.downstream_collapse_key);
         if (isNotEmpty((collapseKey))) {
             messageBuilder.collapseKey(collapseKey.trim());
         }
-        String restrictedPackageName = ((EditText) activity
-                .findViewById(R.id.downstream_restricted_package_name)).getText().toString();
+        String restrictedPackageName = getValue(R.id.downstream_restricted_package_name);
         if (isNotEmpty((restrictedPackageName))) {
             messageBuilder.restrictedPackageName(restrictedPackageName.trim());
         }
-        String ttlString = ((EditText) activity.findViewById(R.id.downstream_ttl))
-                .getText().toString();
+        String ttlString = getValue(R.id.downstream_ttl);
         try {
             int ttl = Integer.parseInt(ttlString);
             messageBuilder.timeToLive(ttl);

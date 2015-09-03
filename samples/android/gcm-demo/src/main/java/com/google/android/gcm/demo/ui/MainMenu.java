@@ -17,7 +17,6 @@ package com.google.android.gcm.demo.ui;
 
 import android.support.v4.app.Fragment;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.gcm.demo.R;
 import com.google.android.gcm.demo.service.LoggingService.Logger;
@@ -40,7 +39,7 @@ public class MainMenu {
         mMenu.put(a.getText(R.string.main_menu_notification), NotificationFragment.class);
         mMenu.put(a.getText(R.string.main_menu_groups), GroupsFragment.class);
         mMenu.put(a.getText(R.string.main_menu_topics), TopicsFragment.class);
-        mMenu.put(a.getText(R.string.main_menu_network_scheduler), NetworkSchedulerFragment.class);
+        mMenu.put(a.getText(R.string.main_menu_network_manager), NetworkSchedulerFragment.class);
     }
 
     public CharSequence[] getEntries() {
