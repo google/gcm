@@ -19,9 +19,12 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.android.gcm.demo.R;
 import com.google.android.gcm.demo.model.Sender;
 import com.google.android.gcm.demo.model.SenderCollection;
 import com.google.android.gcm.demo.service.LoggingService;
+import com.google.android.gcm.demo.ui.AbstractFragment;
+import com.google.android.gcm.demo.ui.MainActivity;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
@@ -60,6 +63,9 @@ public class InstanceIdHelper {
                                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                     mLogger.log(Log.INFO, "registration succeeded." +
                             "\nsenderId: " + senderId + "\ntoken: " + token);
+                    MainActivity.showToast(mContext, R.string.iid_toast_success,
+                            AbstractFragment.truncateToLongString(token));
+
                     // Save the token in the address book
                     Sender entry = mSenders.getSender(senderId);
                     if (entry == null) {
@@ -71,6 +77,7 @@ public class InstanceIdHelper {
                 } catch (final IOException e) {
                     mLogger.log(Log.INFO, "registration failed." +
                             "\nsenderId: " + senderId + "\nerror: " + e.getMessage());
+                    MainActivity.showToast(mContext, R.string.iid_toast_error, e.getMessage());
                 }
                 return null;
             }

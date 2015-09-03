@@ -22,6 +22,7 @@ limitations under the License.
     <string name="logs">Logs</string>
 
     <!-- Main Menu -->
+    <string name="main_menu_home">Home</string>
     <string name="main_menu_instanceid">Registrations</string>
     <string name="main_menu_downstream">Downstream</string>
     <string name="main_menu_upstream">Upstream</string>
@@ -53,6 +54,8 @@ limitations under the License.
     <string name="downstream_api_key_hint">Select a Sender API key</string>
     <string name="downstream_token">Registration token:</string>
     <string name="downstream_token_hint">Select a Registration token</string>
+    <string name="downstream_toast_success">Downstream message sent successfully.\nServer response:  %1$s</string>
+    <string name="downstream_toast_failure">Error: %1$s</string>
 
     <!-- Upstream Fragment -->
     <string name="upstream_description">With Upstream APIs you can send messages from a user\'s device to a Sender Id.  &lt;a href="https://developers.google.com/cloud-messaging/ccs#upstream">More info&lt;/a></string>
@@ -68,14 +71,12 @@ limitations under the License.
     <!-- Instance Id Fragment -->
     <string name="iid_description">In order to receive messages from the cloud you need to obtain a registration token. &lt;a href="https://developers.google.com/cloud-messaging/registration">More info&lt;/a></string>
     <string name="iid_sender_id">Sender ID:</string>
-    <string name="iid_execute_quick_test">run</string>
+    <string name="iid_token">Token:</string>
+    <string name="iid_unregistered">Unregistered</string>
     <string name="iid_register">Register</string>
     <string name="iid_unregister">Unregister</string>
-    <string name="iid_unregistered">Unregistered</string>
-    <string name="iid_quick_test">Quick test:</string>
-    <string name="iid_api_key">API Key:</string>
-    <string name="iid_api_key_hint">Select a Sender API Key:</string>
-    <string name="iid_token">Token:</string>
+    <string name="iid_toast_success">Token retrieved successfully:\n%1$s</string>
+    <string name="iid_toast_error">Error: %1$s</string>
 
     <!-- Topics Fragment -->
     <string name="topics_sender_id">Sender ID: %1$s</string>
@@ -154,6 +155,7 @@ limitations under the License.
     <string name="task_constraints_persistence">Persistence</string>
 
     <!-- Quick Tests -->
+    <string name="quicktest_get_registration_token">Get registration token</string>
     <string name="quicktest_downstream_http_json">Downstream HTTP JSON</string>
 
     <!-- Editable Map View -->
@@ -242,4 +244,19 @@ limitations under the License.
     <string name="group_alert_group_will_be_deleted">Removing all the members will delete the group itself</string>
     <string name="group_alert_cancel">Cancel</string>
     <string name="group_alert_delete_group">Delete the group</string>
+
+    <string name="home_description">Try Google Cloud Messaging using this list of pre-filled API calls, or personalize the parameters in the screens dedicated to each APIs</string>
+    <string name="home_quick_test">Test:</string>
+    <string name="home_quick_test_hint">Select an API to test</string>
+    <string name="home_google_cloud_messaging">Google Cloud Messaging</string>
+    <string name="home_url">https://developers.google.com/cloud-messaging</string>
+    <string name="home_results">The result will be shown as an on-screen notification. Open the Logs panel to have more details.</string>
+    <string name="home_submit">Execute API call</string>
+    <string name="home_parameters">Parameters</string>
+    <string name="home_sender_id">Sender Id:</string>
+    <string name="home_sender_id_hint">Select a Sender Id</string>
+    <string name="home_api_key">Sender API Key:</string>
+    <string name="home_api_key_hint">Select a Sender API Key</string>
+    <string name="home_destination">Destination:</string>
+    <string name="home_destination_hint">Select a Destination</string>
 </resources>

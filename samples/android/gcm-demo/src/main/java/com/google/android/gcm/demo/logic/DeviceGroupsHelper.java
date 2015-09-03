@@ -40,6 +40,7 @@ import com.google.android.gcm.demo.model.DeviceGroup;
 import com.google.android.gcm.demo.model.Sender;
 import com.google.android.gcm.demo.model.SenderCollection;
 import com.google.android.gcm.demo.service.LoggingService;
+import com.google.android.gcm.demo.ui.MainActivity;
 
 
 public class DeviceGroupsHelper {
@@ -98,7 +99,7 @@ public class DeviceGroupsHelper {
                         mLogger.log(Log.INFO, "Group creation failed."
                                 + "\ngroupName: " + groupName
                                 + "\nhttpResponse:" + httpRequest.getResponseBody());
-                        showToast(R.string.group_toast_group_creation_failed,
+                        MainActivity.showToast(mContext, R.string.group_toast_group_creation_failed,
                                 responseBody.getString("error"));
                     } else {
                         // Store the group in the local storage.
@@ -116,13 +117,15 @@ public class DeviceGroupsHelper {
                         mLogger.log(Log.INFO, "Group creation succeeded."
                                 + "\ngroupName: " + group.notificationKeyName
                                 + "\ngroupKey: " + group.notificationKey);
-                        showToast(R.string.group_toast_group_creation_succeeded);
+                        MainActivity.showToast(mContext,
+                                R.string.group_toast_group_creation_succeeded);
                     }
                 } catch (JSONException | IOException e) {
                     mLogger.log(Log.INFO, "Exception while creating a new group"
                             + "\nerror: " + e.getMessage()
                             + "\ngroupName: " + groupName);
-                    showToast(R.string.group_toast_group_creation_failed, e.getMessage());
+                    MainActivity.showToast(mContext,
+                            R.string.group_toast_group_creation_failed, e.getMessage());
                 }
                 return null;
             }
@@ -222,7 +225,7 @@ public class DeviceGroupsHelper {
                         + "\ngroupName: " + groupName
                         + "\ngroupKey: " + groupKey
                         + "\nhttpResponse: " + httpRequest.getResponseBody());
-                showToast(R.string.group_toast_add_members_failed,
+                MainActivity.showToast(mContext, R.string.group_toast_add_members_failed,
                         responseBody.getString("error"));
             } else {
                 // Store the group in the local storage.
@@ -236,14 +239,15 @@ public class DeviceGroupsHelper {
                 mLogger.log(Log.INFO, "Group members added successfully."
                         + "\ngroupName: " + groupName
                         + "\ngroupKey: " + groupKey);
-                showToast(R.string.group_toast_add_members_succeeded);
+                MainActivity.showToast(mContext, R.string.group_toast_add_members_succeeded);
             }
         } catch (JSONException | IOException e) {
             mLogger.log(Log.INFO, "Exception while adding new group members."
                     + "\nerror: " + e.getMessage()
                     + "\ngroupName: " + groupName
                     + "\ngroupKey: " + groupKey);
-            showToast(R.string.group_toast_add_members_failed, e.getMessage());
+            MainActivity.showToast(mContext,
+                    R.string.group_toast_add_members_failed, e.getMessage());
         }
     }
 
@@ -285,7 +289,7 @@ public class DeviceGroupsHelper {
                     + "\ngroupName: " + groupName
                     + "\ngroupKey: " + groupKey
                     + "\nhttpResponse: " + httpRequest.getResponseBody());
-                showToast(R.string.group_toast_remove_members_failed,
+                MainActivity.showToast(mContext, R.string.group_toast_remove_members_failed,
                         responseBody.getString("error"));
             } else {
                 // Store the group in the local storage.
@@ -300,14 +304,15 @@ public class DeviceGroupsHelper {
                 mLogger.log(Log.INFO, "Group members removed successfully."
                         + "\ngroupName: " + groupName
                         + "\ngroupKey: " + groupKey);
-                showToast(R.string.group_toast_remove_members_succeeded);
+                MainActivity.showToast(mContext, R.string.group_toast_remove_members_succeeded);
             }
         } catch (JSONException | IOException e) {
             mLogger.log(Log.INFO, "Exception while removing group members."
                     + "\nerror: " + e.getMessage()
                     + "\ngroupName: " + groupName
                     + "\ngroupKey: " + groupKey);
-            showToast(R.string.group_toast_remove_members_failed, e.getMessage());
+            MainActivity.showToast(mContext,
+                    R.string.group_toast_remove_members_failed, e.getMessage());
         }
     }
 
@@ -317,14 +322,5 @@ public class DeviceGroupsHelper {
             values.add(bundle.getString(key));
         }
         return values;
-    }
-
-    private void showToast(final int msgId, final Object... args) {
-        Handler handler = new Handler(mContext.getMainLooper());
-        handler.post( new Runnable(){
-            public void run(){
-                Toast.makeText(mContext, mContext.getString(msgId, args), Toast.LENGTH_LONG).show();
-            }
-        });
     }
 }

@@ -24,6 +24,7 @@ import android.content.res.TypedArray;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -50,6 +51,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gcm.demo.R;
 import com.google.android.gcm.demo.service.LoggingService;
@@ -397,6 +399,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             String value = data.getStringExtra(SelectActivity.INTENT_EXTRA_VALUE);
             currentFragment.handleAddressBookSelection(id, name, value);
         }
+    }
+
+    static public void showToast(final Context context, final int msgId, final Object... args) {
+        Handler handler = new Handler(context.getMainLooper());
+        handler.post( new Runnable(){
+            public void run(){
+                Toast.makeText(context, context.getString(msgId, args), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     public interface RefreshableFragment {

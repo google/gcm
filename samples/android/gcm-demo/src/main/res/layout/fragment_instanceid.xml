@@ -92,58 +92,5 @@ limitations under the License.
             android:text="@string/iid_unregister"
             android:id="@+id/iid_delete_token"/>
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:text="@string/iid_quick_test"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:textStyle="bold"
-            style="@style/TextAppearance.AppCompat.Caption"/>
-
-        <Spinner
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            android:id="@+id/iid_quick_test"
-            android:spinnerMode="dropdown"
-            style="@style/Widget.AppCompat.Spinner.Underlined"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="0.2"
-            android:layout_height="wrap_content"
-            android:text="@string/iid_api_key"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:textStyle="bold"
-            style="@style/TextAppearance.AppCompat.Caption"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="0.8"
-            android:layout_height="wrap_content"
-            android:id="@+id/iid_api_key"
-            style="@style/Widget.AppCompat.Spinner.Underlined"/>
-    </LinearLayout>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/iid_execute_quick_test"
-        android:id="@+id/iid_execute_quick_test"/>
-
 </LinearLayout>
 

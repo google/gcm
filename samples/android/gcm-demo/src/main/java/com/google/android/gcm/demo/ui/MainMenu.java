@@ -15,10 +15,14 @@ limitations under the License.
  */
 package com.google.android.gcm.demo.ui;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.view.MenuItem;
 
 import com.google.android.gcm.demo.R;
+import com.google.android.gcm.demo.logic.quicktest.DownstreamHttpJsonQuickTest;
+import com.google.android.gcm.demo.logic.quicktest.GetTokenQuickTest;
+import com.google.android.gcm.demo.logic.quicktest.QuickTest;
 import com.google.android.gcm.demo.service.LoggingService.Logger;
 
 import java.util.LinkedHashMap;
@@ -28,18 +32,18 @@ import java.util.LinkedHashMap;
  */
 public class MainMenu {
     private final MainActivity mActivity;
-    private LinkedHashMap<CharSequence, Class<? extends Fragment>> mMenu;
+    private LinkedHashMap<CharSequence, Class<? extends Fragment>> mMenu = new LinkedHashMap<>();
 
-    public MainMenu(MainActivity a) {
-        mActivity = a;
-        mMenu = new LinkedHashMap<>();
-        mMenu.put(a.getText(R.string.main_menu_instanceid), InstanceIdFragment.class);
-        mMenu.put(a.getText(R.string.main_menu_downstream), DownstreamFragment.class);
-        mMenu.put(a.getText(R.string.main_menu_upstream), UpstreamFragment.class);
-        mMenu.put(a.getText(R.string.main_menu_notification), NotificationFragment.class);
-        mMenu.put(a.getText(R.string.main_menu_groups), GroupsFragment.class);
-        mMenu.put(a.getText(R.string.main_menu_topics), TopicsFragment.class);
-        mMenu.put(a.getText(R.string.main_menu_network_manager), NetworkSchedulerFragment.class);
+    public MainMenu(MainActivity mActivity) {
+        this.mActivity = mActivity;
+        addMenuEntry(R.string.main_menu_home, HomeFragment.class);
+        addMenuEntry(R.string.main_menu_instanceid, InstanceIdFragment.class);
+        addMenuEntry(R.string.main_menu_downstream, DownstreamFragment.class);
+        addMenuEntry(R.string.main_menu_upstream, UpstreamFragment.class);
+        addMenuEntry(R.string.main_menu_notification, NotificationFragment.class);
+        addMenuEntry(R.string.main_menu_groups, GroupsFragment.class);
+        addMenuEntry(R.string.main_menu_topics, TopicsFragment.class);
+        addMenuEntry(R.string.main_menu_network_manager, NetworkSchedulerFragment.class);
     }
 
     public CharSequence[] getEntries() {
@@ -73,5 +77,21 @@ public class MainMenu {
             default:
                 return false;
         }
+    }
+
+    public static LinkedHashMap<String, QuickTest> getTests(Context context) {
+        LinkedHashMap<String, QuickTest> tests = new LinkedHashMap<>();
+        addTest(context, tests, new GetTokenQuickTest());
+        addTest(context, tests, new DownstreamHttpJsonQuickTest());
+        return tests;
+    }
+
+    private void addMenuEntry(int title, Class<? extends Fragment> fragment) {
+        mMenu.put(mActivity.getText(title), fragment);
+    }
+
+    private static void addTest(Context context, LinkedHashMap<String, QuickTest> arrayMap,
+                                QuickTest test) {
+        arrayMap.put(context.getText(test.getName()).toString(), test);
     }
 }

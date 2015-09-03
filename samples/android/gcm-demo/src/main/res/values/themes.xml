@@ -26,6 +26,8 @@ limitations under the License.
         <item name="android:actionModeBackground">@color/google_blue_700</item>
         <item name="android:windowBackground">@color/grey_50</item>
 
+        <item name="android:textColorLink">@color/light_blue_500</item>
+
         <!-- Toolbar -->
         <item name="toolbarStyle">@style/Toolbar</item>
         <item name="drawerArrowStyle">@style/Toolbar.DrawerToggle</item>
