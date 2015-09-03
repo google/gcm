@@ -85,6 +85,8 @@ public class SenderAdapter
         final View senderView = viewHolder.getView();
         ImageView icon = (ImageView) senderView.findViewById(R.id.widget_itbr_icon);
         icon.setImageResource(R.drawable.cloud_googblue);
+        float density = mActivity.getResources().getDisplayMetrics().density;
+        icon.setPadding(0, 0, (int) (8 * density), 0);
         Button deleteButton = (Button) senderView.findViewById(R.id.widget_itbr_button);
         if (sender.senderId.equals(SenderCollection.DEFAULT_SENDER_ID)) {
             deleteButton.setVisibility(View.GONE);
@@ -101,7 +103,7 @@ public class SenderAdapter
             }
         });
         TextView textView = (TextView) senderView.findViewById(R.id.widget_itbr_text);
-        textView.setText(sender.name + "(" + sender.senderId + ")");
+        textView.setText(sender.name + " - " + sender.senderId);
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

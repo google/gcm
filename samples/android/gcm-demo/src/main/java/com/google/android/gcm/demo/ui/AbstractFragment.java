@@ -76,37 +76,9 @@ public abstract class AbstractFragment extends Fragment implements View.OnLongCl
         return false;
     }
 
-    protected String getValue(View view) {
-        if (view.getTag(R.id.tag_clipboard_value) instanceof String) {
-            return (String) view.getTag(R.id.tag_clipboard_value);
-        }
-        if (view instanceof TextView) {
-            return ((TextView) view).getText().toString();
-        }
-        if (view instanceof Spinner) {
-            return ((Spinner) view).getSelectedItem().toString();
-        }
-        return "";
-    }
-
     protected String getValue(int viewId) {
         View view = getActivity().findViewById(viewId);
         return getValue(view);
-    }
-
-    protected void setValue(View view, String name, String value) {
-        if (view != null && view instanceof TextView) {
-            if (name != null && value != null) {
-                ((TextView) view).setText(name + " (" + truncateToMediumString(value) + ")");
-                view.setTag(R.id.tag_clipboard_value, value);
-            } else if (value != null) {
-                ((TextView) view).setText(truncateToLongString(value));
-                view.setTag(R.id.tag_clipboard_value, value);
-            } else {
-                ((TextView) view).setText(truncateToLongString(name));
-                view.setTag(R.id.tag_clipboard_value, name);
-            }
-        }
     }
 
     protected void setValueFromFragmentState(View view, String stateKey) {
@@ -125,6 +97,10 @@ public abstract class AbstractFragment extends Fragment implements View.OnLongCl
         }
     }
 
+    protected void setValue(View view, String value) {
+        setValue(view, null, value);
+    }
+
     protected void setValue(int id, String name, String value) {
         setValue(getActivity().findViewById(id), name, value);
     }
@@ -133,6 +109,37 @@ public abstract class AbstractFragment extends Fragment implements View.OnLongCl
         TextView description = (TextView) parent.findViewById(viewId);
         description.setMovementMethod(LinkMovementMethod.getInstance());
         description.setText(Html.fromHtml(getValue(parent.findViewById(viewId))));
+    }
+
+    public static String getValue(View view) {
+        if (view.getTag(R.id.tag_clipboard_value) instanceof String) {
+            return (String) view.getTag(R.id.tag_clipboard_value);
+        }
+        if (view instanceof TextView) {
+            return ((TextView) view).getText().toString();
+        }
+        if (view instanceof Spinner) {
+            return ((Spinner) view).getSelectedItem().toString();
+        }
+        return "";
+    }
+
+    public static void setValue(View view, String name, String value) {
+        if (view == null) {
+            return;
+        }
+        if (view instanceof TextView) {
+            if (name != null && value != null) {
+                ((TextView) view).setText(name + " (" + truncateToMediumString(value) + ")");
+                view.setTag(R.id.tag_clipboard_value, value);
+            } else if (value != null) {
+                ((TextView) view).setText(truncateToLongString(value));
+                view.setTag(R.id.tag_clipboard_value, value);
+            } else {
+                ((TextView) view).setText(truncateToLongString(name));
+                view.setTag(R.id.tag_clipboard_value, name);
+            }
+        }
     }
 
     public static String truncateToLongString(String value) {

@@ -23,7 +23,7 @@ limitations under the License.
 
     <!-- Main Menu -->
     <string name="main_menu_home">Home</string>
-    <string name="main_menu_instanceid">Registrations</string>
+    <string name="main_menu_instanceid">InstanceID and Auth. Tokens</string>
     <string name="main_menu_downstream">Downstream</string>
     <string name="main_menu_upstream">Upstream</string>
     <string name="main_menu_notification">Notifications</string>
@@ -69,13 +69,22 @@ limitations under the License.
     <string name="upstream_sender_id_not_registered">The device needs to hold a registration token for this sender id, in order to send upstream messages to it.</string>
 
     <!-- Instance Id Fragment -->
-    <string name="iid_description">In order to receive messages from the cloud you need to obtain a registration token. &lt;a href="https://developers.google.com/cloud-messaging/registration">More info&lt;/a></string>
+    <string name="iid_description">Instance ID is a unique ID per instance of your app.&lt;br/>With Instance ID you can generate security tokens such as GCM authorization tokens. &lt;a href="https://developers.google.com/instance-id">More info&lt;/a></string>
+    <string name="iid_instance_id">Instance ID:</string>
+    <string name="iid_instance_id_loading">loading…</string>
+    <string name="iid_creation_time">Creation time:</string>
+    <string name="iid_delete_instance_id_message">If you delete the Instance ID all the App\'s tokens and topic subscriptions will be reset.</string>
+    <string name="iid_delete_instance_id">Delete IID</string>
+    <string name="iid_tokens">Authorization tokens:</string>
+    <string name="iid_no_tokens">You don\'t have any authorization token active at the moment.</string>
+
     <string name="iid_sender_id">Sender ID:</string>
     <string name="iid_token">Token:</string>
     <string name="iid_unregistered">Unregistered</string>
-    <string name="iid_register">Register</string>
-    <string name="iid_unregister">Unregister</string>
-    <string name="iid_toast_success">Token retrieved successfully:\n%1$s</string>
+    <string name="iid_get_token">Get token</string>
+    <string name="iid_delete_token">Delete</string>
+    <string name="iid_get_token_toast_success">Token retrieved successfully:\n%1$s</string>
+    <string name="iid_delete_token_toast_success">Token deleted successfully.</string>
     <string name="iid_toast_error">Error: %1$s</string>
 
     <!-- Topics Fragment -->
@@ -201,16 +210,25 @@ limitations under the License.
     <string name="address_book_topic_title">Topics</string>
     <string name="address_book_topic_add">Add Topic</string>
     <string name="address_book_sender_id_add">Add Sender ID</string>
-    <string name="address_book_select_api_key">Select an API Key:</string>
-    <string name="address_book_select_destination">Select a recipient (token, notfication group or topic):</string>
-    <string name="address_book_select_sender_id">Select a sender ID:</string>
-    <string name="address_book_select_token">Select a registration token:</string>
-    <string name="address_book_select_topic">Select a topic:</string>
-    <string name="address_book_select_group">Select a group:</string>
+    <string name="address_book_select_api_key">Select an API Key</string>
+    <string name="address_book_select_destination">Select a recipient</string>
+    <string name="address_book_select_sender_id">Select a Sender ID</string>
+    <string name="address_book_select_token">Select a registration token</string>
+    <string name="address_book_select_topic">Select a Topic</string>
+    <string name="address_book_select_group">Select a Group</string>
     <string name="address_book_delete">Delete</string>
     <string name="address_book_add_sender_invalid_token">Token already exists.</string>
     <string name="address_book_add_sender_invalid_topic">Topic already exists.</string>
     <string name="address_book_add_sender_invalid_api_key">API Key already exists.</string>
+
+    <!-- Create Token Activity -->
+    <string name="token_activity_title">Get Authorization Token</string>
+    <string name="token_audience">Audience:</string>
+    <string name="token_audience_hint">Choose a Sender ID</string>
+    <string name="token_scope">Scope:</string>
+    <string name="token_scope_hint">Scope of the token (e.g. GCM)</string>
+    <string name="token_extra">Extra params:</string>
+    <string name="token_generate">Generate token</string>
 
     <!-- Group Activity -->
     <string name="group_activity_title_new_group">New Device Group</string>

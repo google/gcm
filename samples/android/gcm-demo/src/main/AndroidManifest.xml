@@ -49,6 +49,16 @@ limitations under the License.
         </activity>
 
         <activity
+            android:name=".ui.TokenActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName="com.google.android.gcm.demo.ui.MainActivity">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.google.android.gcm.demo.ui.MainActivity" />
+        </activity>
+
+        <activity
             android:name=".ui.GroupActivity"
             android:windowSoftInputMode="adjustPan"
             android:parentActivityName="com.google.android.gcm.demo.ui.MainActivity">

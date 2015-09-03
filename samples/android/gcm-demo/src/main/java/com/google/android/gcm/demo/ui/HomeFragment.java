@@ -55,9 +55,8 @@ public class HomeFragment extends AbstractFragment
 
         mQuickTests = MainMenu.getTests(getActivity());
         mQuickTestsAdapter = new HintAdapter(getActivity(), android.R.layout.simple_spinner_item,
-                new ArrayList<>(mQuickTests.keySet()));
+                new ArrayList<>(mQuickTests.keySet()), getString(R.string.home_quick_test_hint));
         mQuickTestsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mQuickTestsAdapter.add(getString(R.string.home_quick_test_hint));
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         Spinner quickTests = (Spinner) view.findViewById(R.id.home_quick_test);
@@ -158,8 +157,9 @@ public class HomeFragment extends AbstractFragment
      */
     private class HintAdapter extends ArrayAdapter<String> {
 
-        public HintAdapter(Context theContext, int layoutResourceId, ArrayList<String> values) {
-            super(theContext, layoutResourceId, values);
+        public HintAdapter(Context c, int layoutResourceId, ArrayList<String> values, String hint) {
+            super(c, layoutResourceId, values);
+            this.add(hint);
         }
 
         @Override

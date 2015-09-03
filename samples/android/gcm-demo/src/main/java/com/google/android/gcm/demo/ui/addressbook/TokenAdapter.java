@@ -29,6 +29,8 @@ import android.widget.Toast;
 
 import com.google.android.gcm.demo.R;
 import com.google.android.gcm.demo.model.Sender;
+import com.google.android.gcm.demo.model.Token;
+import com.google.android.gcm.demo.ui.AbstractFragment;
 
 /**
  * Adapter for displaying the list of tokens of a sender.
@@ -52,9 +54,9 @@ public class TokenAdapter extends AbstractElementAdapter {
         Button addButton = (Button) view.findViewById(R.id.sender_element_add);
         addButton.setText(mActivity.getString(R.string.address_book_token_add));
         final LinearLayout listLayout = (LinearLayout) view.findViewById(R.id.sender_element_list);
-        if (sender.testAppToken != null) {
+        for (Token token : sender.appTokens.values()) {
             listLayout.addView(getChildView(
-                    senderId, "GCM Demo", sender.testAppToken, listLayout));
+                    senderId, "GcmDemo - " + token.scope, token.token, listLayout));
         }
         for (String tokenName : sender.otherTokens.keySet()) {
             listLayout.addView(getChildView(
@@ -103,7 +105,7 @@ public class TokenAdapter extends AbstractElementAdapter {
                         String id = idView.getText().toString().trim();
                         if (!mSenders.getSender(senderId).otherTokens.containsKey(name)) {
                             Sender sender = mSenders.getSender(senderId);
-                            int offset = sender.testAppToken == null ? 0 : 1;
+                            int offset = sender.appTokens.size();
                             sender.otherTokens.put(name, id);
                             mSenders.updateSender(sender);
                             addChild(listLayout, getChildView(senderId, name, id, listLayout),
@@ -126,7 +128,7 @@ public class TokenAdapter extends AbstractElementAdapter {
                 .setImageResource(R.drawable.smartphone_grey600);
         TextView text =
                 ((TextView) view.findViewById(R.id.widget_itbr_text));
-        text.setText(tokenName + " (" + token + ")");
+        text.setText(tokenName + " " + AbstractFragment.truncateToLongString(token));
         text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -135,14 +137,14 @@ public class TokenAdapter extends AbstractElementAdapter {
         });
         Button deleteButton = (Button) view.findViewById(R.id.widget_itbr_button);
         deleteButton.setText(mActivity.getString(R.string.address_book_delete));
-        if (token.equals(mSenders.getSender(senderId).testAppToken)) {
+        if (mSenders.getSender(senderId).appTokens.containsKey(token)) {
             deleteButton.setVisibility(View.GONE);
         } else {
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Sender sender = mSenders.getSender(senderId);
-                    int offset = sender.testAppToken == null ? 0 : 1;
+                    int offset = sender.appTokens.size();
                     int position = sender.otherTokens.indexOfKey(tokenName);
                     if (position >= 0) {
                         sender.otherTokens.remove(tokenName);

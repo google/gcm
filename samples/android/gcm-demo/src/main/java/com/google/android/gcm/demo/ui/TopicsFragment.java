@@ -34,6 +34,7 @@ import com.google.android.gcm.demo.R;
 import com.google.android.gcm.demo.logic.PubSubHelper;
 import com.google.android.gcm.demo.model.Sender;
 import com.google.android.gcm.demo.model.SenderCollection;
+import com.google.android.gcm.demo.model.Token;
 import com.google.android.gcm.demo.service.LoggingService;
 import com.google.android.gcm.demo.ui.addressbook.SelectActivity;
 
@@ -153,7 +154,7 @@ public class TopicsFragment extends AbstractFragment
                 return;
             }
 
-            String gcmToken = mSenders.getSender(senderId).testAppToken;
+            Token gcmToken = mSenders.getSender(senderId).getGcmDemoAppToken();
             if (gcmToken == null) {
                 Toast.makeText(getActivity(),
                         getString(R.string.topics_sender_not_registered),
@@ -166,7 +167,7 @@ public class TopicsFragment extends AbstractFragment
                     getString(R.string.topics_subscribing, topic),
                     Toast.LENGTH_SHORT)
                     .show();
-            mPubSubHelper.subscribeTopic(senderId, gcmToken, topic, null);
+            mPubSubHelper.subscribeTopic(senderId, gcmToken.token, topic, null);
         }
     }
 
@@ -174,14 +175,15 @@ public class TopicsFragment extends AbstractFragment
         String senderId = (String) v.getTag(R.id.tag_senderid);
         String topic = (String) v.getTag(R.id.tag_topic);
         Sender sender = mSenders.getSender(senderId);
-        String gcmToken = (sender != null) ? sender.testAppToken : null;
+        Token gcmToken = (sender != null) ? sender.getGcmDemoAppToken() : null;
         if (gcmToken == null) {
             mLogger.log(Log.ERROR, "gcmToken missing while un-subscribing from topic.");
+            return;
         }
         Toast.makeText(getActivity(),
                 getString(R.string.topics_unsubscribing, topic),
                 Toast.LENGTH_SHORT)
                 .show();
-        mPubSubHelper.unsubscribeTopic(senderId, gcmToken, topic);
+        mPubSubHelper.unsubscribeTopic(senderId, gcmToken.token, topic);
     }
 }

@@ -21,6 +21,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,9 +29,9 @@ import java.util.List;
 import static com.google.android.gcm.demo.model.Constants.API_KEYS;
 import static com.google.android.gcm.demo.model.Constants.GROUPS;
 import static com.google.android.gcm.demo.model.Constants.NAME;
+import static com.google.android.gcm.demo.model.Constants.APP_TOKENS;
 import static com.google.android.gcm.demo.model.Constants.OTHER_TOKENS;
 import static com.google.android.gcm.demo.model.Constants.SENDER_ID;
-import static com.google.android.gcm.demo.model.Constants.TEST_APP_TOKEN;
 import static com.google.android.gcm.demo.model.Constants.TOPICS;
 
 /**
@@ -40,7 +41,7 @@ public class Sender implements Comparable<Sender> {
     public String name;
     public String senderId;
     public List<String> apiKeys = new ArrayList<>();
-    public String testAppToken;
+    public ArrayMap<String, Token> appTokens = new ArrayMap<>();
     public ArrayMap<String, String> otherTokens = new ArrayMap<>();
     public ArrayMap<String, Boolean> topics = new ArrayMap<>();
     public ArrayMap<String, DeviceGroup> groups = new ArrayMap<>();
@@ -51,12 +52,19 @@ public class Sender implements Comparable<Sender> {
         // read {"name": "serverName", "serverId": "123456789", "testAppToken": "generatedToken"}
         entry.name = jsonObject.getString(NAME);
         entry.senderId = jsonObject.getString(SENDER_ID);
-        entry.testAppToken = jsonObject.optString(TEST_APP_TOKEN, null);
         // read "apiKeys": ["apikey1", "apikey2"]
         JSONArray jsonApiKeys = jsonObject.optJSONArray(API_KEYS);
         if (jsonApiKeys != null) {
             for (int index = 0; index < jsonApiKeys.length(); index++) {
                 entry.apiKeys.add(jsonApiKeys.getString(index));
+            }
+        }
+        // read "appTokens": [{token1}, {token2}]
+        JSONArray jsonAppTokens = jsonObject.optJSONArray(APP_TOKENS);
+        if (jsonAppTokens != null) {
+            for (int index = 0; index < jsonAppTokens.length(); index++) {
+                Token token = Token.fromJson(jsonAppTokens.getJSONObject(index));
+                entry.appTokens.put(token.token, token);
             }
         }
         // read "otherTokens": {"name1" : "token1", "name2" : "token2"}
@@ -93,7 +101,13 @@ public class Sender implements Comparable<Sender> {
         jsonObject.put(NAME, name);
         jsonObject.put(SENDER_ID, senderId);
         jsonObject.put(API_KEYS, new JSONArray(apiKeys));
-        jsonObject.putOpt(TEST_APP_TOKEN, testAppToken);
+
+        JSONArray jsonAppTokens = new JSONArray();
+        for (Token token : appTokens.values()) {
+            jsonAppTokens.put(token.toJson());
+        }
+        jsonObject.put(APP_TOKENS, jsonAppTokens);
+
         jsonObject.put(OTHER_TOKENS, new JSONObject(otherTokens));
         jsonObject.put(TOPICS, new JSONObject(topics));
 
@@ -106,6 +120,18 @@ public class Sender implements Comparable<Sender> {
         return jsonObject;
     }
 
+    public Token getGcmDemoAppToken() {
+        Token gcmToken = null;
+        for (Token token : appTokens.values()) {
+            if ("GCM".equals(token.scope)) {
+                if (gcmToken != null && (token.createdAt > gcmToken.createdAt)) {
+                    continue;
+                }
+                gcmToken = token;
+            }
+        }
+        return gcmToken;
+    }
 
     @Override
     public int compareTo(Sender sender) {

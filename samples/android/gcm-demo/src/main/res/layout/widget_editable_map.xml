@@ -19,6 +19,7 @@ limitations under the License.
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/editable_map_title"
         android:text="@string/data_title"
         android:layout_marginTop="8dp"
         android:textStyle="bold"

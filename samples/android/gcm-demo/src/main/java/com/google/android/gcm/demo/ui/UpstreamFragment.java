@@ -77,7 +77,7 @@ public class UpstreamFragment extends AbstractFragment implements View.OnClickLi
     public void handleAddressBookSelection(int id, String name, String value) {
         if (id == R.id.upstream_sender_id) {
             Sender sender = mSenders.getSender(value);
-            if (sender != null && sender.testAppToken != null) {
+            if (sender != null && sender.getGcmDemoAppToken() != null) {
                 setValue(R.id.upstream_sender_id, name, value);
                 mFragmentState.putStringArray(SENDER_ID, new String[]{name, value});
             } else {

@@ -27,7 +27,7 @@ and an API key to be able to test server side APIs. For more information, see
 
 ![Menu](screenshots/menu.png "The app's menu")
 ![Quick Tests](screenshots/home.png "Quick Tests page")
-![Registration](screenshots/registration.png "Registration page")
+![InstanceID](screenshots/instanceid.png "InstanceID page")
 ![Downstream](screenshots/downstream.png "Sending downstream messages")
 ![Upstream](screenshots/upstream.png "Upstream page")
 ![Groups](screenshots/groups.png "Groups page")

@@ -18,16 +18,13 @@ limitations under the License.
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <TextView
-        android:id="@+id/select_dialog_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/select_dialog_list"
+        android:layout_marginTop="16dp"
         android:layout_width="wrap_content"
-        android:layout_height="0px"
-        android:layout_weight="0.9"/>
+        android:layout_height="wrap_content"/>
+
     <Button
         android:layout_gravity="end"
         android:layout_width="wrap_content"
@@ -35,8 +32,7 @@ limitations under the License.
         android:text="@string/address_book_sender_id_add"
         android:id="@+id/select_dialog_add"
         android:background="?android:attr/selectableItemBackground"
-        android:layout_marginTop="2dp"
-        android:layout_marginBottom="2dp"
-        android:layout_marginLeft="2dp"
-        android:layout_marginRight="2dp"/>
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"/>
 </LinearLayout>

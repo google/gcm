@@ -42,6 +42,6 @@ public class GetTokenQuickTest implements QuickTest {
         final String senderId = params.get(R.id.home_sender_id);
 
         InstanceIdHelper instanceIdHelper = new InstanceIdHelper(context);
-        instanceIdHelper.getGcmTokenInBackground(senderId);
+        instanceIdHelper.getTokenInBackground(senderId, "GCM", null);
     }
 }

@@ -19,8 +19,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,7 +34,7 @@ import com.google.android.gcm.demo.R;
  * This activity allows selecting elements from the app's storage, as well as adding new elements or
  * deleting existing ones
  */
-public class SelectActivity extends Activity {
+public class SelectActivity extends AppCompatActivity {
 
     // Intent categories, used to specify what this activity should select
     public static final String INTENT_CATEGORY_SENDERID =
@@ -65,13 +68,20 @@ public class SelectActivity extends Activity {
             setResult(RESULT_CANCELED);
             finish();
         }
-
+        setTitle(getIntent().getStringExtra(INTENT_EXTRA_TITLE));
         setContentView(R.layout.dialog_select_element);
 
-        TextView title = (TextView) findViewById(R.id.select_dialog_title);
-        title.setText(getIntent().getStringExtra(INTENT_EXTRA_TITLE));
-
         mRecyclerView = (RecyclerView) findViewById(R.id.select_dialog_list);
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        int minScreenHeight = 600;
+        float activityHeightPercentage = 0.5f;
+        if (metrics.heightPixels > minScreenHeight) {
+            ViewGroup.LayoutParams layoutParams = mRecyclerView.getLayoutParams();
+            layoutParams.height = (int) (metrics.heightPixels * activityHeightPercentage);
+            mRecyclerView.setLayoutParams(layoutParams);
+        }
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
