@@ -15,27 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/fragment_description"
-        android:text="@string/iid_description"/>
-
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
+        android:weightSum="1">
 
         <TextView
             android:layout_width="0dp"
-            android:layout_height ="wrap_content"
-            android:text="@string/iid_instance_id"
+            android:layout_height="wrap_content"
+            android:text="@string/token_audience"
             android:layout_weight="0.3"
             android:textStyle="bold"
             style="@style/TextAppearance.AppCompat.Caption"/>
@@ -43,64 +38,47 @@ limitations under the License.
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:id="@+id/iid_instance_id"
-            android:layout_weight="0.5"
-            android:text="@string/iid_instance_id_loading"
-            style="@style/TextAppearance.AppCompat"/>
-
-        <Button
-            android:id="@+id/iid_delete_instance_id"
-            android:text="@string/iid_delete_instance_id"
-            android:layout_weight="0.2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/selectableItemBackground"
-            android:minHeight="24dp"
-            android:padding="0dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height ="wrap_content"
-            android:text="@string/iid_creation_time"
-            android:layout_weight="0.3"
-            android:textStyle="bold"
-            style="@style/TextAppearance.AppCompat.Caption"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/iid_creation_time"
+            android:text="@string/token_audience_hint"
+            android:id="@+id/token_audience"
             android:layout_weight="0.7"
-            android:text="@string/iid_instance_id_loading"
-            style="@style/TextAppearance.AppCompat"/>
+            style="@style/Widget.AppCompat.Spinner.Underlined"/>
     </LinearLayout>
 
-    <TextView
-        android:text="@string/iid_tokens"
-        android:layout_width="wrap_content"
-        android:layout_height ="wrap_content"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        style="@style/TextAppearance.AppCompat.Caption"/>
-
-    <FrameLayout
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:id="@+id/iid_tokens_wrapper" />
+        android:weightSum="1">
 
-    <Button
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/token_scope"
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            style="@style/TextAppearance.AppCompat.Caption"/>
+
+        <EditText
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/token_scope"
+            android:layout_weight="0.7"
+            style="@style/TextAppearance.AppCompat"
+            android:hint="@string/token_scope_hint"
+            android:text="GCM"
+            android:enabled="false"/>
+    </LinearLayout>
+
+    <com.google.android.gcm.demo.ui.EditableMapView
+        android:id="@+id/token_extra"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/iid_get_token"
-        android:id="@+id/iid_get_token"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="8dp"/>
+
+   <Button
+        android:id="@+id/token_generate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/token_generate" />
+
 </LinearLayout>
-

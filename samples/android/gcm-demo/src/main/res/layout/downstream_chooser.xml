@@ -19,32 +19,28 @@ limitations under the License.
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="vertical">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="1">
+
         <TextView
-            android:layout_width="0px"
-            android:layout_height ="match_parent"
+            android:layout_width="0dp"
+            android:layout_height ="wrap_content"
             android:text="@string/downstream_api_key"
             android:layout_weight="0.3"
-            android:textAlignment="center"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            style="@style/TextAppearance.AppCompat.Caption"/>
+
         <TextView
-            android:layout_width="0px"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:id="@+id/downstream_api_key"
-            android:textColor="#0000FF"
-            android:textStyle="italic"
-            android:layout_weight="0.6" />
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/list_grey600"
-            android:background="?android:attr/selectableItemBackground"
-            android:id="@+id/downstream_select_api_key"
-            android:focusable="true" />
+            android:text="@string/downstream_api_key_hint"
+            android:layout_weight="0.7"
+            style="@style/Widget.AppCompat.Spinner.Underlined"/>
     </LinearLayout>
 
     <LinearLayout
@@ -53,25 +49,19 @@ limitations under the License.
         android:orientation="horizontal"
         android:weightSum="1">
         <TextView
-            android:layout_width="0px"
-            android:layout_height ="match_parent"
-            android:text="@string/downstream_registration_id"
+            android:layout_width="0dp"
+            android:layout_height ="wrap_content"
+            android:text="@string/downstream_token"
             android:layout_weight="0.3"
-            android:textAlignment="center"
             android:textStyle="bold"
-            android:phoneNumber="true" />
+            style="@style/TextAppearance.AppCompat.Caption"/>
+
         <TextView
-            android:layout_width="0px"
-            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:id="@+id/downstream_token"
-            android:textColor="#0000FF"
-            android:textStyle="italic"
-            android:layout_weight="0.6" />
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/list_grey600"
-            android:background="?android:attr/selectableItemBackground"
-            android:id="@+id/downstream_select_token" />
+            android:text="@string/downstream_token_hint"
+            android:layout_weight="0.7"
+            style="@style/Widget.AppCompat.Spinner.Underlined"/>
     </LinearLayout>
 </LinearLayout>

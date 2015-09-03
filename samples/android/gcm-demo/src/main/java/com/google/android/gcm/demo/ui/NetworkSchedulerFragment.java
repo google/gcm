@@ -65,12 +65,11 @@ public class NetworkSchedulerFragment extends AbstractFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
         View view = inflater.inflate(R.layout.fragment_network_scheduler, container, false);
-        view.findViewById(R.id.scheduler_about_apis).setOnClickListener(this);
         view.findViewById(R.id.scheduler_add_oneoff).setOnClickListener(this);
         view.findViewById(R.id.scheduler_add_periodic).setOnClickListener(this);
+        setHtmlMode(view, R.id.scheduler_description);
 
         mScheduler = GcmNetworkManager.getInstance(getActivity());
-
         mTasks = TaskCollection.getInstance(getActivity());
 
         return view;
@@ -105,9 +104,6 @@ public class NetworkSchedulerFragment extends AbstractFragment
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.scheduler_about_apis:
-                toggleAboutApi();
-                break;
             case R.id.scheduler_add_oneoff:
                 showDialog(TYPE_ONE_OFF);
                 break;
@@ -335,11 +331,4 @@ public class NetworkSchedulerFragment extends AbstractFragment
         }
         refresh();
     }
-
-    private void toggleAboutApi() {
-        toggleText((TextView) getActivity().findViewById(R.id.scheduler_about_apis),
-                R.string.scheduler_about_apis, R.string.scheduler_about_apis_open);
-        toggleVisibility(getActivity().findViewById(R.id.scheduler_about_apis_full_text));
-    }
-
 }

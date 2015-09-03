@@ -44,12 +44,16 @@ public class GroupAdapter extends AbstractElementAdapter {
         View view = mActivity.getLayoutInflater().inflate(
                 R.layout.widget_sender_element_list, parentView, false);
         TextView title = (TextView) view.findViewById(R.id.sender_element_title);
-        title.setText(mActivity.getString(R.string.address_book_group_title));
         Button addButton = (Button) view.findViewById(R.id.sender_element_add);
         addButton.setVisibility(View.GONE);
-        final LinearLayout listLayout = (LinearLayout) view.findViewById(R.id.sender_element_list);
-        for (String groupName : sender.groups.keySet()) {
-            listLayout.addView(getChildView(senderId, groupName, listLayout));
+        if (sender.groups.keySet().size() > 0) {
+            title.setText(mActivity.getString(R.string.address_book_group_title));
+            final LinearLayout listLayout = (LinearLayout) view.findViewById(R.id.sender_element_list);
+            for (String groupName : sender.groups.keySet()) {
+                listLayout.addView(getChildView(senderId, groupName, listLayout));
+            }
+        } else {
+            title.setVisibility(View.GONE);
         }
         return view;
     }

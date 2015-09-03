@@ -54,9 +54,9 @@ public class EditableMapView extends LinearLayout implements View.OnClickListene
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.widget_editable_map, this, true);
 
-        mTable = (TableLayout) getChildAt(2);
-        getChildAt(3).setOnClickListener(this);
-
+        mTable = (TableLayout) getChildAt(1);
+        getChildAt(2).setOnClickListener(this);
+        addDataRow(null, null);
     }
 
     public EditableMapView(Context context) {
@@ -82,7 +82,8 @@ public class EditableMapView extends LinearLayout implements View.OnClickListene
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
 
-        if (ss.entries != null) {
+        if (ss.entries != null && ss.entries.size() > 0) {
+            mTable.removeAllViews();
             for (MapEntry entry : ss.entries) {
                 String key = entry.key;
                 String value = entry.value;
@@ -142,10 +143,13 @@ public class EditableMapView extends LinearLayout implements View.OnClickListene
         int numRows = mTable.getChildCount();
         for (int index = 0; index < numRows; index++) {
             TableRow row = (TableRow) mTable.getChildAt(index);
-            EditText keyText = (EditText) row.getChildAt(0);
-            EditText valueText = (EditText) row.getChildAt(1);
-            mapEntries.add(new MapEntry(keyText.getText().toString(), valueText.getText()
-                    .toString()));
+            String key = ((EditText) row.getChildAt(0)).getText().toString();
+            String value = ((EditText) row.getChildAt(1)).getText().toString();
+            if (key.isEmpty() && value.isEmpty()) {
+                // Skip the key/value pair if it's completely empty.
+                continue;
+            }
+            mapEntries.add(new MapEntry(key, value));
         }
         return mapEntries;
     }

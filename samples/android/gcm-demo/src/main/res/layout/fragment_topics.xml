@@ -27,12 +27,6 @@ limitations under the License.
         android:text="@string/topics_description"
         android:layout_marginBottom="8dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height ="wrap_content"
-        android:textStyle="bold"
-        android:text="@string/topics_active_subscriptions"/>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

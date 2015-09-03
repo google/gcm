@@ -18,8 +18,14 @@ package com.google.android.gcm.demo.ui;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,11 +39,27 @@ import com.google.android.gcm.demo.R;
  * too long to be displayed.
  */
 public abstract class AbstractFragment extends Fragment implements View.OnLongClickListener {
+    private static final String STATE_FRAGMENT = "state_fragment";
 
     // Keys used for saving and restoring this fragment's state
     protected static final String SENDER_ID = "sender_id";
     protected static final String API_KEY = "api_key";
     protected static final String TOKEN = "token";
+
+    protected Bundle mFragmentState = new Bundle();
+
+
+    protected void loadSavedState(Bundle savedState) {
+        if (savedState != null) {
+            mFragmentState = savedState.getBundle(STATE_FRAGMENT);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedState) {
+        super.onSaveInstanceState(savedState);
+        savedState.putBundle(STATE_FRAGMENT, mFragmentState);
+    }
 
     @Override
     public boolean onLongClick(View v) {
@@ -56,6 +78,40 @@ public abstract class AbstractFragment extends Fragment implements View.OnLongCl
 
     protected String getValue(int viewId) {
         View view = getActivity().findViewById(viewId);
+        return getValue(view);
+    }
+
+    protected void setValueFromFragmentState(View view, String stateKey) {
+        Object value = mFragmentState.get(stateKey);
+        if (value != null) {
+            if (value instanceof String[]) {
+                String[] values = (String[]) value;
+                if (values.length >= 2) {
+                    setValue(view, values[0], values[1]);
+                } else if (values.length == 1) {
+                    setValue(view, null, values[0]);
+                }
+            } else {
+                setValue(view, null, value.toString());
+            }
+        }
+    }
+
+    protected void setValue(View view, String value) {
+        setValue(view, null, value);
+    }
+
+    protected void setValue(int id, String name, String value) {
+        setValue(getActivity().findViewById(id), name, value);
+    }
+
+    protected void setHtmlMode(View parent, int viewId) {
+        TextView description = (TextView) parent.findViewById(viewId);
+        description.setMovementMethod(LinkMovementMethod.getInstance());
+        description.setText(Html.fromHtml(getValue(parent.findViewById(viewId))));
+    }
+
+    public static String getValue(View view) {
         if (view.getTag(R.id.tag_clipboard_value) instanceof String) {
             return (String) view.getTag(R.id.tag_clipboard_value);
         }
@@ -68,20 +124,21 @@ public abstract class AbstractFragment extends Fragment implements View.OnLongCl
         return "";
     }
 
-    protected void toggleVisibility(View view) {
-        if (view.getVisibility() == View.GONE) {
-            view.setVisibility(View.VISIBLE);
-        } else {
-            view.setVisibility(View.GONE);
+    public static void setValue(View view, String name, String value) {
+        if (view == null) {
+            return;
         }
-    }
-
-    protected void toggleText(TextView textView, int textA, int textB) {
-        String stringA = getString(textA);
-        if (textView.getText().toString().equals(stringA)) {
-            textView.setText(textB);
-        } else {
-            textView.setText(textA);
+        if (view instanceof TextView) {
+            if (name != null && value != null) {
+                ((TextView) view).setText(name + " (" + truncateToMediumString(value) + ")");
+                view.setTag(R.id.tag_clipboard_value, value);
+            } else if (value != null) {
+                ((TextView) view).setText(truncateToLongString(value));
+                view.setTag(R.id.tag_clipboard_value, value);
+            } else {
+                ((TextView) view).setText(truncateToLongString(name));
+                view.setTag(R.id.tag_clipboard_value, name);
+            }
         }
     }
 
@@ -112,19 +169,9 @@ public abstract class AbstractFragment extends Fragment implements View.OnLongCl
         return s != null && !"".equals(s.trim());
     }
 
+    /**
+     * Override this method to receive the user's selection from the AddressBook.
+     */
     public void handleAddressBookSelection(int id, String name, String value) {
-        View view = getActivity().findViewById(id);
-        if (view != null && view instanceof TextView) {
-            if (name != null && value != null) {
-                ((TextView) view).setText(name + " (" + truncateToLongString(value) + ")");
-                view.setTag(R.id.tag_clipboard_value, value);
-            } else if (value != null) {
-                ((TextView) view).setText(truncateToLongString(value));
-                view.setTag(R.id.tag_clipboard_value, value);
-            } else {
-                ((TextView) view).setText(truncateToLongString(name));
-                view.setTag(R.id.tag_clipboard_value, name);
-            }
-        }
     }
 }

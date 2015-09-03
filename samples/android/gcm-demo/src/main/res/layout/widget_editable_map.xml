@@ -16,16 +16,14 @@ limitations under the License.
 -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/editable_map_title"
         android:text="@string/data_title"
-        style="@style/TextAppearance.Widget.AppCompat.Toolbar.Subtitle" />
+        android:layout_marginTop="8dp"
+        android:textStyle="bold"
+        style="@style/TextAppearance.AppCompat.Caption" />
 
     <TableLayout
         android:id="@+id/data"
@@ -39,11 +37,5 @@ limitations under the License.
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
         android:text="@string/data_add_row"
-        android:layout_gravity="end" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
-
+        android:layout_gravity="end"/>
 </merge>

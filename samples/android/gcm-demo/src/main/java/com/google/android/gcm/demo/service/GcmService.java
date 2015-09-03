@@ -34,7 +34,7 @@ public class GcmService extends GcmListenerService {
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        sendNotification("Received: " + data.toString());
+        sendNotification("Received GCM Message: " + data.toString());
     }
 
     @Override

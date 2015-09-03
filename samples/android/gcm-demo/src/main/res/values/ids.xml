@@ -24,5 +24,6 @@ limitations under the License.
     <item name="tag_topic" type="id"/>
     <item name="tag_group" type="id"/>
     <item name="tag_token" type="id"/>
+    <item name="tag_scope" type="id"/>
 
 </resources>

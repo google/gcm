@@ -19,12 +19,14 @@ limitations under the License.
     <!-- Application Theme -->
     <style name="Theme.AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
 
-        <item name="colorPrimary">@color/blue_500</item>
-        <item name="colorPrimaryDark">@color/blue_700</item>
-        <item name="colorAccent">@color/orange_500</item>
+        <item name="colorPrimary">@color/google_blue_500</item>
+        <item name="colorPrimaryDark">@color/google_blue_700</item>
+        <item name="colorAccent">@color/light_blue_500</item>
 
-        <item name="android:actionModeBackground">@color/blue_700</item>
+        <item name="android:actionModeBackground">@color/google_blue_700</item>
         <item name="android:windowBackground">@color/grey_50</item>
+
+        <item name="android:textColorLink">@color/light_blue_500</item>
 
         <!-- Toolbar -->
         <item name="toolbarStyle">@style/Toolbar</item>
@@ -51,7 +53,7 @@ limitations under the License.
     <!-- Styles -->
     <style name="Toolbar" parent="@style/Widget.AppCompat.Toolbar">
         <item name="titleTextAppearance">@style/Toolbar.Title</item>
-        <item name="android:background">@color/blue_500</item>
+        <item name="android:background">@color/google_blue_500</item>
     </style>
 
     <style name="Toolbar.Title" parent="@style/TextAppearance.AppCompat.Widget.ActionMode.Title">
@@ -82,8 +84,8 @@ limitations under the License.
     <color name="grey_50">#F5F5F5</color>
     <color name="grey_200">#EEEEEE</color>
     <color name="grey_500">#757575</color>
-    <color name="blue_500">#5677FC</color>
-    <color name="blue_700">#455EDE</color>
-    <color name="blue_900">#1A237E</color>
-    <color name="orange_500">#FF9800</color>
+    <color name="light_blue_500">#03A9F4</color>
+    <color name="google_blue_500">#4285F4</color>
+    <color name="google_blue_700">#3367D6</color>
+    <color name="google_blue_900">#1C3AA9</color>
 </resources>

@@ -22,7 +22,9 @@ import static com.google.android.gcm.demo.logic.HttpRequest.HEADER_AUTHORIZATION
 
 import android.util.Log;
 
+import com.google.android.gcm.demo.R;
 import com.google.android.gcm.demo.service.LoggingService;
+import com.google.android.gcm.demo.ui.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -149,7 +151,7 @@ public class GcmServerSideSender {
      * @param message        the message to be sent
      * @throws IOException
      */
-    public void sendHttpJsonDownstreamMessage(String destination,
+    public String sendHttpJsonDownstreamMessage(String destination,
                                               Message message) throws IOException {
 
         JSONObject jsonBody = new JSONObject();
@@ -170,7 +172,7 @@ public class GcmServerSideSender {
             }
         } catch (JSONException e) {
             logger.log(Log.ERROR, "Failed to build JSON body");
-            return;
+            throw new IOException("Failed to build JSON body");
         }
 
         HttpRequest httpRequest = new HttpRequest();
@@ -192,6 +194,7 @@ public class GcmServerSideSender {
             logger.log(Log.ERROR, "Failed to parse server response:\n"
                     + httpRequest.getResponseBody());
         }
+        return httpRequest.getResponseBody();
     }
 
     /**

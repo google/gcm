@@ -19,11 +19,11 @@ package com.google.android.gcm.demo.model;
  * Constants used for persisting the app's objects
  */
 public class Constants {
-    // Sednder constants
+    // Sender constants
     public static final String NAME = "name";
     public static final String SENDER_ID = "senderId";
     public static final String API_KEYS = "apiKeys";
-    public static final String TEST_APP_TOKEN = "testAppToken";
+    public static final String APP_TOKENS = "appTokens";
     public static final String OTHER_TOKENS = "otherTokens";
     public static final String TOPICS = "topics";
     public static final String GROUPS = "groups";

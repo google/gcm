@@ -17,14 +17,12 @@ package com.google.android.gcm.demo.ui;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gcm.demo.R;
@@ -40,72 +38,26 @@ import java.io.IOException;
  * Fragment for sending upstream messages from the app to a server.
  * Upstream messages can be received by a server connecting to GCM using the XMPP protocol.
  */
-public class UpstreamFragment extends AbstractFragment
-        implements View.OnClickListener, MainActivity.RefreshableFragment {
+public class UpstreamFragment extends AbstractFragment implements View.OnClickListener {
 
     private LoggingService.Logger mLogger;
     private SenderCollection mSenders;
-    private String mCurrentSenderId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
-        mLogger = new LoggingService.Logger(getActivity());
         View view = inflater.inflate(R.layout.fragment_upstream, container, false);
         view.findViewById(R.id.upstream_send_button).setOnClickListener(this);
+        view.findViewById(R.id.upstream_sender_id).setOnClickListener(this);
         view.findViewById(R.id.upstream_sender_id).setOnLongClickListener(this);
-        view.findViewById(R.id.upstream_select_sender_id).setOnClickListener(this);
+        setHtmlMode(view, R.id.upstream_description);
 
-        if (savedState != null) {
-            mCurrentSenderId = savedState.getString(SENDER_ID);
-        }
-        if (mCurrentSenderId != null) {
-            TextView senderIdView = (TextView) view.findViewById(R.id.upstream_sender_id);
-            senderIdView.setText(truncateToLongString(mCurrentSenderId));
-            senderIdView.setTag(R.id.tag_clipboard_value, mCurrentSenderId);
-        }
-
+        mLogger = new LoggingService.Logger(getActivity());
         mSenders = SenderCollection.getInstance(getActivity());
 
+        loadSavedState(savedState);
+        setValueFromFragmentState(view.findViewById(R.id.upstream_sender_id), SENDER_ID);
+
         return view;
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedState) {
-        refresh();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedState) {
-        super.onSaveInstanceState(savedState);
-        savedState.putString(SENDER_ID, mCurrentSenderId);
-    }
-
-    @Override
-    public void refresh() {
-        Sender server = mSenders.getSender(getValue(R.id.upstream_sender_id));
-        if (server == null) {
-            server = mSenders.getSender(SenderCollection.DEFAULT_SENDER_ID);
-        }
-        if (getView() != null) {
-            TextView senderIdView = (TextView) getView().findViewById(R.id.upstream_sender_id);
-            TextView tokenView = (TextView) getView().findViewById(R.id.upstream_token);
-            senderIdView.setText(truncateToLongString(server.senderId));
-            senderIdView.setTag(R.id.tag_clipboard_value, server.senderId);
-            if (server.testAppToken != null) {
-                tokenView.setText(truncateToLongString(server.testAppToken));
-                tokenView.setTag(R.id.tag_clipboard_value, server.testAppToken);
-                tokenView.setTextColor(Color.BLUE);
-                tokenView.setOnLongClickListener(this);
-                getView().findViewById(R.id.upstream_send_button).setEnabled(true);
-            } else {
-                tokenView.setText(getString(R.string.upstream_unregistered));
-                tokenView.setTextColor(Color.RED);
-                tokenView.setOnLongClickListener(null);
-                getView().findViewById(R.id.upstream_send_button).setEnabled(false);
-            }
-        } else {
-            // nothing, the fragment has been already destroyed
-        }
     }
 
     @Override
@@ -114,26 +66,51 @@ public class UpstreamFragment extends AbstractFragment
             case R.id.upstream_send_button:
                 doGcmSendUpstreamMessage();
                 break;
-            case R.id.upstream_select_sender_id:
-                Intent startSelectActivityIntent = SelectActivity.pickSenderId(getActivity(),
-                        R.id.upstream_sender_id);
-                startActivityForResult(startSelectActivityIntent, 0);
+            case R.id.upstream_sender_id:
+                Intent intent = SelectActivity.pickSenderId(getActivity(), R.id.upstream_sender_id);
+                startActivityForResult(intent, 0);
                 break;
         }
+    }
 
+    @Override
+    public void handleAddressBookSelection(int id, String name, String value) {
+        if (id == R.id.upstream_sender_id) {
+            Sender sender = mSenders.getSender(value);
+            if (sender != null && sender.getGcmDemoAppToken() != null) {
+                setValue(R.id.upstream_sender_id, name, value);
+                mFragmentState.putStringArray(SENDER_ID, new String[]{name, value});
+            } else {
+                Toast.makeText(getActivity(),
+                        R.string.upstream_sender_id_not_registered, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void doGcmSendUpstreamMessage() {
-        final Activity activity = this.getActivity();
+        final Activity activity = getActivity();
         final GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(activity);
         final String senderId = getValue(R.id.upstream_sender_id);
         final String msgId = getValue(R.id.upstream_message_id);
+        final String ttl = getValue(R.id.upstream_ttl);
         final Bundle data = new Bundle();
         EditableMapView dataView = (EditableMapView) activity.findViewById(R.id.upstream_data);
         for (EditableMapView.MapEntry entry : dataView.getMapEntries()) {
             data.putString(entry.key, entry.value);
         }
-        final String ttl = getValue(R.id.upstream_ttl);
+
+        if (senderId.equals(getString(R.string.upstream_sender_id_hint))) {
+            Toast.makeText(activity, R.string.upstream_sender_id_not_select, Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
+        if (msgId.equals("")) {
+            Toast.makeText(activity, R.string.upstream_message_id_not_provided, Toast.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+
         new AsyncTask<Void, Void, String>() {
             @Override
             protected String doInBackground(Void... params) {
@@ -168,15 +145,4 @@ public class UpstreamFragment extends AbstractFragment
             }
         }.execute(null, null, null);
     }
-
-    @Override
-    public void handleAddressBookSelection(int id, String name, String value) {
-        super.handleAddressBookSelection(id, name, value);
-        if (id == R.id.upstream_sender_id) {
-            mCurrentSenderId = value;
-        }
-        refresh();
-    }
-
 }
-

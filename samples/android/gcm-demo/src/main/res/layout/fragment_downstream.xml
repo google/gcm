@@ -15,11 +15,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_description"
+        android:text="@string/downstream_description"/>
 
     <include layout="@layout/downstream_chooser" />
 
@@ -45,16 +50,62 @@ limitations under the License.
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-             <CheckBox android:id="@+id/downstream_delay_while_idle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/downstream_delay_while_idle_text" />
-             <CheckBox android:id="@+id/downstream_dry_run"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/downstream_dry_run_text" />
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height ="wrap_content"
+            android:text="@string/downstream_more_options"
+            android:textStyle="bold"
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:layout_weight="0.3"/>
+
+        <CheckBox android:id="@+id/downstream_delay_while_idle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/downstream_delay_while_idle_text"
+            android:layout_weight="0.4"/>
+
+        <CheckBox android:id="@+id/downstream_dry_run"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/downstream_dry_run_text"
+            android:layout_weight="0.3"/>
     </LinearLayout>
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        android:weightSum="1">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height ="wrap_content"
+            android:text="@string/downstream_request_format"
+            android:textStyle="bold"
+            android:layout_weight="0.3"
+            style="@style/TextAppearance.AppCompat.Caption"/>
+
+        <RadioButton
+            android:id="@+id/downstream_radio_json"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/downstream_json_request"
+            android:layout_weight="0.4"/>
+
+        <RadioButton
+            android:id="@+id/downstream_radio_cleartext"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/downstream_plaintext_request"
+            android:layout_weight="0.3"/>
+    </RadioGroup>
 
     <com.google.android.gcm.demo.ui.EditableMapView
         android:id="@+id/downstream_data"
@@ -62,23 +113,6 @@ limitations under the License.
         android:layout_height="wrap_content">
     </com.google.android.gcm.demo.ui.EditableMapView>
 
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <RadioButton
-            android:id="@+id/downstream_radio_json"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:checked="true"
-            android:text="@string/downstream_json_text"/>
-        <RadioButton
-            android:id="@+id/downstream_radio_cleartext"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:checked="false"
-            android:text="@string/downstream_cleartext_text"/>
-    </RadioGroup>
     <Button
         android:id="@+id/downstream_send_button"
         android:layout_width="match_parent"

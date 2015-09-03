@@ -19,8 +19,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.util.SimpleArrayMap;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +34,7 @@ import com.google.android.gcm.demo.R;
 import com.google.android.gcm.demo.logic.PubSubHelper;
 import com.google.android.gcm.demo.model.Sender;
 import com.google.android.gcm.demo.model.SenderCollection;
+import com.google.android.gcm.demo.model.Token;
 import com.google.android.gcm.demo.service.LoggingService;
 import com.google.android.gcm.demo.ui.addressbook.SelectActivity;
 
@@ -43,7 +42,7 @@ import java.util.Map;
 
 /**
  * This fragment shows a list of subscribed topics, allowing subscribing to new ones or
- * unsubscribing from the ones displayed.
+ * un-subscribing from the ones displayed.
  */
 public class TopicsFragment extends AbstractFragment
         implements View.OnClickListener, MainActivity.RefreshableFragment {
@@ -61,9 +60,7 @@ public class TopicsFragment extends AbstractFragment
         mSenders = SenderCollection.getInstance(getActivity());
 
         View view = inflater.inflate(R.layout.fragment_topics, container, false);
-        TextView description = (TextView) view.findViewById(R.id.topics_description);
-        description.setMovementMethod(LinkMovementMethod.getInstance());
-        description.setText(Html.fromHtml(getActivity().getString(R.string.topics_description)));
+        setHtmlMode(view, R.id.topics_description);
         view.findViewById(R.id.topics_subscribe).setOnClickListener(this);
         return view;
     }
@@ -86,13 +83,19 @@ public class TopicsFragment extends AbstractFragment
     @Override
     public void refresh() {
         float density = getActivity().getResources().getDisplayMetrics().density;
-        SimpleArrayMap<String, Sender> addressBook =
-                mSenders.getSenders();
+        SimpleArrayMap<String, Sender> addressBook = mSenders.getSenders();
         LinearLayout sendersList = new LinearLayout(getActivity());
         sendersList.setOrientation(LinearLayout.VERTICAL);
         for (int i = 0; i < addressBook.size(); i++) {
             Sender sender = addressBook.valueAt(i);
-            if (sender.testAppToken != null) {
+            // Check if at least a topic is subscribed for this sender
+            int subscribedTopics = 0;
+            for (Boolean subscribed : sender.topics.values()) {
+                if (subscribed) {
+                    subscribedTopics++;
+                }
+            }
+            if (subscribedTopics > 0) {
                 LinearLayout senderRow = (LinearLayout) getActivity().getLayoutInflater()
                         .inflate(R.layout.widget_icon_text_button_row, sendersList, false);
                 ImageView senderIcon = (ImageView) senderRow.findViewById(R.id.widget_itbr_icon);
@@ -100,13 +103,10 @@ public class TopicsFragment extends AbstractFragment
                 senderRow.findViewById(R.id.widget_itbr_button).setVisibility(View.GONE);
                 senderIcon.setImageResource(R.drawable.cloud_googblue);
                 senderIcon.setPadding(0, 0, (int) (8 * density), 0);
-                senderLabel.setText(
-                        getString(R.string.topics_sender_id, sender.senderId));
+                senderLabel.setText(getString(R.string.topics_sender_id, sender.senderId));
                 sendersList.addView(senderRow);
-                int subscribedTopics = 0;
                 for (Map.Entry<String, Boolean> topic : sender.topics.entrySet()) {
                     if (topic.getValue()) {
-                        subscribedTopics++;
                         LinearLayout row = (LinearLayout) getActivity().getLayoutInflater()
                                 .inflate(R.layout.widget_icon_text_button_row, sendersList, false);
                         ImageView icon = (ImageView) row.findViewById(R.id.widget_itbr_icon);
@@ -123,23 +123,13 @@ public class TopicsFragment extends AbstractFragment
                         sendersList.addView(row);
                     }
                 }
-                if (subscribedTopics == 0) {
-                    TextView noTopics = new TextView(getActivity());
-                    noTopics.setText(R.string.topics_no_topic_subscribed);
-                    noTopics.setTypeface(null, Typeface.ITALIC);
-                    noTopics.setPadding((int) (16 * density), 0, 0, 0);
-                    sendersList.addView(noTopics);
-                }
             }
         }
         if (sendersList.getChildCount() == 0) {
             TextView noTokens = new TextView(getActivity());
-            noTokens.setText(getString(R.string.topics_no_sender_registered));
+            noTokens.setText(getString(R.string.topics_no_topic_subscribed));
             noTokens.setTypeface(null, Typeface.ITALIC);
             sendersList.addView(noTokens);
-            getActivity().findViewById(R.id.topics_subscribe).setEnabled(false);
-        } else {
-            getActivity().findViewById(R.id.topics_subscribe).setEnabled(true);
         }
         FrameLayout topicsView = (FrameLayout) getActivity().findViewById(R.id.topics_list_wrapper);
         topicsView.removeAllViews();
@@ -164,7 +154,7 @@ public class TopicsFragment extends AbstractFragment
                 return;
             }
 
-            String gcmToken = mSenders.getSender(senderId).testAppToken;
+            Token gcmToken = mSenders.getSender(senderId).getGcmDemoAppToken();
             if (gcmToken == null) {
                 Toast.makeText(getActivity(),
                         getString(R.string.topics_sender_not_registered),
@@ -177,7 +167,7 @@ public class TopicsFragment extends AbstractFragment
                     getString(R.string.topics_subscribing, topic),
                     Toast.LENGTH_SHORT)
                     .show();
-            mPubSubHelper.subscribeTopic(senderId, gcmToken, topic, null);
+            mPubSubHelper.subscribeTopic(senderId, gcmToken.token, topic, null);
         }
     }
 
@@ -185,14 +175,15 @@ public class TopicsFragment extends AbstractFragment
         String senderId = (String) v.getTag(R.id.tag_senderid);
         String topic = (String) v.getTag(R.id.tag_topic);
         Sender sender = mSenders.getSender(senderId);
-        String gcmToken = (sender != null) ? sender.testAppToken : null;
+        Token gcmToken = (sender != null) ? sender.getGcmDemoAppToken() : null;
         if (gcmToken == null) {
-            mLogger.log(Log.ERROR, "gcmToken missing while unsubscribing from topic.");
+            mLogger.log(Log.ERROR, "gcmToken missing while un-subscribing from topic.");
+            return;
         }
         Toast.makeText(getActivity(),
                 getString(R.string.topics_unsubscribing, topic),
                 Toast.LENGTH_SHORT)
                 .show();
-        mPubSubHelper.unsubscribeTopic(senderId, gcmToken, topic);
+        mPubSubHelper.unsubscribeTopic(senderId, gcmToken.token, topic);
     }
 }

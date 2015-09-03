@@ -31,20 +31,30 @@ limitations under the License.
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/group_sender_id"
-            android:layout_weight="0.4"
-            android:textStyle="bold" />
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            style="@style/TextAppearance.AppCompat.Caption"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/group_sender_id_hint"
             android:id="@+id/group_sender_id"
-            android:layout_weight="0.6"/>
+            android:layout_weight="0.7"
+            style="@style/TextAppearance.AppCompat"
+            android:visibility="gone"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/group_sender_id_hint"
+            android:id="@+id/group_choose_sender_id"
+            android:layout_weight="0.7"
+            style="@style/Widget.AppCompat.Spinner.Underlined"/>
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1">
@@ -53,19 +63,22 @@ limitations under the License.
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/group_sender_api_key"
-            android:layout_weight="0.4"
-            android:textStyle="bold" />
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            style="@style/TextAppearance.AppCompat.Caption"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/group_api_key"
-            android:layout_weight="0.6"/>
+            android:layout_weight="0.7"
+            style="@style/Widget.AppCompat.Spinner.Underlined"
+            android:text="@string/group_sender_api_key_hint"
+            android:enabled="false"/>
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1">
@@ -75,13 +88,15 @@ limitations under the License.
             android:layout_height="wrap_content"
             android:text="@string/group_name"
             android:textStyle="bold"
-            android:layout_weight="0.4"/>
+            android:layout_weight="0.3"
+            style="@style/TextAppearance.AppCompat.Caption"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/group_name"
-            android:layout_weight="0.6"/>
+            android:layout_weight="0.7"
+            style="@style/TextAppearance.AppCompat"/>
     </LinearLayout>
 
     <EditText
@@ -93,6 +108,7 @@ limitations under the License.
     <LinearLayout
         android:orientation="horizontal"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1"
@@ -103,13 +119,15 @@ limitations under the License.
             android:layout_height="wrap_content"
             android:text="@string/group_key"
             android:textStyle="bold"
-            android:layout_weight="0.4"/>
+            android:layout_weight="0.3"
+            style="@style/TextAppearance.AppCompat.Caption"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/group_key"
-            android:layout_weight="0.6"/>
+            android:layout_weight="0.7"
+            style="@style/TextAppearance.AppCompat"/>
     </LinearLayout>
 
     <LinearLayout
@@ -123,7 +141,8 @@ limitations under the License.
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            style="@style/TextAppearance.AppCompat.Caption"/>
 
         <LinearLayout
             android:id="@+id/group_current_members_list"
@@ -144,7 +163,8 @@ limitations under the License.
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            style="@style/TextAppearance.AppCompat.Caption"/>
 
         <LinearLayout
             android:id="@+id/group_removed_members_list"
@@ -165,7 +185,8 @@ limitations under the License.
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
-            android:layout_marginTop="8dp" />
+            android:layout_marginTop="8dp"
+            style="@style/TextAppearance.AppCompat.Caption"/>
 
         <LinearLayout
             android:id="@+id/group_new_members_list"

@@ -26,12 +26,12 @@ and an API key to be able to test server side APIs. For more information, see
 ## Screenshots
 
 ![Menu](screenshots/menu.png "The app's menu")
-![Registration](screenshots/registration1.png "Registration page - unregistered")
-![Registration - registered](screenshots/registration2.png "Registration page - registered")
+![Quick Tests](screenshots/home.png "Quick Tests page")
+![InstanceID](screenshots/instanceid.png "InstanceID page")
 ![Downstream](screenshots/downstream.png "Sending downstream messages")
+![Upstream](screenshots/upstream.png "Upstream page")
 ![Groups](screenshots/groups.png "Groups page")
 ![Topics](screenshots/topics.png "Topics page")
-![Add topic](screenshots/add_topic.png "Add a topic")
 ![Tasks](screenshots/tasks.png "Network manager tasks page")
 
 ## Support

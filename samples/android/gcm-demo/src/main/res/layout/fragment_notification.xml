@@ -20,6 +20,12 @@ limitations under the License.
     android:layout_height="match_parent"
     android:padding="8dp">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fragment_description"
+        android:text="@string/notification_description"/>
+
     <include layout="@layout/downstream_chooser" />
 
     <EditText
