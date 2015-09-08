@@ -29,6 +29,7 @@ import static com.google.android.gcm.server.Constants.PARAM_COLLAPSE_KEY;
 import static com.google.android.gcm.server.Constants.PARAM_DELAY_WHILE_IDLE;
 import static com.google.android.gcm.server.Constants.PARAM_DRY_RUN;
 import static com.google.android.gcm.server.Constants.PARAM_PAYLOAD_PREFIX;
+import static com.google.android.gcm.server.Constants.PARAM_PRIORITY;
 import static com.google.android.gcm.server.Constants.PARAM_REGISTRATION_ID;
 import static com.google.android.gcm.server.Constants.PARAM_RESTRICTED_PACKAGE_NAME;
 import static com.google.android.gcm.server.Constants.PARAM_TIME_TO_LIVE;
@@ -152,6 +153,10 @@ public class Sender {
   public Result sendNoRetry(Message message, String registrationId)
       throws IOException {
     StringBuilder body = newBody(PARAM_REGISTRATION_ID, registrationId);
+    String priority = message.getPriority();
+    if (priority != null) {
+      addParameter(body, PARAM_PRIORITY, priority);
+    }
     Boolean delayWhileIdle = message.isDelayWhileIdle();
     if (delayWhileIdle != null) {
       addParameter(body, PARAM_DELAY_WHILE_IDLE, delayWhileIdle ? "1" : "0");
@@ -393,6 +398,7 @@ public class Sender {
       throw new IllegalArgumentException("registrationIds cannot be empty");
     }
     Map<Object, Object> jsonRequest = new HashMap<Object, Object>();
+    setJsonField(jsonRequest, PARAM_PRIORITY, message.getPriority());
     setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
     setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, message.getCollapseKey());
     setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME, message.getRestrictedPackageName());

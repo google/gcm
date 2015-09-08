@@ -63,6 +63,11 @@ public final class Constants {
   public static final String PARAM_TIME_TO_LIVE = "time_to_live";
 
   /**
+   * Prefix to HTTP parameter used to set the message priority.
+   */
+  public static final String PARAM_PRIORITY = "priority";
+
+  /**
    * Too many messages sent by the sender. Retry after a while.
    */
   public static final String ERROR_QUOTA_EXCEEDED = "QuotaExceeded";
