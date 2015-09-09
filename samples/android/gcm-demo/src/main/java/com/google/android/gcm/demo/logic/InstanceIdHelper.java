@@ -99,11 +99,7 @@ public class InstanceIdHelper {
     /**
      * Unregister by deleting the token
      */
-<<<<<<< HEAD
     public void deleteTokenInBackground(final String authorizedEntity, final String scope) {
-=======
-    public void deleteGcmTokenInBackground(final String senderId) {
->>>>>>> Fix method name typo
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
