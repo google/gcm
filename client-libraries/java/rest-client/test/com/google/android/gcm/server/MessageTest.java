@@ -46,7 +46,7 @@ public class MessageTest {
   @Test
   public void testOptionalParameters() {
     Message message = new Message.Builder()
-        .priority("high")
+        .priority(Message.Priority.HIGH)
         .collapseKey("108")
         .delayWhileIdle(true)
         .timeToLive(42)

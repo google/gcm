@@ -58,14 +58,24 @@ public final class Constants {
   public static final String PARAM_PAYLOAD_PREFIX = "data.";
 
   /**
-   * Prefix to HTTP parameter used to set the message time-to-live.
+   * Parameter used to set the message time-to-live.
    */
   public static final String PARAM_TIME_TO_LIVE = "time_to_live";
 
   /**
-   * Prefix to HTTP parameter used to set the message priority.
+   * Parameter used to set the message priority.
    */
   public static final String PARAM_PRIORITY = "priority";
+
+  /**
+   * Value used to set message priority to normal.
+   */
+  public static final String MESSAGE_PRIORITY_NORMAL = "normal";
+
+  /**
+   * Value used to set message priority to high.
+   */
+  public static final String MESSAGE_PRIORITY_HIGH = "high";
 
   /**
    * Too many messages sent by the sender. Retry after a while.

@@ -67,6 +67,10 @@ public final class Message implements Serializable {
   private final String restrictedPackageName;
   private final String priority;
 
+  public enum Priority {
+    NORMAL, HIGH
+  }
+
   public static final class Builder {
 
     private final Map<String, String> data;
@@ -134,8 +138,15 @@ public final class Message implements Serializable {
     /**
      * Sets the priority property.
      */
-    public Builder priority(String value) {
-      priority = value;
+    public Builder priority(Priority value) {
+      switch(value) {
+        case NORMAL:
+          priority = Constants.MESSAGE_PRIORITY_NORMAL;
+          break;
+        case HIGH:
+          priority = Constants.MESSAGE_PRIORITY_HIGH;
+          break;
+      }
       return this;
     }
 
