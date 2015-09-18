@@ -732,14 +732,14 @@ public class SenderTest {
 
   @Test
   public void testPost() throws Exception {
-    String requestBody = "req";
+    String requestBody = "マルチバイト文字";
     String responseBody = "resp";
     setResponseExpectations(200, responseBody);
     HttpURLConnection response =
         sender.post(Constants.GCM_SEND_ENDPOINT, requestBody);
     assertEquals(requestBody, new String(outputStream.toByteArray()));
     verify(mockedConn).setRequestMethod("POST");
-    verify(mockedConn).setFixedLengthStreamingMode(requestBody.length());
+    verify(mockedConn).setFixedLengthStreamingMode(requestBody.getBytes("UTF-8").length);
     verify(mockedConn).setRequestProperty("Content-Type",
         "application/x-www-form-urlencoded;charset=UTF-8");
     verify(mockedConn).setRequestProperty("Authorization", "key=" + authKey);
@@ -748,14 +748,14 @@ public class SenderTest {
 
   @Test
   public void testPost_customType() throws Exception {
-    String requestBody = "req";
+    String requestBody = "マルチバイト文字";
     String responseBody = "resp";
     setResponseExpectations(200, responseBody);
     HttpURLConnection response =
         sender.post(Constants.GCM_SEND_ENDPOINT, "stuff", requestBody);
     assertEquals(requestBody, new String(outputStream.toByteArray()));
     verify(mockedConn).setRequestMethod("POST");
-    verify(mockedConn).setFixedLengthStreamingMode(requestBody.length());
+    verify(mockedConn).setFixedLengthStreamingMode(requestBody.getBytes("UTF-8").length);
     verify(mockedConn).setRequestProperty("Content-Type", "stuff");
     verify(mockedConn).setRequestProperty("Authorization", "key=" + authKey);
     assertEquals(200, response.getResponseCode());
