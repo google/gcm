@@ -561,7 +561,7 @@ public class Sender {
     }
     logger.fine("Sending POST to " + url);
     logger.finest("POST body: " + body);
-    byte[] bytes = body.getBytes();
+    byte[] bytes = body.getBytes(UTF8);
     HttpURLConnection conn = getConnection(url);
     conn.setDoOutput(true);
     conn.setUseCaches(false);
