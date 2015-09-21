@@ -46,6 +46,7 @@ import java.util.Map;
  * <strong>Message with optional attributes and payload data:</strong>
  * <pre><code>
  * Message message = new Message.Builder()
+ *    .priority("normal")
  *    .collapseKey(collapseKey)
  *    .timeToLive(3)
  *    .delayWhileIdle(true)
@@ -64,6 +65,11 @@ public final class Message implements Serializable {
   private final Map<String, String> data;
   private final Boolean dryRun;
   private final String restrictedPackageName;
+  private final String priority;
+
+  public enum Priority {
+    NORMAL, HIGH
+  }
 
   public static final class Builder {
 
@@ -75,6 +81,7 @@ public final class Message implements Serializable {
     private Integer timeToLive;
     private Boolean dryRun;
     private String restrictedPackageName;
+    private String priority;
 
     public Builder() {
       this.data = new LinkedHashMap<String, String>();
@@ -128,6 +135,21 @@ public final class Message implements Serializable {
       return this;
     }
 
+    /**
+     * Sets the priority property.
+     */
+    public Builder priority(Priority value) {
+      switch(value) {
+        case NORMAL:
+          priority = Constants.MESSAGE_PRIORITY_NORMAL;
+          break;
+        case HIGH:
+          priority = Constants.MESSAGE_PRIORITY_HIGH;
+          break;
+      }
+      return this;
+    }
+
     public Message build() {
       return new Message(this);
     }
@@ -141,6 +163,7 @@ public final class Message implements Serializable {
     timeToLive = builder.timeToLive;
     dryRun = builder.dryRun;
     restrictedPackageName = builder.restrictedPackageName;
+    priority = builder.priority;
   }
 
   /**
@@ -179,6 +202,13 @@ public final class Message implements Serializable {
   }
 
   /**
+   * Gets the message priority value.
+   */
+  public String getPriority() {
+    return priority;
+  }
+
+  /**
    * Gets the payload data, which is immutable.
    */
   public Map<String, String> getData() {
@@ -188,6 +218,9 @@ public final class Message implements Serializable {
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder("Message(");
+    if (priority != null) {
+      builder.append("priority=").append(priority).append(", ");
+    }
     if (collapseKey != null) {
       builder.append("collapseKey=").append(collapseKey).append(", ");
     }

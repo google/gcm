@@ -46,6 +46,7 @@ public class MessageTest {
   @Test
   public void testOptionalParameters() {
     Message message = new Message.Builder()
+        .priority(Message.Priority.HIGH)
         .collapseKey("108")
         .delayWhileIdle(true)
         .timeToLive(42)
@@ -55,6 +56,7 @@ public class MessageTest {
         .addData("k1", "v1")
         .addData("k2", "v2")
         .build();
+    assertEquals("high", message.getPriority());
     assertEquals("108", message.getCollapseKey());
     assertTrue(message.isDelayWhileIdle());
     assertEquals(42, message.getTimeToLive().intValue());
@@ -65,6 +67,7 @@ public class MessageTest {
     assertEquals("v1", data.get("k1"));
     assertEquals("v2", data.get("k2"));
     String toString = message.toString();
+    assertTrue(toString.contains("priority=high"));
     assertTrue(toString.contains("collapseKey=108"));
     assertTrue(toString.contains("timeToLive=42"));
     assertTrue(toString.contains("delayWhileIdle=true"));
