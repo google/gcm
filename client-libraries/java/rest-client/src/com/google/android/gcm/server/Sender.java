@@ -83,7 +83,9 @@ public class Sender {
       Logger.getLogger(Sender.class.getName());
 
   private final String key;
-
+  private int connectTimeout;
+  private int readTimeout;
+  
   /**
    * Default constructor.
    *
@@ -91,6 +93,34 @@ public class Sender {
    */
   public Sender(String key) {
     this.key = nonNull(key);
+  }
+  
+  /**
+   * Set the underlying URLConnection's connect timeout (in milliseconds). A timeout value of 0 specifies an infinite timeout.
+   * <p>
+   * Default is the system's default timeout.
+   *
+   * @see java.net.URLConnection#setConnectTimeout(int)
+   */
+  public final void setConnectTimeout(int connectTimeout) {
+      if (connectTimeout < 0) {
+          throw new IllegalArgumentException("timeout can not be negative");
+      }
+      this.connectTimeout = connectTimeout;
+  }
+
+  /**
+   * Set the underlying URLConnection's read timeout (in milliseconds). A timeout value of 0 specifies an infinite timeout.
+   * <p>
+   * Default is the system's default timeout.
+   *
+   * @see java.net.URLConnection#setReadTimeout(int)
+   */
+  public final void setReadTimeout(int readTimeout) {
+      if (readTimeout < 0) {
+          throw new IllegalArgumentException("timeout can not be negative");
+      }
+      this.readTimeout = readTimeout;
   }
 
   /**
@@ -623,6 +653,8 @@ public class Sender {
    */
   protected HttpURLConnection getConnection(String url) throws IOException {
     HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+    conn.setConnectTimeout(connectTimeout);
+    conn.setReadTimeout(readTimeout);
     return conn;
   }
 
