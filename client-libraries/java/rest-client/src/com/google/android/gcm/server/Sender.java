@@ -15,30 +15,7 @@
  */
 package com.google.android.gcm.server;
 
-import static com.google.android.gcm.server.Constants.GCM_SEND_ENDPOINT;
-import static com.google.android.gcm.server.Constants.JSON_CANONICAL_IDS;
-import static com.google.android.gcm.server.Constants.JSON_ERROR;
-import static com.google.android.gcm.server.Constants.JSON_FAILURE;
-import static com.google.android.gcm.server.Constants.JSON_MESSAGE_ID;
-import static com.google.android.gcm.server.Constants.JSON_MULTICAST_ID;
-import static com.google.android.gcm.server.Constants.JSON_PAYLOAD;
-import static com.google.android.gcm.server.Constants.JSON_REGISTRATION_IDS;
-import static com.google.android.gcm.server.Constants.JSON_RESULTS;
-import static com.google.android.gcm.server.Constants.JSON_SUCCESS;
-import static com.google.android.gcm.server.Constants.PARAM_COLLAPSE_KEY;
-import static com.google.android.gcm.server.Constants.PARAM_DELAY_WHILE_IDLE;
-import static com.google.android.gcm.server.Constants.PARAM_DRY_RUN;
-import static com.google.android.gcm.server.Constants.PARAM_PAYLOAD_PREFIX;
-import static com.google.android.gcm.server.Constants.PARAM_PRIORITY;
-import static com.google.android.gcm.server.Constants.PARAM_REGISTRATION_ID;
-import static com.google.android.gcm.server.Constants.PARAM_RESTRICTED_PACKAGE_NAME;
-import static com.google.android.gcm.server.Constants.PARAM_TIME_TO_LIVE;
-import static com.google.android.gcm.server.Constants.TOKEN_CANONICAL_REG_ID;
-import static com.google.android.gcm.server.Constants.TOKEN_ERROR;
-import static com.google.android.gcm.server.Constants.TOKEN_MESSAGE_ID;
-
-import com.google.android.gcm.server.Result.Builder;
-
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
@@ -52,15 +29,33 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.google.android.gcm.server.Constants.CONTENT_TYPE_JSON;
+import static com.google.android.gcm.server.Constants.GCM_SEND_ENDPOINT;
+import static com.google.android.gcm.server.Constants.JSON_CANONICAL_IDS;
+import static com.google.android.gcm.server.Constants.JSON_ERROR;
+import static com.google.android.gcm.server.Constants.JSON_FAILURE;
+import static com.google.android.gcm.server.Constants.JSON_MESSAGE_ID;
+import static com.google.android.gcm.server.Constants.JSON_MULTICAST_ID;
+import static com.google.android.gcm.server.Constants.JSON_PAYLOAD;
+import static com.google.android.gcm.server.Constants.JSON_REGISTRATION_IDS;
+import static com.google.android.gcm.server.Constants.JSON_RESULTS;
+import static com.google.android.gcm.server.Constants.JSON_SUCCESS;
+import static com.google.android.gcm.server.Constants.PARAM_COLLAPSE_KEY;
+import static com.google.android.gcm.server.Constants.PARAM_DELAY_WHILE_IDLE;
+import static com.google.android.gcm.server.Constants.PARAM_DRY_RUN;
+import static com.google.android.gcm.server.Constants.PARAM_PRIORITY;
+import static com.google.android.gcm.server.Constants.PARAM_RESTRICTED_PACKAGE_NAME;
+import static com.google.android.gcm.server.Constants.PARAM_TIME_TO_LIVE;
+import static com.google.android.gcm.server.Constants.PARAM_TO;
+import static com.google.android.gcm.server.Constants.TOKEN_CANONICAL_REG_ID;
 
 /**
  * Helper class to send messages to the GCM service using an API Key.
@@ -148,51 +143,31 @@ public class Sender {
    *         unavailable or any network exception caused the request to fail.
    *
    * @throws InvalidRequestException if GCM didn't returned a 200 or 5xx status.
-   * @throws IllegalArgumentException if registrationId is {@literal null}.
+   * @throws IllegalArgumentException if to is {@literal null}.
    */
-  public Result sendNoRetry(Message message, String registrationId)
-      throws IOException {
-    StringBuilder body = newBody(PARAM_REGISTRATION_ID, registrationId);
-    String priority = message.getPriority();
-    if (priority != null) {
-      addParameter(body, PARAM_PRIORITY, priority);
+  public Result sendNoRetry(Message message, String to) throws IOException {
+    if (nonNull(to).isEmpty()) {
+      throw new IllegalArgumentException("to cannot be empty");
     }
-    Boolean delayWhileIdle = message.isDelayWhileIdle();
-    if (delayWhileIdle != null) {
-      addParameter(body, PARAM_DELAY_WHILE_IDLE, delayWhileIdle ? "1" : "0");
+    Map<Object, Object> jsonRequest = new HashMap<Object, Object>();
+    setJsonField(jsonRequest, PARAM_PRIORITY, message.getPriority());
+    setJsonField(jsonRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
+    setJsonField(jsonRequest, PARAM_COLLAPSE_KEY, message.getCollapseKey());
+    setJsonField(jsonRequest, PARAM_RESTRICTED_PACKAGE_NAME, message.getRestrictedPackageName());
+    setJsonField(jsonRequest, PARAM_DELAY_WHILE_IDLE, message.isDelayWhileIdle());
+    setJsonField(jsonRequest, PARAM_DRY_RUN, message.isDryRun());
+    jsonRequest.put(PARAM_TO, to);
+    Map<String, String> payload = message.getData();
+    if (!payload.isEmpty()) {
+      jsonRequest.put(JSON_PAYLOAD, payload);
     }
-    Boolean dryRun = message.isDryRun();
-    if (dryRun != null) {
-      addParameter(body, PARAM_DRY_RUN, dryRun ? "1" : "0");
-    }
-    String collapseKey = message.getCollapseKey();
-    if (collapseKey != null) {
-      addParameter(body, PARAM_COLLAPSE_KEY, collapseKey);
-    }
-    String restrictedPackageName = message.getRestrictedPackageName();
-    if (restrictedPackageName != null) {
-      addParameter(body, PARAM_RESTRICTED_PACKAGE_NAME, restrictedPackageName);
-    }
-    Integer timeToLive = message.getTimeToLive();
-    if (timeToLive != null) {
-      addParameter(body, PARAM_TIME_TO_LIVE, Integer.toString(timeToLive));
-    }
-    for (Entry<String, String> entry : message.getData().entrySet()) {
-      String key = entry.getKey();
-      String value = entry.getValue();
-      if (key == null || value == null) {
-        logger.warning("Ignoring payload entry thas has null: " + entry);
-      } else {
-        key = PARAM_PAYLOAD_PREFIX + key;
-        addParameter(body, key, URLEncoder.encode(value, UTF8));
-      }
-    }
-    String requestBody = body.toString();
-    logger.finest("Request body: " + requestBody);
+    String requestBody = JSONValue.toJSONString(jsonRequest);
+    logger.finest("JSON request: " + requestBody);
+
     HttpURLConnection conn;
     int status;
     try {
-      conn = post(GCM_SEND_ENDPOINT, requestBody);
+      conn = post(GCM_SEND_ENDPOINT, CONTENT_TYPE_JSON, requestBody);
       status = conn.getResponseCode();
     } catch (IOException e) {
       logger.log(Level.FINE, "IOException posting to GCM", e);
@@ -206,9 +181,9 @@ public class Sender {
     if (status != 200) {
       try {
         responseBody = getAndClose(conn.getErrorStream());
-        logger.finest("Plain post error response: " + responseBody);
+        logger.finest("JSON error response: " + responseBody);
       } catch (IOException e) {
-        // ignore the exception since it will thrown an InvalidRequestException
+        // ignore the exception since it will throw an InvalidRequestException
         // anyways
         responseBody = "N/A";
         logger.log(Level.FINE, "Exception reading response: ", e);
@@ -223,37 +198,48 @@ public class Sender {
         return null;
       }
     }
-    String[] lines = responseBody.split("\n");
-    if (lines.length == 0 || lines[0].equals("")) {
-      throw new IOException("Received empty response from GCM service.");
-    }
-    String firstLine = lines[0];
-    String[] responseParts = split(firstLine);
-    String token = responseParts[0];
-    String value = responseParts[1];
-    if (token.equals(TOKEN_MESSAGE_ID)) {
-      Builder builder = new Result.Builder().messageId(value);
-      // check for canonical registration id
-      if (lines.length > 1) {
-        String secondLine = lines[1];
-        responseParts = split(secondLine);
-        token = responseParts[0];
-        value = responseParts[1];
-        if (token.equals(TOKEN_CANONICAL_REG_ID)) {
-          builder.canonicalRegistrationId(value);
+
+    JSONParser jsonParser = new JSONParser();
+    JSONObject jsonResponse;
+    try {
+      jsonResponse = (JSONObject) jsonParser.parse(responseBody);
+      if (jsonResponse.containsKey(JSON_RESULTS)) {
+        // results key is expected when this is the response from a message sent to a specific
+        // InstanceID token.
+        JSONArray jsonResults = (JSONArray) jsonResponse.get(JSON_RESULTS);
+        // Using 0 here since this method will always be called with single destination.
+        JSONObject jsonResult = (JSONObject) jsonResults.get(0);
+        if (jsonResult.containsKey(JSON_MESSAGE_ID)) {
+          String messageId = (String) jsonResult.get(JSON_MESSAGE_ID);
+          Result.Builder resultBuilder = new Result.Builder().messageId(messageId);
+          if (jsonResult.containsKey(TOKEN_CANONICAL_REG_ID)) {
+            String canonicalId = (String) jsonResult.get(TOKEN_CANONICAL_REG_ID);
+            resultBuilder.canonicalRegistrationId(canonicalId);
+          }
+          return resultBuilder.build();
+        } else if (jsonResult.containsKey(JSON_ERROR)) {
+          String error = (String) jsonResult.get(JSON_ERROR);
+          return new Result.Builder().errorCode(error).build();
         } else {
           logger.warning("Invalid response from GCM: " + responseBody);
+          throw newIoException(responseBody, new Exception("Invalid GCM response."));
         }
+      } else if (jsonResponse.containsKey(JSON_MESSAGE_ID)) {
+        // message_id is expected when this is the response from a topic message.
+        Long messageId = (Long) jsonResponse.get(JSON_MESSAGE_ID);
+        Result.Builder resultBuilder = new Result.Builder().messageId(messageId.toString());
+        return resultBuilder.build();
+      } else if (jsonResponse.containsKey(JSON_ERROR)) {
+        String error = (String) jsonResponse.get(JSON_ERROR);
+        return new Result.Builder().errorCode(error).build();
+      } else {
+        logger.warning("Empty GCM response: " + responseBody);
+        throw newIoException(responseBody, new Exception("Empty GCM response."));
       }
-      Result result = builder.build();
-      if (logger.isLoggable(Level.FINE)) {
-        logger.fine("Message created succesfully (" + result + ")");
-      }
-      return result;
-    } else if (token.equals(TOKEN_ERROR)) {
-      return new Result.Builder().errorCode(value).build();
-    } else {
-      throw new IOException("Invalid response from GCM: " + responseBody);
+    } catch (ParseException e) {
+      throw newIoException(responseBody, e);
+    } catch (IndexOutOfBoundsException e) {
+      throw newIoException(responseBody, e);
     }
   }
 
@@ -415,7 +401,7 @@ public class Sender {
     HttpURLConnection conn;
     int status;
     try {
-      conn = post(GCM_SEND_ENDPOINT, "application/json", requestBody);
+      conn = post(GCM_SEND_ENDPOINT, CONTENT_TYPE_JSON, requestBody);
       status = conn.getResponseCode();
     } catch (IOException e) {
       logger.log(Level.FINE, "IOException posting to GCM", e);

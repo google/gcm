@@ -27,6 +27,11 @@ public final class Constants {
       "https://android.googleapis.com/gcm/send";
 
   /**
+   * Parameter for to field.
+   */
+  public static final String PARAM_TO = "to";
+
+  /**
    * HTTP parameter for registration id.
    */
   public static final String PARAM_REGISTRATION_ID = "registration_id";
@@ -206,6 +211,7 @@ public final class Constants {
    * JSON-only field sent by GCM when a message was successfully sent.
    */
   public static final String JSON_MESSAGE_ID = "message_id";
+  public static final String CONTENT_TYPE_JSON = "application/json";
 
   private Constants() {
     throw new UnsupportedOperationException();

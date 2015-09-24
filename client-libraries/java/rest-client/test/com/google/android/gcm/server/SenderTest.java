@@ -49,14 +49,14 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SenderTest {
 
-  private final String regId = "15;16";
+  private final String to = "15;16";
+  private final String topic = "/topic/name";
   private final String collapseKey = "collapseKey";
   private final boolean delayWhileIdle = true;
   private final boolean dryRun = true;
@@ -108,21 +108,21 @@ public class SenderTest {
   @Test
   public void testSend_noRetryOk() throws Exception {
     doNotSleep();
-    doReturn(result).when(sender).sendNoRetry(message, regId);
-    sender.send(message, regId, 0);
+    doReturn(result).when(sender).sendNoRetry(message, to);
+    sender.send(message, to, 0);
   }
 
   @Test(expected = IOException.class)
   public void testSend_noRetryFail() throws Exception {
     doNotSleep();
-    doReturn(null).when(sender).sendNoRetry(message, regId);
-    sender.send(message, regId, 0);
+    doReturn(null).when(sender).sendNoRetry(message, to);
+    sender.send(message, to, 0);
   }
 
   @Test(expected = IOException.class)
   public void testSend_noRetryException() throws Exception {
-    doThrow(new IOException()).when(sender).sendNoRetry(message, regId);
-    sender.send(message, regId, 0);
+    doThrow(new IOException()).when(sender).sendNoRetry(message, to);
+    sender.send(message, to, 0);
   }
 
   @Test
@@ -131,9 +131,9 @@ public class SenderTest {
     doReturn(null) // fails 1st time
         .doReturn(null) // fails 2nd time
         .doReturn(result) // succeeds 3rd time
-        .when(sender).sendNoRetry(message, regId);
-    sender.send(message, regId, 2);
-    verify(sender, times(3)).sendNoRetry(message, regId);
+        .when(sender).sendNoRetry(message, to);
+    sender.send(message, to, 2);
+    verify(sender, times(3)).sendNoRetry(message, to);
   }
 
   @Test(expected = IOException.class)
@@ -142,9 +142,9 @@ public class SenderTest {
     doReturn(null) // fails 1st time
         .doReturn(null) // fails 2nd time
         .doReturn(null) // fails 3rd time
-        .when(sender).sendNoRetry(message, regId);
-    sender.send(message, regId, 2);
-    verify(sender, times(3)).sendNoRetry(message, regId);
+        .when(sender).sendNoRetry(message, to);
+    sender.send(message, to, 2);
+    verify(sender, times(3)).sendNoRetry(message, to);
   }
 
   @Test
@@ -152,15 +152,15 @@ public class SenderTest {
     ArgumentCaptor<Long> capturedSleep = ArgumentCaptor.forClass(Long.class);
     int total = retries + 1; // fist attempt + retries
     doNothing().when(sender).sleep(anyInt());
-    doReturn(null).when(sender).sendNoRetry(message, regId);
+    doReturn(null).when(sender).sendNoRetry(message, to);
     try {
-      sender.send(message, regId, retries);
+      sender.send(message, to, retries);
       fail("Should have thrown IOEXception");
     } catch (IOException e) {
       String message = e.getMessage();
       assertTrue("invalid message:" + message, message.contains("" + total));
     }
-    verify(sender, times(total)).sendNoRetry(message, regId);
+    verify(sender, times(total)).sendNoRetry(message, to);
     verify(sender, times(retries)).sleep(capturedSleep.capture());
     long backoffRange = Sender.BACKOFF_INITIAL_DELAY;
     for (long value : capturedSleep.getAllValues()) {
@@ -174,8 +174,8 @@ public class SenderTest {
 
   @Test
   public void testSendNoRetry_ok() throws Exception {
-    setResponseExpectations(200, "id=4815162342");
-    Result result = sender.sendNoRetry(message, regId);
+    setResponseExpectations(200, replaceQuotes("{'results': [{'message_id': '4815162342'}]}"));
+    Result result = sender.sendNoRetry(message, to);
     assertNotNull(result);
     assertEquals("4815162342", result.getMessageId());
     assertNull(result.getCanonicalRegistrationId());
@@ -184,9 +184,20 @@ public class SenderTest {
   }
 
   @Test
+  public void testSendNoRetry_topic_ok() throws Exception {
+    setResponseExpectations(200, replaceQuotes("{'message_id': 12345}"));
+    Result result = sender.sendNoRetry(message, topic);
+    assertNotNull(result);
+    assertEquals("12345", result.getMessageId());
+    assertNull(result.getCanonicalRegistrationId());
+    assertNull(result.getErrorCodeName());
+    assertRequestBody(topic);
+  }
+
+  @Test
   public void testSendNoRetry_ok_canonical() throws Exception {
-    setResponseExpectations(200, "id=4815162342\nregistration_id=108");
-    Result result = sender.sendNoRetry(message, regId);
+    setResponseExpectations(200, replaceQuotes("{'results': [{'message_id': '4815162342', 'registration_id': '108'}]}"));
+    Result result = sender.sendNoRetry(message, to);
     assertNotNull(result);
     assertEquals("4815162342", result.getMessageId());
     assertEquals("108", result.getCanonicalRegistrationId());
@@ -198,7 +209,7 @@ public class SenderTest {
   public void testSendNoRetry_unauthorized() throws Exception {
     setResponseExpectations(401, "");
     try {
-      sender.sendNoRetry(message, regId);
+      sender.sendNoRetry(message, to);
       fail("Should have thrown InvalidRequestException");
     } catch (InvalidRequestException e) {
       assertEquals(401, e.getHttpStatusCode());
@@ -210,7 +221,7 @@ public class SenderTest {
   public void testSendNoRetry_unauthorized_nullStream() throws Exception {
     setResponseExpectations(401, null);
     try {
-      sender.sendNoRetry(message, regId);
+      sender.sendNoRetry(message, to);
       fail("Should have thrown InvalidRequestException");
     } catch (InvalidRequestException e) {
       assertEquals(401, e.getHttpStatusCode());
@@ -221,18 +232,18 @@ public class SenderTest {
 
   @Test
   public void testSendNoRetry_error() throws Exception {
-    setResponseExpectations(200, "Error=D'OH!");
-    Result result = sender.sendNoRetry(message, regId);
+    setResponseExpectations(200, replaceQuotes("{'results': [{'error':'D-OH!'}]}"));
+    Result result = sender.sendNoRetry(message, to);
     assertNull(result.getMessageId());
     assertNull(result.getCanonicalRegistrationId());
-    assertEquals("D'OH!", result.getErrorCodeName());
+    assertEquals("D-OH!", result.getErrorCodeName());
     assertRequestBody();
   }
 
   @Test
   public void testSendNoRetry_serviceUnavailable() throws Exception {
     setResponseExpectations(503, "");
-    Result result = sender.sendNoRetry(message, regId);
+    Result result = sender.sendNoRetry(message, to);
     assertNull(result);
     assertRequestBody();
   }
@@ -240,7 +251,7 @@ public class SenderTest {
   @Test
   public void testSendNoRetry_internalServerError() throws Exception {
     setResponseExpectations(500, "");
-    Result result = sender.sendNoRetry(message, regId);
+    Result result = sender.sendNoRetry(message, to);
     assertNull(result);
     assertRequestBody();
   }
@@ -250,7 +261,7 @@ public class SenderTest {
     when(mockedConn.getOutputStream()).thenThrow(new IOException());
     doReturn(mockedConn).when(sender)
         .getConnection(Constants.GCM_SEND_ENDPOINT);
-    Result result = sender.sendNoRetry(message, regId);
+    Result result = sender.sendNoRetry(message, to);
     assertNull(result);
     assertRequestBody();
   }
@@ -263,7 +274,7 @@ public class SenderTest {
     doReturn(mockedConn).when(sender)
         .getConnection(Constants.GCM_SEND_ENDPOINT);
     try {
-      sender.sendNoRetry(message, regId);
+      sender.sendNoRetry(message, to);
     } catch (InvalidRequestException e) {
       assertEquals(42, e.getHttpStatusCode());
     }
@@ -277,7 +288,7 @@ public class SenderTest {
     when(mockedConn.getInputStream()).thenReturn(exceptionalStream);
     doReturn(mockedConn).when(sender)
         .getConnection(Constants.GCM_SEND_ENDPOINT);
-    Result result = sender.sendNoRetry(message, regId);
+    Result result = sender.sendNoRetry(message, to);
     assertNull(result);
     assertRequestBody();
   }
@@ -285,32 +296,38 @@ public class SenderTest {
   @Test(expected = IOException.class)
   public void testSendNoRetry_emptyBody() throws Exception {
     setResponseExpectations(200, "");
-    sender.sendNoRetry(message, regId);
+    sender.sendNoRetry(message, to);
+  }
+
+  @Test(expected = IOException.class)
+  public void testSendNoRetry_noResults() throws Exception {
+    setResponseExpectations(200, "{}");
+    sender.sendNoRetry(message, to);
+  }
+
+  @Test(expected = IOException.class)
+  public void testSendNoRetry_emptyResults() throws Exception {
+    setResponseExpectations(200, replaceQuotes("{'results': []}"));
+    sender.sendNoRetry(message, to);
   }
 
   @Test(expected = IOException.class)
   public void testSendNoRetry_noToken() throws Exception {
-    setResponseExpectations(200, "no token");
-    sender.sendNoRetry(message, regId);
+    setResponseExpectations(200, replaceQuotes("{'results': [{'registration':]}"));
+    sender.sendNoRetry(message, to);
   }
 
   @Test(expected = IOException.class)
   public void testSendNoRetry_invalidToken() throws Exception {
-    setResponseExpectations(200, "bad=token");
-    sender.sendNoRetry(message, regId);
-  }
-
-  @Test(expected = IOException.class)
-  public void testSendNoRetry_emptyToken() throws Exception {
-    setResponseExpectations(200, "token=");
-    sender.sendNoRetry(message, regId);
+    setResponseExpectations(200, replaceQuotes("{'results': [{'registration_id': 'none'}]}"));
+    sender.sendNoRetry(message, to);
   }
 
   @Test
   public void testSendNoRetry_invalidHttpStatusCode() throws Exception {
     setResponseExpectations(108, "id=4815162342");
     try {
-      sender.sendNoRetry(message, regId);
+      sender.sendNoRetry(message, to);
     } catch (InvalidRequestException e) {
       assertEquals(108, e.getHttpStatusCode());
       assertEquals("id=4815162342", e.getDescription());
@@ -318,7 +335,7 @@ public class SenderTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testSendNoRetry_noRegistrationId() throws Exception {
+  public void testSendNoRetry_noTo() throws Exception {
     sender.sendNoRetry(new Message.Builder().build(), (String) null);
   }
 
@@ -632,7 +649,7 @@ public class SenderTest {
     for (int i = 0; i < expectedRegIds.length; i++) {
       String expectedRegId = expectedRegIds[i];
       String actualRegId = (String) actualRegIds.get(i);
-      assertEquals("invalid regId at index " + i, expectedRegId, actualRegId);
+      assertEquals("invalid to at index " + i, expectedRegId, actualRegId);
     }
   }
 
@@ -785,32 +802,36 @@ public class SenderTest {
   }
 
   private void assertRequestBody() throws Exception {
-    ArgumentCaptor<String> capturedBody = ArgumentCaptor.forClass(String.class);
-    verify(sender).post(eq(Constants.GCM_SEND_ENDPOINT), capturedBody.capture());
-    // parse body
-    String body = capturedBody.getValue();
-    Map<String, String> params = new HashMap<String, String>();
-    for (String param : body.split("&")) {
-      String[] split = param.split("=");
-      params.put(split[0], split[1]);
-    }
-    // check parameters
-    assertEquals("wrong parameters size for " + body, 9, params.size());
-    assertParameter(params, "registration_id", regId);
-    assertParameter(params, "collapse_key", collapseKey);
-    assertParameter(params, "delay_while_idle", delayWhileIdle ? "1" : "0");
-    assertParameter(params, "dry_run", dryRun ? "1" : "0");
-    assertParameter(params, "restricted_package_name", restrictedPackageName);
-    assertParameter(params, "time_to_live", "" + ttl);
-    assertParameter(params, "data.k1", "v1");
-    assertParameter(params, "data.k2", "v2");
-    assertParameter(params, "data.k3", "v3");
+    assertRequestBody(to);
   }
 
-  static void assertParameter(Map<String, String> params, String name,
+  private void assertRequestBody(String to) throws Exception {
+    ArgumentCaptor<String> capturedBody = ArgumentCaptor.forClass(String.class);
+    verify(sender).post(eq(Constants.GCM_SEND_ENDPOINT), eq(Constants.CONTENT_TYPE_JSON), capturedBody.capture());
+    // parse body
+    String body = capturedBody.getValue();
+    JSONParser jsonParser = new JSONParser();
+    JSONObject jsonBody = (JSONObject) jsonParser.parse(body);
+
+    // check parameters
+    assertEquals("wrong parameters size for " + body, 7, jsonBody.keySet().size());
+    assertParameter(jsonBody, "to", to);
+    assertParameter(jsonBody, "collapse_key", collapseKey);
+    assertParameter(jsonBody, "delay_while_idle", delayWhileIdle +"");
+    assertParameter(jsonBody, "dry_run", String.valueOf(dryRun));
+    assertParameter(jsonBody, "restricted_package_name", restrictedPackageName);
+    assertParameter(jsonBody, "time_to_live", "" + ttl);
+
+    JSONObject jsonData = (JSONObject) jsonParser.parse(jsonBody.get("data").toString());
+    assertParameter(jsonData, "k1", "v1");
+    assertParameter(jsonData, "k2", "v2");
+    assertParameter(jsonData, "k3", "v3");
+  }
+
+  static void assertParameter(JSONObject jsonObject, String name,
       String expectedValue) {
     assertEquals("invalid value for request parameter parameter " + name,
-        params.get(name), expectedValue);
+            expectedValue, jsonObject.get(name).toString());
   }
 
 }
