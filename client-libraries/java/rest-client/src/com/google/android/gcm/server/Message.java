@@ -66,6 +66,7 @@ public final class Message implements Serializable {
   private final Boolean dryRun;
   private final String restrictedPackageName;
   private final String priority;
+  private final Notification notification;
 
   public enum Priority {
     NORMAL, HIGH
@@ -82,6 +83,7 @@ public final class Message implements Serializable {
     private Boolean dryRun;
     private String restrictedPackageName;
     private String priority;
+    private Notification notification;
 
     public Builder() {
       this.data = new LinkedHashMap<String, String>();
@@ -150,6 +152,14 @@ public final class Message implements Serializable {
       return this;
     }
 
+    /**
+     * Sets the notification property.
+     */
+    public Builder notification(Notification value) {
+      notification = value;
+      return this;
+    }
+
     public Message build() {
       return new Message(this);
     }
@@ -164,6 +174,7 @@ public final class Message implements Serializable {
     dryRun = builder.dryRun;
     restrictedPackageName = builder.restrictedPackageName;
     priority = builder.priority;
+    notification = builder.notification;
   }
 
   /**
@@ -215,6 +226,13 @@ public final class Message implements Serializable {
     return data;
   }
 
+  /**
+   * Gets notification payload, which is immutable.
+   */
+  public Notification getNotification() {
+    return notification;
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder("Message(");
@@ -235,6 +253,9 @@ public final class Message implements Serializable {
     }
     if (restrictedPackageName != null) {
       builder.append("restrictedPackageName=").append(restrictedPackageName).append(", ");
+    }
+    if (notification != null) {
+      builder.append("notification: ").append(notification).append(", ");
     }
     if (!data.isEmpty()) {
       builder.append("data: {");
