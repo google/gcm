@@ -56,6 +56,7 @@ import java.util.Map;
 public class SenderTest {
 
   private final String regId = "15;16";
+  private final String topic = "/topics/group";
   private final String collapseKey = "collapseKey";
   private final boolean delayWhileIdle = true;
   private final boolean dryRun = true;
@@ -192,6 +193,35 @@ public class SenderTest {
   }
 
   @Test
+  public void testSendNoRetry_topic_ok() throws Exception {
+    String json = replaceQuotes("\n"
+        + "{"
+        + "  'message_id': 4815162342 "
+        + "}");
+    setResponseExpectations(200, json);
+    Result result = sender.sendNoRetry(message, topic);
+    assertNotNull(result);
+    assertEquals("4815162342", result.getMessageId());
+    assertNull(result.getCanonicalRegistrationId());
+    assertNull(result.getErrorCodeName());
+  }
+
+  @Test
+  public void testSendNoRetry_group_ok() throws Exception {
+    String json = replaceQuotes("\n"
+        + "{"
+        + "'success': 3,"
+        + "'failure': 0"
+        + "}");
+    setResponseExpectations(200, json);
+    Result result = sender.sendNoRetry(message, regId);
+    assertNotNull(result);
+    assertEquals(3, result.getSuccess().intValue());
+    assertEquals(0, result.getFailure().intValue());
+    assertNull(result.getFailedRegistrationIds());
+  }
+
+  @Test
   public void testSendNoRetry_ok_canonical() throws Exception {
     String json = replaceQuotes("\n"
         + "{"
@@ -254,6 +284,36 @@ public class SenderTest {
   }
 
   @Test
+  public void testSendNoRetry_topic_error() throws Exception {
+    String json = replaceQuotes("\n"
+        + "{"
+        + " 'error': 'MissingRegistration' "
+        + "}");
+    setResponseExpectations(200, json);
+    Result result = sender.sendNoRetry(message, topic);
+    assertNull(result.getMessageId());
+    assertEquals("MissingRegistration", result.getErrorCodeName());
+  }
+
+  @Test
+  public void testSendNoRetry_group_error() throws Exception {
+    String json = replaceQuotes("\n"
+        + "{"
+        + "'success': 3,"
+        + "'failure': 2,"
+        + "'failed_registration_ids': ["
+        + " 'reg_id1', 'reg_id2'"
+        + " ]"
+        + "}");
+    setResponseExpectations(200, json);
+    Result result = sender.sendNoRetry(message, regId);
+    assertNotNull(result);
+    assertEquals(3, result.getSuccess().intValue());
+    assertEquals(2, result.getFailure().intValue());
+    assertEquals(2, result.getFailedRegistrationIds().size());
+  }
+
+  @Test
   public void testSendNoRetry_resultsCount() throws Exception {
     String json = replaceQuotes("\n"
         + "{"
@@ -268,6 +328,14 @@ public class SenderTest {
         + "}");
     setResponseExpectations(200, json);
     Result result = sender.sendNoRetry(message, regId);
+    assertNull(result);
+  }
+
+  @Test
+  public void testSendNoRetry_emptyResult() throws Exception {
+    String json = "{}";
+    setResponseExpectations(200, json);
+    Result result = sender.sendNoRetry(message, topic);
     assertNull(result);
   }
 
