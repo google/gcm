@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Google Inc.
+ * Copyright Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -24,7 +24,17 @@ public final class Constants {
    * Endpoint for sending messages.
    */
   public static final String GCM_SEND_ENDPOINT =
-      "https://android.googleapis.com/gcm/send";
+      "https://gcm-http.googleapis.com/gcm/send";
+
+  /**
+   * Parameter for to field.
+   */
+  public static final String PARAM_TO = "to";
+
+  /**
+   * Prefix of the topic.
+   */
+  public static final String TOPIC_PREFIX = "/topics/";
 
   /**
    * HTTP parameter for registration id.
@@ -165,6 +175,11 @@ public final class Constants {
    * JSON-only field representing the registration ids.
    */
   public static final String JSON_REGISTRATION_IDS = "registration_ids";
+
+  /**
+   * JSON-only field representing the to recipient.
+   */
+  public static final String JSON_TO = "to";
 
   /**
    * JSON-only field representing the payload data.
