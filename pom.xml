@@ -5,49 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.google.gcm</groupId>
-    <artifactId>libraries</artifactId>
-    <version>1.1.1</version>
+    <artifactId>gcm-aggregator</artifactId>
+    <version>0.9.0</version>
     <packaging>pom</packaging>
 
     <modules>
         <module>client-libraries/java/rest-client</module>
     </modules>
 
+    <scm>
+        <connection>scm:git:git:://github.com:eroad/gcm.git</connection>
+        <developerConnection>scm:git:git@github.com:eroad/gcm.git</developerConnection>
+        <url>https://github.com/eroad/gcm</url>
+        <tag>HEAD</tag>
+    </scm>
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <name>Nexus Central</name>
-            <url>http://central</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>http://central</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-    <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <url>https://nexus.eroad.io/content/repositories/releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <url>https://nexus.eroad.io/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
