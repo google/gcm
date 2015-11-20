@@ -3,3 +3,14 @@ gcm-demo.iml
 .gradle/
 .idea/
 local.properties
+
+**/target/*
+**/.settings/*
+.project
+.classpath
+.idea/*
+*.iml
+dependency-reduced-pom.xml
+**/bin/
+atlassian-ide-plugin.xml
+
