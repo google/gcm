@@ -28,7 +28,7 @@
     <name>Google GCM Java Library</name>
     <description>POM file created to enable maven dependency management for Google's GCM Library</description>
     <url>http://apigee.io/</url>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
