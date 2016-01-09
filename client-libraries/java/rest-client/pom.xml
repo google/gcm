@@ -7,7 +7,7 @@
 	<name>Google Cloud Messaging (GCM) REST Client</name>
 	<description>REST Client for Google Cloud Messaging (GCM).</description>
 	<parent>
-		<groupId>com.google.android</groupId>
+		<groupId>com.google.cloud.messaging</groupId>
 		<artifactId>gcm</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 		<relativePath>../../../pom.xml</relativePath>
