@@ -1,18 +1,15 @@
 language: java
 script:
-  - "ant -f ./client-libraries/java/rest-client/build.xml -lib ./client-libraries/java/rest-client/lib deploy"
-
-env:
-  global:
-    - secure: "AWWCqun7xqbM0h+GikCiuPHvyyKtMffhX5/eBQX7+MoCczD/bgMTiJmKaY3XQ2IE8wHTIOz3AFzIAjjf6V2BAvV0IpjWtrBL31uZ1ra6POH+NY2WpeZCT8VNqtggVmy4kJUpYHgZle7U6SeLGk5gXUpTu8wumIRDeS119tUQb54=" 
-    - secure: "Nb3PWjnEMEtCflsGHTLsqFhHeTPXOT+h5u5WAPLKCZyNfeZjEnETyAR5hgz8emPvAjsi7tr+YhSWuV3OlEOX7DA+f/NZKU53QEFAxxZazAuG+cIJf7hQ2K1MwFK0cx4LlyoxXzpd6Om73iTOIeU/jonf6nE1q84xVeZkcOAAuhY="
-
+- ant -f ./client-libraries/java/rest-client/build.xml -lib ./client-libraries/java/rest-client/lib
+  deploy
 before_install:
-  - cp settings.xml ${HOME}/.m2/settings.xml
-
+- cp settings.xml ${HOME}/.m2/settings.xml
 after_success:
-  - echo "deploy completed."
-
+- echo "deploy completed."
 branches:
   only:
-    - master
+  - master
+env:
+  global:
+  - secure: JLi7Nhp/kr5Nv8e3Ldg0jEyitvjSljZwNLlR5SHphvUlV7POvVNqXJ994358wySD9sDEFCupHdO5sCmIkw4f9rQfEOB7uCWVr3qBR7qalQAeSCSjxkPAZMB7oZZrlgBR+aviwiUHlElVB+Qn6QtUWZfwT5qmCzKDTFTPiDaby2s=
+  - secure: MN7EKwGBOUQ9FDA4TXnq4lDprIBXmkXHMsp6jSBhdyXaZt0ix/FcmCqCYNumxrAVxquHRmcgb6hI5EuqZNHfI0hTvhbPGG9MIKweMNzWC3O9Lw44ufvog2wa2Xa/+hJDHNSLsL5HiF4sWy//V7/GcfYnIpdl/GN43dKBsd8FooQ=
