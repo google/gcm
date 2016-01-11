@@ -14,7 +14,7 @@
   - License for the specific language governing permissions and limitations
   - under the License.
 -->
-<project name="gcm-server" default="dist">
+<project name="gcm-server" default="dist" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
   <property name="version" value="dev"/>
   <property name="src" location="src"/>
@@ -25,10 +25,19 @@
   <property name="test-classes" location="${build}/test-classes"/>
   <property name="test-reports" location="${build}/test-reports"/>
   <property name="dist"  location="dist"/>
-  <property name="jar" value="${dist}/gcm-server.jar"/>
-  <property name="src-jar" value="${dist}/gcm-server-src.jar"/>
   <property name="demo-dir" value="${basedir}/../samples/gcm-demo-server"/>
   <property name="demo-appengine-dir" value="${basedir}/../samples/gcm-demo-appengine"/>
+  <!-- define Maven coordinates -->
+  <property name="groupId" value="com.google.gcm" />
+  <property name="artifactId" value="gcm-server" />
+  <property name="version" value="1.0-SNAPSHOT" />
+  <!-- define artifacts' name, which follows the convention of Maven -->
+  <property name="jar" value="${dist}/${artifactId}-${version}.jar" />
+  <!-- defined maven snapshots and staging repository id and url -->
+  <property name="ossrh-snapshots-repository-url"
+            value="https://oss.sonatype.org/content/repositories/snapshots" />
+  <!-- there server id in the Maven settings.xml -->
+  <property name="ossrh-server-id" value="ossrh" />
 
   <path id="compile.classpath">
     <fileset dir="${lib}">
@@ -98,7 +107,7 @@
 
   <target name="src-jar" description="Generate a JAR with the GCM server library source files.">
     <antcall target="_jar">
-      <param name="_destfile" value="${src-jar}"/>
+      <param name="_destfile" value="${sources-jar}"/>
       <param name="_basedir" value="${src}"/>
     </antcall>
   </target>
@@ -107,7 +116,7 @@
     <jar destfile="${_destfile}" basedir="${_basedir}">
       <manifest>
         <attribute name="Implementation-Vendor" value="Google"/>
-        <attribute name="Implementation-Title" 
+        <attribute name="Implementation-Title"
           value="Google Cloud Messaging - server support"/>
         <attribute name="Implementation-Version" value="${version}"/>
       </manifest>
@@ -121,5 +130,14 @@
     <copy file="${jar}" todir="${demo-appengine-dir}/WebContent/WEB-INF/lib"/>
   </target>
 
+  <target name="deploy" depends="dist" description="deploy snapshot version to Maven snapshot repository">
+    <artifact:mvn>
+      <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
+      <arg value="-Durl=${ossrh-snapshots-repository-url}" />
+      <arg value="-DrepositoryId=${ossrh-server-id}" />
+      <arg value="-DpomFile=client-libraries/java/rest-client/pom.xml" />
+      <arg value="-Dfile=${jar}" />
+      <arg value="-e" />
+    </artifact:mvn>
+  </target>
 </project>
-
