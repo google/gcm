@@ -1,17 +1,15 @@
 language: java
 script:
-- ant -f ./client-libraries/java/rest-client/build.xml -lib ./client-libraries/java/rest-client/lib
-  stage
+- ./build.sh
 before_install:
 - openssl aes-256-cbc -K $encrypted_8864fe5d711d_key -iv $encrypted_8864fe5d711d_iv
   -in sign.key.enc -out sign.key -d
 - gpg --import sign.key
 - cp settings.xml ${HOME}/.m2/settings.xml
-after_success:
-- echo "deploy completed."
 branches:
   only:
   - master
+  - /^v[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,3}$/
 env:
   global:
   - secure: JLi7Nhp/kr5Nv8e3Ldg0jEyitvjSljZwNLlR5SHphvUlV7POvVNqXJ994358wySD9sDEFCupHdO5sCmIkw4f9rQfEOB7uCWVr3qBR7qalQAeSCSjxkPAZMB7oZZrlgBR+aviwiUHlElVB+Qn6QtUWZfwT5qmCzKDTFTPiDaby2s=

@@ -147,7 +147,7 @@
     <copy file="${jar}" todir="${demo-appengine-dir}/WebContent/WEB-INF/lib"/>
   </target>
 
-  <target name="deploy" depends="dist" description="deploy snapshot version to Maven snapshot repository">
+  <target name="stage" depends="dist" description="deploy snapshot version to Maven snapshot repository">
     <artifact:mvn>
       <arg value="org.apache.maven.plugins:maven-deploy-plugin:2.6:deploy-file" />
       <arg value="-Durl=${ossrh-snapshots-repository-url}" />
@@ -159,7 +159,7 @@
   </target>
 
   <!-- before this, update project version (both build.xml and pom.xml) from SNAPSHOT to RELEASE -->
-  <target name="stage" depends="dist" description="deploy release version to Maven staging repository">
+  <target name="deploy" depends="dist" description="deploy release version to Maven staging repository">
     <!-- sign and deploy the main artifact -->
     <artifact:mvn>
       <arg value="org.apache.maven.plugins:maven-gpg-plugin:1.3:sign-and-deploy-file" />
