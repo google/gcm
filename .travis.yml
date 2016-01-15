@@ -2,9 +2,6 @@ language: java
 script:
 - ./build.sh
 before_install:
-- openssl aes-256-cbc -K $encrypted_8864fe5d711d_key -iv $encrypted_8864fe5d711d_iv
-  -in sign.key.enc -out sign.key -d
-- gpg --import sign.key
 - cp settings.xml ${HOME}/.m2/settings.xml
 env:
   global:
