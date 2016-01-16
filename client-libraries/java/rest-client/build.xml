@@ -29,7 +29,7 @@
   <!-- define Maven coordinates -->
   <property name="groupId" value="com.google.gcm" />
   <property name="artifactId" value="gcm-server" />
-  <property name="version" value="1.0.0" />
+  <property name="version" value="1.0-SNAPSHOT" />
   <!-- define artifacts' name, which follows the convention of Maven -->
   <property name="jar" value="${dist}/${artifactId}-${version}.jar" />
   <property name="javadoc-jar" value="${dist}/${artifactId}-${version}-javadoc.jar"/>
