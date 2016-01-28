@@ -78,6 +78,11 @@ public final class Constants {
   public static final String PARAM_PRIORITY = "priority";
 
   /**
+   * Parameter used to set the content available (iOS only)
+   */
+  public static final String PARAM_CONTENT_AVAILABLE = "content_available";
+
+  /**
    * Value used to set message priority to normal.
    */
   public static final String MESSAGE_PRIORITY_NORMAL = "normal";

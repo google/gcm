@@ -66,7 +66,9 @@ public final class Message implements Serializable {
   private final Boolean dryRun;
   private final String restrictedPackageName;
   private final String priority;
+  private final Boolean contentAvailable;
   private final Notification notification;
+
 
   public enum Priority {
     NORMAL, HIGH
@@ -83,6 +85,7 @@ public final class Message implements Serializable {
     private Boolean dryRun;
     private String restrictedPackageName;
     private String priority;
+    private Boolean contentAvailable;
     private Notification notification;
 
     public Builder() {
@@ -160,6 +163,14 @@ public final class Message implements Serializable {
       return this;
     }
 
+    /**
+     * Sets the contentAvailable property
+     */
+    public Builder contentAvailable(Boolean value){
+        contentAvailable = value;
+        return this;
+    }
+
     public Message build() {
       return new Message(this);
     }
@@ -174,6 +185,7 @@ public final class Message implements Serializable {
     dryRun = builder.dryRun;
     restrictedPackageName = builder.restrictedPackageName;
     priority = builder.priority;
+    contentAvailable = builder.contentAvailable;
     notification = builder.notification;
   }
 
@@ -220,6 +232,13 @@ public final class Message implements Serializable {
   }
 
   /**
+   * Gets the contentAvailable value
+   */
+  public Boolean getContentAvailable() {
+      return contentAvailable;
+  }
+
+  /**
    * Gets the payload data, which is immutable.
    */
   public Map<String, String> getData() {
@@ -238,6 +257,9 @@ public final class Message implements Serializable {
     StringBuilder builder = new StringBuilder("Message(");
     if (priority != null) {
       builder.append("priority=").append(priority).append(", ");
+    }
+    if (contentAvailable != null){
+        builder.append("contentAvailable=").append(contentAvailable).append(", ");
     }
     if (collapseKey != null) {
       builder.append("collapseKey=").append(collapseKey).append(", ");
