@@ -43,7 +43,6 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-
     <build>
         <sourceDirectory>src/</sourceDirectory>
         <testSourceDirectory>test/</testSourceDirectory>
@@ -130,6 +129,19 @@
         </profile>
     </profiles>
 
+    <developers>
+        <developer>
+            <name>GCM Java</name>
+            <email>java-gcm@google.com</email>
+            <organization>Google</organization>
+            <organizationUrl>https://google.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Michael Russo</name>
+            <id>michaelarusso</id>
+        </developer>
+	
+    </developers>
     <dependencies>
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
@@ -158,12 +170,5 @@
         <developerConnection>scm:git:ssh://git@github.com/apigee/gcm.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
-
-    <developers>
-        <developer>
-            <name>Michael Russo</name>
-            <id>michaelarusso</id>
-        </developer>
-    </developers>
 
 </project>

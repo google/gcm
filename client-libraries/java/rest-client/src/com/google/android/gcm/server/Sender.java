@@ -43,6 +43,7 @@ import static com.google.android.gcm.server.Constants.PARAM_COLLAPSE_KEY;
 import static com.google.android.gcm.server.Constants.PARAM_DELAY_WHILE_IDLE;
 import static com.google.android.gcm.server.Constants.PARAM_DRY_RUN;
 import static com.google.android.gcm.server.Constants.PARAM_PRIORITY;
+import static com.google.android.gcm.server.Constants.PARAM_CONTENT_AVAILABLE;
 import static com.google.android.gcm.server.Constants.PARAM_RESTRICTED_PACKAGE_NAME;
 import static com.google.android.gcm.server.Constants.PARAM_TIME_TO_LIVE;
 import static com.google.android.gcm.server.Constants.TOKEN_CANONICAL_REG_ID;
@@ -456,6 +457,7 @@ public class Sender {
       return;
     }
     setJsonField(mapRequest, PARAM_PRIORITY, message.getPriority());
+    setJsonField(mapRequest, PARAM_CONTENT_AVAILABLE, message.getContentAvailable());
     setJsonField(mapRequest, PARAM_TIME_TO_LIVE, message.getTimeToLive());
     setJsonField(mapRequest, PARAM_COLLAPSE_KEY, message.getCollapseKey());
     setJsonField(mapRequest, PARAM_RESTRICTED_PACKAGE_NAME, message.getRestrictedPackageName());
