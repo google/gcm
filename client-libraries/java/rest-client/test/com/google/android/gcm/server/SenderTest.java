@@ -105,6 +105,36 @@ public class SenderTest {
     new Sender(null);
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testSetConnectTimeout_lessThanZero() {
+    sender.setConnectTimeout(-1);
+  }
+
+  @Test
+  public void testSetConnectTimeout() throws IOException {
+    int connectTimeout = 5000;
+    sender.setConnectTimeout(connectTimeout);
+    
+    // does not establish the actual network connection on creation see java.util.URL#openConnection
+    HttpURLConnection connection = sender.getConnection("http://www.google.com");
+    assertEquals(connectTimeout, connection.getConnectTimeout());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testSetReadTimeout_lessThanZero() {
+    sender.setReadTimeout(-1);
+  }
+  
+  @Test
+  public void testSetReadTimeout() throws IOException {
+    int readTimeout = 5000;
+    sender.setReadTimeout(readTimeout);
+    
+    // does not establish the actual network connection on creation see java.util.URL#openConnection
+    HttpURLConnection connection = sender.getConnection("http://www.google.com");
+    assertEquals(readTimeout, connection.getReadTimeout());
+  }  
+
   @Test
   public void testSend_noRetryOk() throws Exception {
     doNotSleep();
