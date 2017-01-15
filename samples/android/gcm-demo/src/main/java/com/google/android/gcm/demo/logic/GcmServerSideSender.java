@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class GcmServerSideSender {
 
-    private static final String GCM_SEND_ENDPOINT = "https://gcm-http.googleapis.com/gcm/send";
+    private static final String GCM_SEND_ENDPOINT = "https://fcm.googleapis.com/fcm/send";
 
     private static final String UTF8 = "UTF-8";
 

@@ -46,7 +46,7 @@ import com.google.android.gcm.demo.ui.MainActivity;
 public class DeviceGroupsHelper {
 
     private static final String GCM_GROUPS_ENDPOINT =
-            "https://gcm-http.googleapis.com/gcm/notification";
+            "https://fcm.googleapis.com/fcm/notification";
 
     private final Context mContext;
     private final LoggingService.Logger mLogger;
