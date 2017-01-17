@@ -15,7 +15,6 @@
  */
 package com.google.android.gcm.server;
 
-import static com.google.android.gcm.server.Constants.FCM_SEND_ENDPOINT;
 import static com.google.android.gcm.server.Constants.JSON_CANONICAL_IDS;
 import static com.google.android.gcm.server.Constants.JSON_ERROR;
 import static com.google.android.gcm.server.Constants.JSON_FAILURE;
@@ -70,7 +69,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Optional;
 
 /**
  * Helper class to send messages to the GCM service using an API Key.
@@ -105,16 +103,22 @@ public class Sender {
    * @param key API key obtained through the Google API Console.
    */
   public Sender(String key) {
-    this.key = nonNull(key);
+    this(key, Constants.FCM_SEND_ENDPOINT);
   }
 
+  /**
+   * Full options constructor.
+   *
+   * @param key FCM Server Key obtained through the Firebase Web Console.
+   * @param endpoint Endpoint to use when sending the message.
+   */
   public Sender(String key, String endpoint) {
-    this(key);
-    this.endpoint = endpoint;
+    this.key = nonNull(key);
+    this.endpoint = nonNull(endpoint);
   }
 
   public String getEndpoint() {
-    return Optional.ofNullable(endpoint).orElse(FCM_SEND_ENDPOINT);
+    return endpoint;
   }
 
   /**
