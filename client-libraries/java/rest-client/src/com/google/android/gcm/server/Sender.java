@@ -102,6 +102,10 @@ public class Sender {
     this.key = nonNull(key);
   }
 
+  public String getEndpoint() {
+    return GCM_SEND_ENDPOINT;
+  }
+
   /**
    * Sends a message to one device, retrying in case of unavailability.
    *
@@ -417,7 +421,7 @@ public class Sender {
     HttpURLConnection conn;
     int status;
     try {
-      conn = post(GCM_SEND_ENDPOINT, "application/json", requestBody);
+      conn = post(getEndpoint(), "application/json", requestBody);
       status = conn.getResponseCode();
     } catch (IOException e) {
       logger.log(Level.FINE, "IOException posting to GCM", e);
