@@ -15,7 +15,7 @@
  */
 package com.google.android.gcm.server;
 
-import static com.google.android.gcm.server.Constants.GCM_SEND_ENDPOINT;
+import static com.google.android.gcm.server.Constants.FCM_SEND_ENDPOINT;
 import static com.google.android.gcm.server.Constants.JSON_CANONICAL_IDS;
 import static com.google.android.gcm.server.Constants.JSON_ERROR;
 import static com.google.android.gcm.server.Constants.JSON_FAILURE;
@@ -70,6 +70,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Optional;
 
 /**
  * Helper class to send messages to the GCM service using an API Key.
@@ -92,6 +93,7 @@ public class Sender {
       Logger.getLogger(Sender.class.getName());
 
   private final String key;
+  private String endpoint;
 
   /**
    * Default constructor.
@@ -102,8 +104,13 @@ public class Sender {
     this.key = nonNull(key);
   }
 
+  public Sender(String key, String endpoint) {
+    this(key);
+    this.endpoint = endpoint;
+  }
+
   public String getEndpoint() {
-    return GCM_SEND_ENDPOINT;
+    return Optional.ofNullable(endpoint).orElse(FCM_SEND_ENDPOINT);
   }
 
   /**
