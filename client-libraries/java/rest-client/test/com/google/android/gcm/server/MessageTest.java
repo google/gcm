@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -81,6 +82,32 @@ public class MessageTest {
     assertTrue(toString.contains("dryRun=true"));
     assertTrue(toString.contains("restrictedPackageName=package.name"));
     assertTrue(toString.contains("notification: "));
+  }
+
+  @Test
+  public void testSetData() {
+
+    Map<String,String> data = new HashMap<String, String>() {{
+
+      put("k1", "v1");
+      put("k2", "v2");
+
+    }};
+
+    Message message = new Message.Builder()
+            .priority(Message.Priority.HIGH)
+            .collapseKey("108")
+            .delayWhileIdle(true)
+            .timeToLive(42)
+            .dryRun(true)
+            .restrictedPackageName("package.name")
+            .setData(data)
+            .notification(new Notification.Builder("my").build())
+            .build();
+
+    assertEquals("v1", message.getData().get("k1"));
+    assertEquals("v2", message.getData().get("k2"));
+
   }
 
   @Test(expected = UnsupportedOperationException.class)

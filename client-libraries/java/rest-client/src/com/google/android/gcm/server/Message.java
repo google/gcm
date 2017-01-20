@@ -125,6 +125,15 @@ public final class Message implements Serializable {
     }
 
     /**
+     * Overwrites the data to be used for the notification payload
+     */
+    public Builder setData(Map<String, String> data) {
+      this.data.clear();
+      this.data.putAll(data);
+      return this;
+    }
+
+    /**
      * Sets the dryRun property (default value is {@literal false}).
      */
     public Builder dryRun(boolean value) {

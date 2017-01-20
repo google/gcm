@@ -4,3 +4,5 @@ gcm-demo.iml
 .gradle/
 .idea/
 local.properties
+target/
+*.iml
