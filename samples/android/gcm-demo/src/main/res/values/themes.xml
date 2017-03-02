@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<resources>
+
+    <!-- Application Theme -->
+    <style name="Theme.AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+        <item name="colorPrimary">@color/google_blue_500</item>
+        <item name="colorPrimaryDark">@color/google_blue_700</item>
+        <item name="colorAccent">@color/light_blue_500</item>
+
+        <item name="android:actionModeBackground">@color/google_blue_700</item>
+        <item name="android:windowBackground">@color/grey_50</item>
+
+        <item name="android:textColorLink">@color/light_blue_500</item>
+
+        <!-- Toolbar -->
+        <item name="toolbarStyle">@style/Toolbar</item>
+        <item name="drawerArrowStyle">@style/Toolbar.DrawerToggle</item>
+        <item name="actionOverflowButtonStyle">@style/Toolbar.OverflowMenuButton</item>
+
+        <item name="android:buttonStyle">@style/Button</item>
+        <item name="android:editTextStyle">@style/EditText</item>
+
+        <item name="android:activatedBackgroundIndicator">@drawable/activated_background_indicator</item>
+    </style>
+
+    <!-- Application Theme -->
+    <style name="Theme.AppTheme.NoActionBar" parent="Theme.AppTheme">
+        <!-- The drawer needs to set the status bar color manually -->
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+
+    <!-- Styles -->
+    <style name="Toolbar" parent="@style/Widget.AppCompat.Toolbar">
+        <item name="titleTextAppearance">@style/Toolbar.Title</item>
+        <item name="android:background">@color/google_blue_500</item>
+    </style>
+
+    <style name="Toolbar.Title" parent="@style/TextAppearance.AppCompat.Widget.ActionMode.Title">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Toolbar.DrawerToggle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/white</item>
+    </style>
+
+    <style name="Toolbar.OverflowMenuButton" parent="@style/Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:src">@drawable/overflowmenu</item>
+    </style>
+
+    <style name="Button" parent="@style/Widget.AppCompat.Button">
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <style name="EditText" parent="@style/Widget.AppCompat.EditText">
+        <!-- Avoid the keyboard going fullscreen (hiding the application) when in landscape mode -->
+        <item name="android:imeOptions">flagNoExtractUi|flagNoFullscreen</item>
+    </style>
+
+    <!-- Material Design Colors -->
+    <color name="transparent">#00000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="grey_50">#F5F5F5</color>
+    <color name="grey_200">#EEEEEE</color>
+    <color name="grey_500">#757575</color>
+    <color name="light_blue_500">#03A9F4</color>
+    <color name="google_blue_500">#4285F4</color>
+    <color name="google_blue_700">#3367D6</color>
+    <color name="google_blue_900">#1C3AA9</color>
+</resources>
