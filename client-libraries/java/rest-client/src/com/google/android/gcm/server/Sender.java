@@ -15,7 +15,6 @@
  */
 package com.google.android.gcm.server;
 
-import static com.google.android.gcm.server.Constants.GCM_SEND_ENDPOINT;
 import static com.google.android.gcm.server.Constants.JSON_CANONICAL_IDS;
 import static com.google.android.gcm.server.Constants.JSON_ERROR;
 import static com.google.android.gcm.server.Constants.JSON_FAILURE;
@@ -93,15 +92,63 @@ public class Sender {
 
   private final String key;
 
+  private String endpoint;
+
+  private int connectTimeout;
+  private int readTimeout;
+  
   /**
    * Default constructor.
    *
    * @param key API key obtained through the Google API Console.
    */
   public Sender(String key) {
-    this.key = nonNull(key);
+    this(key, Constants.FCM_SEND_ENDPOINT);
   }
 
+  /**
+   * Full options constructor.
+   *
+   * @param key FCM Server Key obtained through the Firebase Web Console.
+   * @param endpoint Endpoint to use when sending the message.
+   */
+  public Sender(String key, String endpoint) {
+    this.key = nonNull(key);
+    this.endpoint = nonNull(endpoint);
+  }
+
+  public String getEndpoint() {
+    return endpoint;
+  }
+
+  /**
+   * Set the underlying URLConnection's connect timeout (in milliseconds). A timeout value of 0 specifies an infinite timeout.
+   * <p>
+   * Default is the system's default timeout.
+   *
+   * @see java.net.URLConnection#setConnectTimeout(int)
+   */
+  public final void setConnectTimeout(int connectTimeout) {
+      if (connectTimeout < 0) {
+          throw new IllegalArgumentException("timeout can not be negative");
+      }
+      this.connectTimeout = connectTimeout;
+  }
+
+  /**
+   * Set the underlying URLConnection's read timeout (in milliseconds). A timeout value of 0 specifies an infinite timeout.
+   * <p>
+   * Default is the system's default timeout.
+   *
+   * @see java.net.URLConnection#setReadTimeout(int)
+   */
+  public final void setReadTimeout(int readTimeout) {
+      if (readTimeout < 0) {
+          throw new IllegalArgumentException("timeout can not be negative");
+      }
+      this.readTimeout = readTimeout;
+  } 
+  
   /**
    * Sends a message to one device, retrying in case of unavailability.
    *
@@ -417,7 +464,7 @@ public class Sender {
     HttpURLConnection conn;
     int status;
     try {
-      conn = post(GCM_SEND_ENDPOINT, "application/json", requestBody);
+      conn = post(getEndpoint(), "application/json", requestBody);
       status = conn.getResponseCode();
     } catch (IOException e) {
       logger.log(Level.FINE, "IOException posting to GCM", e);
@@ -625,7 +672,10 @@ public class Sender {
    * Gets an {@link HttpURLConnection} given an URL.
    */
   protected HttpURLConnection getConnection(String url) throws IOException {
-    return (HttpURLConnection) new URL(url).openConnection();
+    HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+    conn.setConnectTimeout(connectTimeout);
+    conn.setReadTimeout(readTimeout);
+    return conn;
   }
 
   /**
