@@ -74,11 +74,23 @@ public class Sender {
    * @param key FCM Server Key obtained through the Firebase Web Console.
    * @param endpoint Endpoint to use when sending the message.
    */
-  public Sender(String key, Proxy proxy, String endpoint) {
+  public Sender(String key,  String endpoint) {
     this.key = nonNull(key);
     this.endpoint = nonNull(endpoint);
-    this.proxy = proxy;
   }
+
+    /**
+     * Full options constructor.
+     *
+     * @param key FCM Server Key obtained through the Firebase Web Console.
+     * @param Proxy proxy to use when sending the message.
+     * @param endpoint Endpoint to use when sending the message.
+     */
+    public Sender(String key, Proxy proxy, String endpoint) {
+        this.key = nonNull(key);
+        this.endpoint = nonNull(endpoint);
+        this.proxy = proxy;
+    }
 
   public String getEndpoint() {
     return endpoint;
