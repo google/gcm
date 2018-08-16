@@ -1,0 +1,12 @@
+
+This is a fork of the main https://github.com/google/gcm repo.  There (currently) are no Swrve-specific
+code changes; it's just forked so that we can cleanly track exactly what version of the upstream we
+depend on in our codebase.
+
+To build:
+
+        brew install ant
+        cd gcm/client-libraries/java/rest-client
+        LANG=en_US.UTF-8 ant
+        cp dist/gcm-server-1.0-SNAPSHOT.jar /swrve/swrve/event_processor/jars/gcm-server-1.0.4.swrve.jar
+
