@@ -1,0 +1,22 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <servers>
+    <server>
+      <id>ossrh</id>
+      <username>${env.CI_DEPLOY_USERNAME}</username>
+      <password>${env.CI_DEPLOY_PASSWORD}</password>
+    </server>
+  </servers>
+  <profiles>
+    <profile>
+      <id>gpg</id>
+      <properties>
+        <!-- Optionally specify a different path and name for the gpg executable
+              if it differs from the default of "gpg"
+        <gpg.executable>gpg2</gpg.executable>
+        -->
+        <gpg.keyname>${env.GPG_KEY_ID}</gpg.keyname>
+        <gpg.passphrase>${env.GPG_KEY_PASSPHRASE}</gpg.passphrase>
+      </properties>
+    </profile>
+  </profiles>
+</settings>

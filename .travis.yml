@@ -1,0 +1,11 @@
+language: java
+script:
+- ./build.sh
+before_install:
+- cp settings.xml ${HOME}/.m2/settings.xml
+env:
+  global:
+  - secure: JLi7Nhp/kr5Nv8e3Ldg0jEyitvjSljZwNLlR5SHphvUlV7POvVNqXJ994358wySD9sDEFCupHdO5sCmIkw4f9rQfEOB7uCWVr3qBR7qalQAeSCSjxkPAZMB7oZZrlgBR+aviwiUHlElVB+Qn6QtUWZfwT5qmCzKDTFTPiDaby2s=
+  - secure: MN7EKwGBOUQ9FDA4TXnq4lDprIBXmkXHMsp6jSBhdyXaZt0ix/FcmCqCYNumxrAVxquHRmcgb6hI5EuqZNHfI0hTvhbPGG9MIKweMNzWC3O9Lw44ufvog2wa2Xa/+hJDHNSLsL5HiF4sWy//V7/GcfYnIpdl/GN43dKBsd8FooQ=
+  - secure: Me3raHMfhxGb9nYnxBSBW+vAzsw1Aq+pAajwmbqXonr6L9Qq4hRAd07g7NavPw3sGGeLpTe9s0TzKnEAi01DmTLcAu+CWTaBjSxUlNXZHGdUBl3czOpjcm4iqw86HPAlxb+ZkqBRmHe24w/kJY6oqIOo+9Zj4lw09QAUYflLqvI=
+  - secure: bvJg8pV4qPqbuh+BX3QxyZcCZmdJGD5VQnzMRz/9F1enonfuwJfbPqerScDONgOYl8V0P+Q1NN8HOa/SkjHp7IeVqJmWHFhfM1r3uahck/6fGO+FsfWqjBfjpRx7QDNPq3hKXVLoRBmNBlnQxoMpzOogiszWXOG22BLr511DdZM=

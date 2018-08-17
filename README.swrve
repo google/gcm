@@ -8,5 +8,5 @@ To build:
         brew install ant
         cd gcm/client-libraries/java/rest-client
         LANG=en_US.UTF-8 ant
-        cp dist/gcm-server.jar /swrve/swrve/event_processor/jars/gcm-server-1.0.3.swrve.jar
+        cp dist/gcm-server-1.0-SNAPSHOT.jar /swrve/swrve/event_processor/jars/gcm-server-1.0.4.swrve.jar
 
