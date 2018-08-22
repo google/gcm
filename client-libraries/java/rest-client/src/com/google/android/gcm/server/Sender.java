@@ -117,6 +117,17 @@ public class Sender {
     this.endpoint = nonNull(endpoint);
   }
 
+  /**
+   * Full options constructor.
+   *
+   * @param key FCM Server Key obtained through the Firebase Web Console.
+   * @param isFcmEnabled Set to true to use FCM endpoint.
+   */
+  public Sender(String key, boolean isFcmEnabled) {
+    this.key = nonNull(key);
+    this.endpoint = isFcmEnabled ? Constants.FCM_SEND_ENDPOINT : Constants.GCM_SEND_ENDPOINT;
+  }
+
   public String getEndpoint() {
     return endpoint;
   }
