@@ -21,10 +21,14 @@ package com.google.android.gcm.server;
 public final class Constants {
 
   /**
-   * Endpoint for sending messages.
+   * GCM Endpoint for sending messages.
    */
-  public static final String GCM_SEND_ENDPOINT =
-      "https://gcm-http.googleapis.com/gcm/send";
+  public static final String GCM_SEND_ENDPOINT = "https://gcm-http.googleapis.com/gcm/send";
+
+  /**
+   * FCM Endpoint for sending messages.
+   */
+  public static final String FCM_SEND_ENDPOINT = "https://fcm.googleapis.com/fcm/send";
 
   /**
    * Parameter for to field.
@@ -76,6 +80,11 @@ public final class Constants {
    * Parameter used to set the message priority.
    */
   public static final String PARAM_PRIORITY = "priority";
+
+  /**
+   * Parameter used to set the content available (iOS only)
+   */
+  public static final String PARAM_CONTENT_AVAILABLE = "content_available";
 
   /**
    * Value used to set message priority to normal.

@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -104,6 +105,36 @@ public class SenderTest {
   public void testConstructor_null() {
     new Sender(null);
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testSetConnectTimeout_lessThanZero() {
+    sender.setConnectTimeout(-1);
+  }
+
+  @Test
+  public void testSetConnectTimeout() throws IOException {
+    int connectTimeout = 5000;
+    sender.setConnectTimeout(connectTimeout);
+    
+    // does not establish the actual network connection on creation see java.util.URL#openConnection
+    HttpURLConnection connection = sender.getConnection("http://www.google.com");
+    assertEquals(connectTimeout, connection.getConnectTimeout());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testSetReadTimeout_lessThanZero() {
+    sender.setReadTimeout(-1);
+  }
+  
+  @Test
+  public void testSetReadTimeout() throws IOException {
+    int readTimeout = 5000;
+    sender.setReadTimeout(readTimeout);
+    
+    // does not establish the actual network connection on creation see java.util.URL#openConnection
+    HttpURLConnection connection = sender.getConnection("http://www.google.com");
+    assertEquals(readTimeout, connection.getReadTimeout());
+  }  
 
   @Test
   public void testSend_noRetryOk() throws Exception {
@@ -366,8 +397,7 @@ public class SenderTest {
   @Test
   public void testSendNoRetry_ioException_post() throws Exception {
     when(mockedConn.getOutputStream()).thenThrow(new IOException());
-    doReturn(mockedConn).when(sender)
-        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    doReturn(mockedConn).when(sender).getConnection(anyString());
     Result result = sender.sendNoRetry(message, regId);
     assertNull(result);
   }
@@ -377,8 +407,7 @@ public class SenderTest {
     when(mockedConn.getResponseCode()).thenReturn(42);
     when(mockedConn.getOutputStream()).thenReturn(outputStream);
     when(mockedConn.getErrorStream()).thenReturn(exceptionalStream);
-    doReturn(mockedConn).when(sender)
-        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    doReturn(mockedConn).when(sender).getConnection(anyString());
     try {
       sender.sendNoRetry(message, regId);
     } catch (InvalidRequestException e) {
@@ -391,8 +420,7 @@ public class SenderTest {
     when(mockedConn.getResponseCode()).thenReturn(200);
     when(mockedConn.getOutputStream()).thenReturn(outputStream);
     when(mockedConn.getInputStream()).thenReturn(exceptionalStream);
-    doReturn(mockedConn).when(sender)
-        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    doReturn(mockedConn).when(sender).getConnection(anyString());
     Result result = sender.sendNoRetry(message, regId);
     assertNull(result);
   }
@@ -635,8 +663,7 @@ public class SenderTest {
   @Test
   public void testSendNoRetry_json_ioException_post() throws Exception {
     when(mockedConn.getOutputStream()).thenThrow(new IOException());
-    doReturn(mockedConn).when(sender)
-        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    doReturn(mockedConn).when(sender).getConnection(anyString());
     MulticastResult multicastResult = sender.sendNoRetry(message,
         Arrays.asList("4", "8", "15"));
     assertNull(multicastResult);
@@ -647,8 +674,7 @@ public class SenderTest {
     when(mockedConn.getResponseCode()).thenReturn(42);
     when(mockedConn.getOutputStream()).thenReturn(outputStream);
     when(mockedConn.getErrorStream()).thenReturn(exceptionalStream);
-    doReturn(mockedConn).when(sender)
-        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    doReturn(mockedConn).when(sender).getConnection(anyString());
     try {
       sender.sendNoRetry(message, Arrays.asList("4", "8", "15"));
     } catch (InvalidRequestException e) {
@@ -661,8 +687,7 @@ public class SenderTest {
     when(mockedConn.getResponseCode()).thenReturn(200);
     when(mockedConn.getOutputStream()).thenReturn(outputStream);
     when(mockedConn.getInputStream()).thenReturn(exceptionalStream);
-    doReturn(mockedConn).when(sender)
-        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    doReturn(mockedConn).when(sender).getConnection(anyString());
     MulticastResult multicastResult = sender.sendNoRetry(message,
         Arrays.asList("4", "8", "15"));
     assertNull(multicastResult);
@@ -714,7 +739,9 @@ public class SenderTest {
 
   private void assertRequestJsonBody(String...expectedRegIds) throws Exception {
     ArgumentCaptor<String> capturedBody = ArgumentCaptor.forClass(String.class);
-    verify(sender).post(eq(Constants.GCM_SEND_ENDPOINT), eq("application/json"),
+    verify(sender).post(
+        eq(Constants.FCM_SEND_ENDPOINT),
+        eq("application/json"),
         capturedBody.capture());
     // parse body
     String body = capturedBody.getValue();
@@ -835,12 +862,12 @@ public class SenderTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testPost_noBody() throws Exception {
-    sender.post(Constants.GCM_SEND_ENDPOINT, "whatever", null);
+    sender.post(Constants.FCM_SEND_ENDPOINT, "whatever", null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testPost_noType() throws Exception {
-    sender.post(Constants.GCM_SEND_ENDPOINT, null, "whatever");
+    sender.post(Constants.FCM_SEND_ENDPOINT, null, "whatever");
   }
 
   @Test
@@ -849,7 +876,7 @@ public class SenderTest {
     String responseBody = "resp";
     setResponseExpectations(200, responseBody);
     HttpURLConnection response =
-        sender.post(Constants.GCM_SEND_ENDPOINT, requestBody);
+        sender.post(Constants.FCM_SEND_ENDPOINT, requestBody);
     assertEquals(requestBody, new String(outputStream.toByteArray()));
     verify(mockedConn).setRequestMethod("POST");
     verify(mockedConn).setFixedLengthStreamingMode(requestBody.getBytes("UTF-8").length);
@@ -865,7 +892,7 @@ public class SenderTest {
     String responseBody = "resp";
     setResponseExpectations(200, responseBody);
     HttpURLConnection response =
-        sender.post(Constants.GCM_SEND_ENDPOINT, "stuff", requestBody);
+        sender.post(Constants.FCM_SEND_ENDPOINT, "stuff", requestBody);
     assertEquals(requestBody, new String(outputStream.toByteArray()));
     verify(mockedConn).setRequestMethod("POST");
     verify(mockedConn).setFixedLengthStreamingMode(requestBody.getBytes("UTF-8").length);
@@ -888,8 +915,7 @@ public class SenderTest {
       when(mockedConn.getErrorStream()).thenReturn(inputStream);
     }
     when(mockedConn.getOutputStream()).thenReturn(outputStream);
-    doReturn(mockedConn).when(sender)
-        .getConnection(Constants.GCM_SEND_ENDPOINT);
+    doReturn(mockedConn).when(sender).getConnection(anyString());
   }
 
   private void doNotSleep() {
