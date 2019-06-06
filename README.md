@@ -1,5 +1,7 @@
 # Google Cloud Messaging
 
+**On April 10, 2018, Google deprecated GCM. The GCM server and client APIs were removed on May 29, 2019. Migrate GCM apps to [Firebase Cloud Messaging](http://firebase.google.com/docs/cloud-messaging/) (FCM), which inherits the reliable and scalable GCM infrastructure, plus many new features. See the [migration guide](https://developers.google.com/cloud-messaging/android/android-migrate-fcm) to learn more.**
+
 Google Cloud Messaging (GCM) is a service that lets developers send data from
 servers to users' devices, and receive messages from devices on the same
 connection. The service provides a simple, lightweight mechanism that servers
