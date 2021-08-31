@@ -50,9 +50,9 @@ public final class Notification implements Serializable {
   private final String color;
   private final String clickAction;
   private final String bodyLocKey;
-  private final List<String> bodyLocArgs;
+  private final List<?> bodyLocArgs;
   private final String titleLocKey;
-  private final List<String> titleLocArgs;
+  private final List<?> titleLocArgs;
 
   public static final class Builder {
 
@@ -68,9 +68,9 @@ public final class Notification implements Serializable {
     private String color;
     private String clickAction;
     private String bodyLocKey;
-    private List<String> bodyLocArgs;
+    private List<?> bodyLocArgs;
     private String titleLocKey;
-    private List<String> titleLocArgs;
+    private List<?> titleLocArgs;
 
     public Builder(String icon) {
       this.icon = icon;
@@ -144,7 +144,7 @@ public final class Notification implements Serializable {
     /**
      * Sets the body localization values property.
      */
-    public Builder bodyLocArgs(List<String> value) {
+    public Builder bodyLocArgs(List<?> value) {
       bodyLocArgs = Collections.unmodifiableList(value);
       return this;
     }
@@ -160,7 +160,7 @@ public final class Notification implements Serializable {
     /**
      * Sets the title localization values property.
      */
-    public Builder titleLocArgs(List<String> value) {
+    public Builder titleLocArgs(List<?> value) {
       titleLocArgs = Collections.unmodifiableList(value);
       return this;
     }
@@ -252,7 +252,7 @@ public final class Notification implements Serializable {
   /**
    * Gets the body localization values list, which is immutable.
    */
-  public List<String> getBodyLocArgs() {
+  public List<?> getBodyLocArgs() {
     return bodyLocArgs;
   }
 
@@ -266,7 +266,7 @@ public final class Notification implements Serializable {
   /**
    * Gets the title localization values list, which is immutable.
    */
-  public List<String> getTitleLocArgs() {
+  public List<?> getTitleLocArgs() {
     return titleLocArgs;
   }
 
